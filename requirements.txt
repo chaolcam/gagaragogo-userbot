@@ -1,0 +1,13 @@
+pyrogram
+tgcrypto
+psutil
+yt-dlp
+requests
+Pillow
+cachetools
+deep-translator
+TikTokLive
+python-dotenv
+curl-cffi
+beautifulsoup4
+lxml

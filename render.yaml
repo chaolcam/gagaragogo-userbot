@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: gagaragogo-userbot
+    env: docker
+    plan: free
+    region: frankfurt # Türkiye'ye ve Avrupa'ya en yakın ve hızlı bölge
+    branch: main
+    dockerfilePath: Dockerfile
+    healthCheckPath: /
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: API_ID
+        sync: false
+      - key: API_HASH
+        sync: false
+      - key: STRING_SESSION
+        sync: false
+      - key: BOT_TOKEN
+        sync: false
+      - key: YEDEK_GRUP_ID
+        value: "0"
+      - key: RAPIDAPI_KEYS
+        value: "0"
