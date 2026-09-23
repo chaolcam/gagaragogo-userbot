@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual Environment
+venv/
+
+# Bot Specific Data
+*.json
+!core/locales/*.json
+*.log
+nohup.out
+unknown_errors.txt
+test.py
+*.flv
+*.part
+tiktok_cookies.txt
+*.session
+*.session-journal
+downloads/
+tiktok_downloads/
+*.exe
+
+# Custom Plugins (runtime storage)
+plugins/custom_*.py
+eklentiler/
+
+# Security
+.env
+
+# Disabled plugins
+*.disabled
