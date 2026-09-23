@@ -228,5 +228,21 @@
   "tagger_already_running": "⚠️ <b>Bu grupta zaten devam eden bir etiketleme var!</b>\nDurdurmak için: <code>.tag dur</code>",
   "tagger_no_active": "ℹ️ Şu anda bu grupta aktif bir etiketleme işlemi yok.",
   "tagger_scanning": "⏳ <b>{target} taranıyor, lütfen bekleyin...</b>\n💡 <i>Durdurmak için:</i> <code>.tag dur</code>",
-  "tagger_no_users": "⚠️ <b>Etiketlenecek üye bulunamadı!</b>"
+  "tagger_no_users": "⚠️ <b>Etiketlenecek üye bulunamadı!</b>",
+  "menu_alive_header": "⚡ <b>GAGARAGOGO USERBOT</b> ⬝ <b>Canlı Durum</b>",
+  "menu_alive_owner": "👤 <b>Sahip:</b> <code>{owner}</code>",
+  "menu_alive_status": "⚡ <b>Durum:</b> <code>Çevrimiçi</code> ⬝ 📌 <b>Sürüm:</b> <code>{commit} ({version_info})</code>",
+  "menu_alive_uptime": "⏳ <b>Çalışma Süresi:</b> <code>{uptime}</code>",
+  "menu_alive_select_cat": "İncelemek istediğiniz kategoriyi seçin:",
+  "btn_plugins": "🔌 Eklentiler",
+  "btn_control_panel": "⚙️ Ayarlar & Kontrol Paneli",
+  "settings_panel_header": "<b>GAGARAGOGO</b> ⬝ <b>Sistem Ayarları & Kontrol Paneli</b>\n────────────────────────\nÖzellikleri ve sistemi tek dokunuşla yönetebilirsiniz:\n\n• <b>Admin / Yedek Grup:</b> <code>{backup_chat}</code>\n• <b>Sistem Log Konusu:</b> <code>{log_topic}</code>\n\n💡 <i>Güncelleme veya yeniden başlatma işlemlerini aşağıdaki butonlarla tek tıkla yapabilirsiniz.</i>",
+  "btn_sureli_label": "⏳ Süreli Medya: {status}",
+  "btn_antidelete_label": "🗑 Silinen Mesaj: {status}",
+  "btn_update_label": "🔄 Güncelle",
+  "btn_restart_label": "🔁 Yeniden Başlat",
+  "btn_hardware_status": "💻 Detaylı Sistem Durumu",
+  "btn_switch_language": "🌐 Dil Değiştir (TR / EN)",
+  "status_on": "AÇIK ✅",
+  "status_off": "KAPALI ❌"
 }

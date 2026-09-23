@@ -228,5 +228,21 @@
   "tagger_already_running": "⚠️ <b>A mention process is already running in this group!</b>\nTo cancel: <code>.tag stop</code>",
   "tagger_no_active": "ℹ️ There is currently no active mention process in this group.",
   "tagger_scanning": "⏳ <b>Scanning {target}, please wait...</b>\n💡 <i>To cancel:</i> <code>.tag stop</code>",
-  "tagger_no_users": "⚠️ <b>No members found to mention!</b>"
+  "tagger_no_users": "⚠️ <b>No members found to mention!</b>",
+  "menu_alive_header": "⚡ <b>GAGARAGOGO USERBOT</b> ⬝ <b>Live Status</b>",
+  "menu_alive_owner": "👤 <b>Owner:</b> <code>{owner}</code>",
+  "menu_alive_status": "⚡ <b>Status:</b> <code>Online</code> ⬝ 📌 <b>Version:</b> <code>{commit} ({version_info})</code>",
+  "menu_alive_uptime": "⏳ <b>Uptime:</b> <code>{uptime}</code>",
+  "menu_alive_select_cat": "Select a category to explore commands:",
+  "btn_plugins": "🔌 Plugins",
+  "btn_control_panel": "⚙️ Settings & Control Panel",
+  "settings_panel_header": "<b>GAGARAGOGO</b> ⬝ <b>System Settings & Dashboard</b>\n────────────────────────\nManage features and core operations with a single tap:\n\n• <b>Admin / Backup Group:</b> <code>{backup_chat}</code>\n• <b>System Log Topic:</b> <code>{log_topic}</code>\n\n💡 <i>Perform updates and restarts seamlessly using the buttons below.</i>",
+  "btn_sureli_label": "⏳ View-Once Media: {status}",
+  "btn_antidelete_label": "🗑 Anti-Delete: {status}",
+  "btn_update_label": "🔄 Update",
+  "btn_restart_label": "🔁 Restart",
+  "btn_hardware_status": "💻 Hardware Diagnostics",
+  "btn_switch_language": "🌐 Switch Language (EN / TR)",
+  "status_on": "ON ✅",
+  "status_off": "OFF ❌"
 }

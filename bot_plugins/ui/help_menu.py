@@ -47,27 +47,29 @@ def get_main_menu_text():
     cpu_bar = utils.progress_bar(cpu, 10)
     ram_bar = utils.progress_bar(ram_percent, 10)
 
-    owner_name = "Userbot Sahibi"
+    from core.locales import t
+    owner_name = t("alive_user", user="Userbot").replace("<b>Kullanıcı:</b> ", "").replace("<b>User:</b> ", "")
     if utils.bot_client and hasattr(utils.bot_client, "me") and utils.bot_client.me:
-        owner_name = utils.bot_client.me.first_name or "Userbot Sahibi"
+        owner_name = utils.bot_client.me.first_name or owner_name
 
     metin = (
-        "⚡ <b>GAGARAGOGO USERBOT</b> ⬝ <b>Canlı Durum</b>\n"
+        f"{t('menu_alive_header')}\n"
         "────────────────────────\n"
-        f"👤 <b>Sahip:</b> <code>{owner_name}</code>\n"
-        f"⚡ <b>Durum:</b> <code>Çevrimiçi</code> ⬝ 📌 <b>Sürüm:</b> <code>{commit} ({durum_surum})</code>\n"
-        f"⏳ <b>Çalışma Süresi:</b> <code>{uptime_str}</code>\n"
+        f"{t('menu_alive_owner', owner=owner_name)}\n"
+        f"{t('menu_alive_status', commit=commit, version_info=durum_surum)}\n"
+        f"{t('menu_alive_uptime', uptime=uptime_str)}\n"
         "────────────────────────\n"
         f"🖥 <b>CPU:</b> <code>{cpu_bar} %{cpu}</code>\n"
         f"🧠 <b>RAM:</b> <code>{ram_bar} %{ram_percent} ({ram_str})</code>\n"
         "────────────────────────\n"
-        "İncelemek istediğiniz kategoriyi seçin:"
+        f"{t('menu_alive_select_cat')}"
     )
     return metin
 
 
 def get_main_menu_keyboard():
     """Yardım menüsü için dengeli 2 sütunlu interaktif kategori klavyesi oluşturur."""
+    from core.locales import t
     oncelik_haritasi = {
         "admin": 10,
         "araçlar": 20,
@@ -92,26 +94,45 @@ def get_main_menu_keyboard():
         if "medya" in isim_low: return "🎬"
         return "📦"
 
+    def get_kat_label(k_key, fallback_name):
+        map_keys = {
+            "admin": "cat_admin",
+            "araçlar": "cat_tools",
+            "araclar": "cat_tools",
+            "sistem": "cat_system",
+            "medya": "cat_media",
+            "eğlence": "cat_fun",
+            "eglence": "cat_fun",
+            "grup & iletim": "cat_broadcast"
+        }
+        loc_k = map_keys.get(k_key.lower())
+        return t(loc_k) if loc_k else fallback_name
+
     num_kat = len(kategoriler)
     if num_kat % 2 == 1:
         for i in range(0, num_kat - 1, 2):
             k1, k2 = kategoriler[i], kategoriler[i+1]
+            l1 = get_kat_label(k1, KOMUT_BILGILERI[k1]['isim'])
+            l2 = get_kat_label(k2, KOMUT_BILGILERI[k2]['isim'])
             keyboard.append([
-                InlineKeyboardButton(f"{get_icon(KOMUT_BILGILERI[k1]['isim'])} {KOMUT_BILGILERI[k1]['isim']}", callback_data=f"kat_{k1}_1"),
-                InlineKeyboardButton(f"{get_icon(KOMUT_BILGILERI[k2]['isim'])} {KOMUT_BILGILERI[k2]['isim']}", callback_data=f"kat_{k2}_1")
+                InlineKeyboardButton(f"{get_icon(KOMUT_BILGILERI[k1]['isim'])} {l1}", callback_data=f"kat_{k1}_1"),
+                InlineKeyboardButton(f"{get_icon(KOMUT_BILGILERI[k2]['isim'])} {l2}", callback_data=f"kat_{k2}_1")
             ])
         son_kat = kategoriler[-1]
+        l_son = get_kat_label(son_kat, KOMUT_BILGILERI[son_kat]['isim'])
         keyboard.append([
-            InlineKeyboardButton(f"{get_icon(KOMUT_BILGILERI[son_kat]['isim'])} {KOMUT_BILGILERI[son_kat]['isim']}", callback_data=f"kat_{son_kat}_1"),
-            InlineKeyboardButton("🔌 Eklentiler", callback_data="eklenti_ana_menu")
+            InlineKeyboardButton(f"{get_icon(KOMUT_BILGILERI[son_kat]['isim'])} {l_son}", callback_data=f"kat_{son_kat}_1"),
+            InlineKeyboardButton(t("btn_plugins"), callback_data="eklenti_ana_menu")
         ])
-        keyboard.append([InlineKeyboardButton("⚙️ Ayarlar & Kontrol Paneli", callback_data="ayarlar_menu")])
+        keyboard.append([InlineKeyboardButton(t("btn_control_panel"), callback_data="ayarlar_menu")])
     else:
         for i in range(0, num_kat, 2):
             k1, k2 = kategoriler[i], kategoriler[i+1]
+            l1 = get_kat_label(k1, KOMUT_BILGILERI[k1]['isim'])
+            l2 = get_kat_label(k2, KOMUT_BILGILERI[k2]['isim'])
             keyboard.append([
-                InlineKeyboardButton(f"{get_icon(KOMUT_BILGILERI[k1]['isim'])} {KOMUT_BILGILERI[k1]['isim']}", callback_data=f"kat_{k1}_1"),
-                InlineKeyboardButton(f"{get_icon(KOMUT_BILGILERI[k2]['isim'])} {KOMUT_BILGILERI[k2]['isim']}", callback_data=f"kat_{k2}_1")
+                InlineKeyboardButton(f"{get_icon(KOMUT_BILGILERI[k1]['isim'])} {l1}", callback_data=f"kat_{k1}_1"),
+                InlineKeyboardButton(f"{get_icon(KOMUT_BILGILERI[k2]['isim'])} {l2}", callback_data=f"kat_{k2}_1")
             ])
         keyboard.append([
             InlineKeyboardButton("🔌 Eklentiler", callback_data="eklenti_ana_menu"),
@@ -124,37 +145,35 @@ def get_main_menu_keyboard():
 
 def get_settings_keyboard():
     """Botun özelliklerini açıp kapatmaya ve sistem komutlarını yönetmeye yarayan kontrol paneli."""
+    from core.locales import t
     hayalet = utils.ayar_getir("hayalet_durumu", False)
     antidelete = utils.ayar_getir("antidelete_durumu", False)
 
-    hayalet_btn = "AÇIK ✅" if hayalet else "KAPALI ❌"
-    antidelete_btn = "AÇIK ✅" if antidelete else "KAPALI ❌"
+    hayalet_btn = t("status_on") if hayalet else t("status_off")
+    antidelete_btn = t("status_on") if antidelete else t("status_off")
 
     keyboard = [
-        [InlineKeyboardButton(f"⏳ Süreli Medya: {hayalet_btn}", callback_data="toggle_sureli")],
-        [InlineKeyboardButton(f"🗑 Silinen Mesaj: {antidelete_btn}", callback_data="toggle_antidelete")],
+        [InlineKeyboardButton(t("btn_sureli_label", status=hayalet_btn), callback_data="toggle_sureli")],
+        [InlineKeyboardButton(t("btn_antidelete_label", status=antidelete_btn), callback_data="toggle_antidelete")],
         [
-            InlineKeyboardButton("🔄 Güncelle", callback_data="btn_update"),
-            InlineKeyboardButton("🔁 Yeniden Başlat", callback_data="btn_restart")
+            InlineKeyboardButton(t("btn_update_label"), callback_data="btn_update"),
+            InlineKeyboardButton(t("btn_restart_label"), callback_data="btn_restart")
         ],
-        [InlineKeyboardButton("💻 Detaylı Sistem Durumu", callback_data="btn_durum")],
-        [InlineKeyboardButton("🌐 Dil Değiştir (TR / EN)", callback_data="toggle_lang")],
+        [InlineKeyboardButton(t("btn_hardware_status"), callback_data="btn_durum")],
+        [InlineKeyboardButton(t("btn_switch_language"), callback_data="toggle_lang")],
         [
-            InlineKeyboardButton("🏠 Ana Menü", callback_data="main_menu"),
-            InlineKeyboardButton("❌ Kapat", callback_data="yardim_close")
+            InlineKeyboardButton(t("btn_home"), callback_data="main_menu"),
+            InlineKeyboardButton(t("btn_close"), callback_data="yardim_close")
         ]
     ]
 
     yedek_id = utils.get_yedek_grup_id()
-    log_konu = utils.ayar_getir("log_topic_id", "Otomatik Açılır")
+    log_konu = utils.ayar_getir("log_topic_id", "Auto")
 
-    metin = (
-        "<b>GAGARAGOGO</b> ⬝ <b>Sistem Ayarları & Kontrol Paneli</b>\n"
-        "────────────────────────\n"
-        "Özellikleri ve sistemi tek dokunuşla yönetebilirsiniz:\n\n"
-        f"• <b>Admin / Yedek Grup:</b> <code>{yedek_id}</code>\n"
-        f"• <b>Sistem Log Konusu:</b> <code>{log_konu}</code>\n\n"
-        "💡 <i>Güncelleme veya yeniden başlatma işlemlerini aşağıdaki butonlarla tek tıkla yapabilirsiniz.</i>"
+    metin = t(
+        "settings_panel_header",
+        backup_chat=yedek_id,
+        log_topic=log_konu
     )
     return InlineKeyboardMarkup(keyboard), metin
 
