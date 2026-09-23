@@ -194,7 +194,7 @@ async def _route_yardim_callback(client, callback_query, data):
 
     if data in (
         "main_menu", "ayarlar_menu", "btn_durum", "btn_restart", "btn_update",
-        "toggle_sureli", "toggle_antidelete",
+        "toggle_sureli", "toggle_antidelete", "toggle_lang",
         "toggle_sureli_from_koruma", "toggle_antidelete_from_koruma"
     ):
         return await handle_main_and_settings(client, callback_query, data)
