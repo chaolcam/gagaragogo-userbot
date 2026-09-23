@@ -53,10 +53,11 @@ async def get_cached_contacts_count(userbot) -> str:
 
 async def build_rehber_menu_main(userbot, force_refresh: bool = False, back_target: str = "sub_ilet_hub"):
     """Rehber & Grup Yönetim Merkezi ana panelini oluşturur."""
+    from core.locales import t
     if not userbot:
         kb = InlineKeyboardMarkup([
-            [InlineKeyboardButton("◀️ Geri", callback_data=back_target)],
-            [InlineKeyboardButton("🏠 Ana Menü", callback_data="main_menu")]
+            [InlineKeyboardButton(t("btn_back"), callback_data=back_target)],
+            [InlineKeyboardButton(t("btn_home"), callback_data="main_menu")]
         ])
         return kb, "❌ <b>Userbot oturumu aktif değil.</b>"
 
@@ -80,6 +81,7 @@ async def build_rehber_menu_main(userbot, force_refresh: bool = False, back_targ
         "⚠️ <i>Dikkat: Toplu ve otonom işlemlerde hesabınızın Telegram tarafından spam yemesi veya kısıtlanması durumunda sorumluluk kullanıcıya aittir.</i>"
     )
 
+    from core.locales import t
     keyboard = [
         [InlineKeyboardButton("🔄 Gruptan Gruba Üye Aktar", callback_data="rm_act_g2g")],
         [
@@ -88,12 +90,12 @@ async def build_rehber_menu_main(userbot, force_refresh: bool = False, back_targ
         ],
         [
             InlineKeyboardButton("📋 Grupları Sıralı Gör", callback_data="rm_list_1"),
-            InlineKeyboardButton("🔄 Listeyi Yenile", callback_data="rm_rf")
+            InlineKeyboardButton(t("btn_refresh"), callback_data="rm_rf")
         ],
         [
-            InlineKeyboardButton("◀️ Geri", callback_data=back_target),
-            InlineKeyboardButton("🏠 Ana Menü", callback_data="main_menu"),
-            InlineKeyboardButton("❌ Kapat", callback_data="yardim_close")
+            InlineKeyboardButton(t("btn_back"), callback_data=back_target),
+            InlineKeyboardButton(t("btn_home"), callback_data="main_menu"),
+            InlineKeyboardButton(t("btn_close"), callback_data="yardim_close")
         ]
     ]
     return InlineKeyboardMarkup(keyboard), metin
@@ -115,13 +117,14 @@ def _build_rehber_action_keyboard(action: str, page: int, total_pages: int, page
         if num_row:
             keyboard.append(num_row)
 
+    from core.locales import t
     nav_row = []
     src_param = str(src_idx) if src_idx else "0"
     if page > 1:
-        nav_row.append(InlineKeyboardButton("⬅️ Önceki", callback_data=f"rm_gp_{action}_{page-1}_{src_param}"))
+        nav_row.append(InlineKeyboardButton(t("btn_prev"), callback_data=f"rm_gp_{action}_{page-1}_{src_param}"))
     nav_row.append(InlineKeyboardButton(f"📄 {page}/{total_pages}", callback_data="rm_noop"))
     if page < total_pages:
-        nav_row.append(InlineKeyboardButton("Sonraki ➡️", callback_data=f"rm_gp_{action}_{page+1}_{src_param}"))
+        nav_row.append(InlineKeyboardButton(t("btn_next"), callback_data=f"rm_gp_{action}_{page+1}_{src_param}"))
     if nav_row:
         keyboard.append(nav_row)
 
@@ -130,7 +133,7 @@ def _build_rehber_action_keyboard(action: str, page: int, total_pages: int, page
         bot_row.append(InlineKeyboardButton("◀️ Kaynak Seçimine Dön", callback_data="rm_act_g2g"))
     else:
         bot_row.append(InlineKeyboardButton("◀️ Rehber Menüsü", callback_data="rm_main"))
-    bot_row.append(InlineKeyboardButton("❌ Kapat", callback_data="yardim_close"))
+    bot_row.append(InlineKeyboardButton(t("btn_close"), callback_data="yardim_close"))
     keyboard.append(bot_row)
     return InlineKeyboardMarkup(keyboard)
 

@@ -15,13 +15,14 @@ logger = logging.getLogger(__name__)
 
 def get_ilet_hub_content():
     """Grup & İletim ana geçiş menüsü."""
+    from core.locales import t
     keyboard = [
         [InlineKeyboardButton("📢 Anlık İletim (.ilet)", callback_data="sub_ilet_anlik")],
         [InlineKeyboardButton("⏰ Otomatik Mesaj (.otomesaj)", callback_data="sub_ilet_otomesaj")],
         [InlineKeyboardButton("📇 Rehber & Grup Yönetim Merkezi (.rehbermenu)", callback_data="sub_ilet_rehber")],
         [
-            InlineKeyboardButton("🏠 Ana Menü", callback_data="main_menu"),
-            InlineKeyboardButton("❌ Kapat", callback_data="yardim_close")
+            InlineKeyboardButton(t("btn_home"), callback_data="main_menu"),
+            InlineKeyboardButton(t("btn_close"), callback_data="yardim_close")
         ]
     ]
     metin = (
@@ -37,13 +38,14 @@ def get_ilet_hub_content():
 
 def get_ilet_anlik_content():
     """Anlık iletim (.ilet) detay menüsü."""
+    from core.locales import t
     keyboard = [
         [InlineKeyboardButton("📋 Grup Seçim Menüsü (.iletmenu)", callback_data="open_ilet_groups")],
         [
-            InlineKeyboardButton("◀️ Geri", callback_data="sub_ilet_hub"),
-            InlineKeyboardButton("🏠 Ana Menü", callback_data="main_menu")
+            InlineKeyboardButton(t("btn_back"), callback_data="sub_ilet_hub"),
+            InlineKeyboardButton(t("btn_home"), callback_data="main_menu")
         ],
-        [InlineKeyboardButton("❌ Kapat", callback_data="yardim_close")]
+        [InlineKeyboardButton(t("btn_close"), callback_data="yardim_close")]
     ]
     metin = (
         "📢 <b>ANLIK TOPLU İLETİM</b>\n"
@@ -58,13 +60,14 @@ def get_ilet_anlik_content():
 
 def get_ilet_otomesaj_content():
     """Otomatik mesaj (.otomesaj) detay menüsü."""
+    from core.locales import t
     keyboard = [
         [InlineKeyboardButton("⚙️ Otomesaj Yönetim Paneli", callback_data="otomsg_list")],
         [
-            InlineKeyboardButton("◀️ Geri", callback_data="sub_ilet_hub"),
-            InlineKeyboardButton("🏠 Ana Menü", callback_data="main_menu")
+            InlineKeyboardButton(t("btn_back"), callback_data="sub_ilet_hub"),
+            InlineKeyboardButton(t("btn_home"), callback_data="main_menu")
         ],
-        [InlineKeyboardButton("❌ Kapat", callback_data="yardim_close")]
+        [InlineKeyboardButton(t("btn_close"), callback_data="yardim_close")]
     ]
     metin = (
         "⏰ <b>OTOMATİK ZAMANLANMIŞ MESAJ MOTORU</b>\n"
@@ -117,21 +120,22 @@ async def build_ilet_menu_keyboard(page=1):
     if current_row:
         keyboard.append(current_row)
 
+    from core.locales import t
     nav_row = []
     if page > 1:
-        nav_row.append(InlineKeyboardButton("◀️ Geri", callback_data=f"ilet_p_{page-1}"))
+        nav_row.append(InlineKeyboardButton(t("btn_prev"), callback_data=f"ilet_p_{page-1}"))
     nav_row.append(InlineKeyboardButton(f"📄 {page}/{toplam_sayfa}", callback_data="ilet_noop"))
     if page < toplam_sayfa:
-        nav_row.append(InlineKeyboardButton("İleri ▶️", callback_data=f"ilet_p_{page+1}"))
+        nav_row.append(InlineKeyboardButton(t("btn_next"), callback_data=f"ilet_p_{page+1}"))
 
     if nav_row:
         keyboard.append(nav_row)
 
     keyboard.append([
-        InlineKeyboardButton("◀️ İletim Paneli", callback_data="sub_ilet_anlik"),
-        InlineKeyboardButton("🏠 Ana Menü", callback_data="main_menu")
+        InlineKeyboardButton(f"◀️ {t('cat_broadcast')}", callback_data="sub_ilet_anlik"),
+        InlineKeyboardButton(t("btn_home"), callback_data="main_menu")
     ])
-    keyboard.append([InlineKeyboardButton("❌ Menüyü Kapat", callback_data="ilet_close")])
+    keyboard.append([InlineKeyboardButton(t("btn_close"), callback_data="ilet_close")])
     return InlineKeyboardMarkup(keyboard), metin
 
 
@@ -205,10 +209,11 @@ async def build_otomesaj_list_keyboard():
         baslik = tinfo.get("baslik", f"Görev #{tid}")[:20]
         keyboard.append([InlineKeyboardButton(f"{durum} #{tid} {baslik} ({sure})", callback_data=f"otomsg_det_{tid}")])
 
+    from core.locales import t
     keyboard.append([
-        [InlineKeyboardButton("◀️ Geri", callback_data="sub_ilet_otomesaj"),
-         InlineKeyboardButton("🏠 Ana Menü", callback_data="main_menu")],
-        [InlineKeyboardButton("❌ Kapat", callback_data="otomsg_close")]
+        [InlineKeyboardButton(t("btn_back"), callback_data="sub_ilet_otomesaj"),
+         InlineKeyboardButton(t("btn_home"), callback_data="main_menu")],
+        [InlineKeyboardButton(t("btn_close"), callback_data="otomsg_close")]
     ])
     return InlineKeyboardMarkup(keyboard), metin
 

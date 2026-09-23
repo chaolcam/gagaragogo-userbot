@@ -244,5 +244,21 @@
   "btn_hardware_status": "💻 Detaylı Sistem Durumu",
   "btn_switch_language": "🌐 Dil Değiştir (TR / EN)",
   "status_on": "AÇIK ✅",
-  "status_off": "KAPALI ❌"
+  "status_off": "KAPALI ❌",
+  "btn_prev": "⬅️ Önceki",
+  "btn_next": "Sonraki ➡️",
+  "btn_refresh": "🔄 Yenile",
+  "tools_hub_header": "<b>GAGARAGOGO</b> ⬝ <b>Araçlar Menüsü</b>\n────────────────────────\nİncelemek istediğiniz araç kategorisini seçin:\n\n• <b>📥 İndiriciler:</b> TikTok, YouTube, Instagram ve Telegram.\n• <b>🔄 Dönüştürücü:</b> Yuvarlak video, sesli mesaj, sticker ve seslendirme.\n• <b>🛡 Koruma:</b> DM silinen mesajlar ve süreli medya koruması.\n• <b>🌐 Çeviri & Bypass:</b> Anında çeviri ve reklamlı link aşma araçları.",
+  "btn_sub_downloaders": "📥 İndiriciler",
+  "btn_sub_converters": "🔄 Dönüştürücü",
+  "btn_sub_protection": "🛡 Koruma",
+  "btn_sub_translate_bypass": "🌐 Çeviri & Bypass",
+  "tools_indir_header": "📥 <b>MEDYA İNDİRİCİLER & CANLI TAKİP</b>\n────────────────────────\nDetayını görmek istediğiniz komuta tıklayın:\n\n• <code>.tg</code> — Korumalı Telegram medyalarını indirir.\n• <code>.tt</code> — TikTok filigransız video ve albüm indirir.\n• <code>.yt</code> — YouTube video ve Shorts indirir.\n• <code>.ig</code> — Instagram hikaye, gönderi ve öne çıkanlar interaktif gezgini.\n• <code>.tttakip</code> — TikTok otomatik canlı yayın kayıt motoru.",
+  "tools_donustur_header": "🔄 <b>MEDYA DÖNÜŞTÜRÜCÜLER</b>\n────────────────────────\nDetayını görmek istediğiniz komuta tıklayın:\n\n• <code>.yuvarlak</code> — Videoyu yuvarlak mesaja (Telescope) çevirir.\n• <code>.ses</code> — Medyayı Telegram sesli mesajına dönüştürür.\n• <code>.sticker</code> — Fotoğrafı çıkartmaya (WebP) çevirir.\n• <code>.tts</code> — Yazıyı sesli mesaja dönüştürür.",
+  "tools_koruma_header": "🛡 <b>KORUMA & GİZLİLİK ARAÇLARI</b>\n────────────────────────\nÖzel sohbetlerde mesaj ve medya yakalama modları:\n\n• <b>Süreli Medya Koruması:</b> {sureli}\n• <b>Silinen Mesaj Koruması:</b> {antidelete}\n\n💡 <i>Yukarıdaki butonlara tıklayarak özellikleri anında açıp kapatabilirsiniz.</i>",
+  "tools_cevir_header": "🌐 <b>ÇEVİRİ & LİNK BYPASS ARAÇLARI</b>\n────────────────────────\nDetayını görmek istediğiniz komuta tıklayın:\n\n• <code>.cevir</code> — Yanıtlanan mesajı otomatik çevirir.\n• <code>.dil</code> — Çeviri hedef dilini ayarlar.\n• <code>.bypass</code> — Ouo.io, TinyURL vb. reklamlı linkleri çözer.",
+  "plugin_store_header": "<b>GAGARAGOGO</b> ⬝ <b>Eklenti & Mağaza</b>\n────────────────────────\nResmi mağazadaki (<code>@{channel}</code>) eklentileri tek tıkla kurabilir veya özel eklentilerinizi yönetebilirsiniz.\n\n• <b>Özel Eklenti:</b> <code>.py</code> dosyasına <code>.install</code> ile yanıt verin.\n• <b>Mağazadan:</b> <code>.install [No]</code> veya mağazayı inceleyin.",
+  "btn_plugin_store": "🛒 Eklenti Mağazası",
+  "btn_my_plugins": "📦 Eklentilerim",
+  "btn_remove_plugin": "🗑️ Eklenti Kaldır"
 }

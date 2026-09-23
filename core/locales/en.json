@@ -244,5 +244,21 @@
   "btn_hardware_status": "💻 Hardware Diagnostics",
   "btn_switch_language": "🌐 Switch Language (EN / TR)",
   "status_on": "ON ✅",
-  "status_off": "OFF ❌"
+  "status_off": "OFF ❌",
+  "btn_prev": "⬅️ Previous",
+  "btn_next": "Next ➡️",
+  "btn_refresh": "🔄 Refresh",
+  "tools_hub_header": "<b>GAGARAGOGO</b> ⬝ <b>Tools Menu</b>\n────────────────────────\nSelect a tool category to explore:\n\n• <b>📥 Downloaders:</b> TikTok, YouTube, Instagram, and Telegram.\n• <b>🔄 Converters:</b> Round video notes, voice messages, stickers, and TTS.\n• <b>🛡 Protection:</b> DM anti-delete and self-destructing media backup.\n• <b>🌐 Translation & Bypass:</b> Instant translation and URL bypass tools.",
+  "btn_sub_downloaders": "📥 Downloaders",
+  "btn_sub_converters": "🔄 Converters",
+  "btn_sub_protection": "🛡 Protection",
+  "btn_sub_translate_bypass": "🌐 Translate & Bypass",
+  "tools_indir_header": "📥 <b>MEDIA DOWNLOADERS & LIVE MONITOR</b>\n────────────────────────\nTap a command below to inspect details:\n\n• <code>.tg</code> — Downloads restricted Telegram media.\n• <code>.tt</code> — Downloads watermark-free TikTok videos and albums.\n• <code>.yt</code> — Downloads YouTube videos and Shorts.\n• <code>.ig</code> — Interactive Instagram stories, posts, and highlights explorer.\n• <code>.tttakip</code> — TikTok automated live stream recorder.",
+  "tools_donustur_header": "🔄 <b>MEDIA CONVERTERS</b>\n────────────────────────\nTap a command below to inspect details:\n\n• <code>.yuvarlak</code> — Converts video to round video note (Telescope).\n• <code>.ses</code> — Converts media to Telegram voice message.\n• <code>.sticker</code> — Converts photo to sticker (WebP).\n• <code>.tts</code> — Converts text to speech voice note.",
+  "tools_koruma_header": "🛡 <b>PROTECTION & PRIVACY TOOLS</b>\n────────────────────────\nPrivate DM message and media capture modes:\n\n• <b>Self-Destructing Media:</b> {sureli}\n• <b>Anti-Delete Protection:</b> {antidelete}\n\n💡 <i>Use the buttons above to toggle features instantly.</i>",
+  "tools_cevir_header": "🌐 <b>TRANSLATION & LINK BYPASS TOOLS</b>\n────────────────────────\nTap a command below to inspect details:\n\n• <code>.cevir</code> — Automatically translates replied message.\n• <code>.dil</code> — Configures translation target language.\n• <code>.bypass</code> — Resolves shortened and ad links (ouo.io, tinyurl, etc.).",
+  "plugin_store_header": "<b>GAGARAGOGO</b> ⬝ <b>Plugin Store & Manager</b>\n────────────────────────\nInstall plugins from the official repository (<code>@{channel}</code>) or manage custom modules.\n\n• <b>Custom Plugin:</b> Reply to any <code>.py</code> file with <code>.install</code>.\n• <b>From Store:</b> Use <code>.install [No]</code> or explore the store catalog.",
+  "btn_plugin_store": "🛒 Plugin Store",
+  "btn_my_plugins": "📦 Installed Plugins",
+  "btn_remove_plugin": "🗑️ Uninstall Plugin"
 }

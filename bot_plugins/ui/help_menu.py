@@ -210,45 +210,40 @@ def get_detailed_status_content():
         f"💾 <b>Disk:</b> <code>%{disk.percent}</code> ({disk.used / (1024**3):.2f}GB / {disk.total / (1024**3):.2f}GB)"
     )
 
+    from core.locales import t
     keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("🔄 Durumu Yenile", callback_data="btn_durum")],
+        [InlineKeyboardButton(t("btn_refresh"), callback_data="btn_durum")],
         [
-            InlineKeyboardButton("◀️ Ayarlar", callback_data="ayarlar_menu"),
-            InlineKeyboardButton("🏠 Ana Menü", callback_data="main_menu")
+            InlineKeyboardButton(f"◀️ {t('cat_settings')}", callback_data="ayarlar_menu"),
+            InlineKeyboardButton(t("btn_home"), callback_data="main_menu")
         ],
-        [InlineKeyboardButton("❌ Kapat", callback_data="yardim_close")]
+        [InlineKeyboardButton(t("btn_close"), callback_data="yardim_close")]
     ])
     return keyboard, metin
 
 
 def get_araclar_hub_content():
+    from core.locales import t
     keyboard = [
         [
-            InlineKeyboardButton("📥 İndiriciler", callback_data="sub_arac_indir"),
-            InlineKeyboardButton("🔄 Dönüştürücü", callback_data="sub_arac_donustur")
+            InlineKeyboardButton(t("btn_sub_downloaders"), callback_data="sub_arac_indir"),
+            InlineKeyboardButton(t("btn_sub_converters"), callback_data="sub_arac_donustur")
         ],
         [
-            InlineKeyboardButton("🛡 Koruma", callback_data="sub_arac_koruma"),
-            InlineKeyboardButton("🌐 Çeviri & Bypass", callback_data="sub_arac_cevir")
+            InlineKeyboardButton(t("btn_sub_protection"), callback_data="sub_arac_koruma"),
+            InlineKeyboardButton(t("btn_sub_translate_bypass"), callback_data="sub_arac_cevir")
         ],
         [
-            InlineKeyboardButton("🏠 Ana Menü", callback_data="main_menu"),
-            InlineKeyboardButton("❌ Kapat", callback_data="yardim_close")
+            InlineKeyboardButton(t("btn_home"), callback_data="main_menu"),
+            InlineKeyboardButton(t("btn_close"), callback_data="yardim_close")
         ]
     ]
-    metin = (
-        "<b>GAGARAGOGO</b> ⬝ <b>Araçlar Menüsü</b>\n"
-        "────────────────────────\n"
-        "İncelemek istediğiniz araç kategorisini seçin:\n\n"
-        "• <b>📥 İndiriciler:</b> TikTok, YouTube, Instagram ve Telegram.\n"
-        "• <b>🔄 Dönüştürücü:</b> Yuvarlak video, sesli mesaj, sticker ve seslendirme.\n"
-        "• <b>🛡 Koruma:</b> DM silinen mesajlar ve süreli medya koruması.\n"
-        "• <b>🌐 Çeviri & Bypass:</b> Anında çeviri ve reklamlı link aşma araçları."
-    )
+    metin = t("tools_hub_header")
     return InlineKeyboardMarkup(keyboard), metin
 
 
 def get_araclar_indir_content():
+    from core.locales import t
     keyboard = [
         [
             InlineKeyboardButton(".tg", callback_data="csub:Araçlar:sub_arac_indir:tg"),
@@ -264,25 +259,17 @@ def get_araclar_indir_content():
             InlineKeyboardButton(".tttakiptencikar", callback_data="csub:Araçlar:sub_arac_indir:tttakiptencikar")
         ],
         [
-            InlineKeyboardButton("◀️ Geri", callback_data="kat_araçlar_1"),
-            InlineKeyboardButton("🏠 Ana Menü", callback_data="main_menu")
+            InlineKeyboardButton(t("btn_back"), callback_data="sub_arac_hub"),
+            InlineKeyboardButton(t("btn_home"), callback_data="main_menu")
         ],
-        [InlineKeyboardButton("❌ Kapat", callback_data="yardim_close")]
+        [InlineKeyboardButton(t("btn_close"), callback_data="yardim_close")]
     ]
-    metin = (
-        "📥 <b>MEDYA İNDİRİCİLER & CANLI TAKİP</b>\n"
-        "────────────────────────\n"
-        "Detayını görmek istediğiniz komuta tıklayın:\n\n"
-        "• <code>.tg</code> — Korumalı Telegram medyalarını indirir.\n"
-        "• <code>.tt</code> — TikTok filigransız video ve albüm indirir.\n"
-        "• <code>.yt</code> — YouTube video ve Shorts indirir.\n"
-        "• <code>.ig</code> — Instagram hikaye, gönderi ve öne çıkanlar interaktif gezgini.\n"
-        "• <code>.tttakip</code> — TikTok otomatik canlı yayın kayıt motoru."
-    )
+    metin = t("tools_indir_header")
     return InlineKeyboardMarkup(keyboard), metin
 
 
 def get_araclar_donustur_content():
+    from core.locales import t
     keyboard = [
         [
             InlineKeyboardButton(".yuvarlak", callback_data="csub:Araçlar:sub_arac_donustur:yuvarlak"),
@@ -293,54 +280,41 @@ def get_araclar_donustur_content():
             InlineKeyboardButton(".tts", callback_data="csub:Araçlar:sub_arac_donustur:tts")
         ],
         [
-            InlineKeyboardButton("◀️ Geri", callback_data="kat_araçlar_1"),
-            InlineKeyboardButton("🏠 Ana Menü", callback_data="main_menu")
+            InlineKeyboardButton(t("btn_back"), callback_data="sub_arac_hub"),
+            InlineKeyboardButton(t("btn_home"), callback_data="main_menu")
         ],
-        [InlineKeyboardButton("❌ Kapat", callback_data="yardim_close")]
+        [InlineKeyboardButton(t("btn_close"), callback_data="yardim_close")]
     ]
-    metin = (
-        "🔄 <b>MEDYA DÖNÜŞTÜRÜCÜLER</b>\n"
-        "────────────────────────\n"
-        "Detayını görmek istediğiniz komuta tıklayın:\n\n"
-        "• <code>.yuvarlak</code> — Videoyu yuvarlak mesaja (Telescope) çevirir.\n"
-        "• <code>.ses</code> — Medyayı Telegram sesli mesajına dönüştürür.\n"
-        "• <code>.sticker</code> — Fotoğrafı çıkartmaya (WebP) çevirir.\n"
-        "• <code>.tts</code> — Yazıyı Türkçe sesli mesaja dönüştürür."
-    )
+    metin = t("tools_donustur_header")
     return InlineKeyboardMarkup(keyboard), metin
 
 
 def get_araclar_koruma_content():
+    from core.locales import t
     hayalet = utils.ayar_getir("hayalet_durumu", False)
     antidelete = utils.ayar_getir("antidelete_durumu", False)
-    hayalet_btn = "AÇIK ✅" if hayalet else "KAPALI ❌"
-    antidelete_btn = "AÇIK ✅" if antidelete else "KAPALI ❌"
+    hayalet_btn = t("status_on") if hayalet else t("status_off")
+    antidelete_btn = t("status_on") if antidelete else t("status_off")
 
     keyboard = [
-        [InlineKeyboardButton(f"⏳ Süreli Medya: {hayalet_btn}", callback_data="toggle_sureli_from_koruma")],
-        [InlineKeyboardButton(f"🗑 Silinen Mesaj: {antidelete_btn}", callback_data="toggle_antidelete_from_koruma")],
+        [InlineKeyboardButton(t("btn_sureli_label", status=hayalet_btn), callback_data="toggle_sureli_from_koruma")],
+        [InlineKeyboardButton(t("btn_antidelete_label", status=antidelete_btn), callback_data="toggle_antidelete_from_koruma")],
         [
             InlineKeyboardButton(".antidelete", callback_data="csub:Araçlar:sub_arac_koruma:antidelete"),
             InlineKeyboardButton(".sureli", callback_data="csub:Araçlar:sub_arac_koruma:sureli")
         ],
         [
-            InlineKeyboardButton("◀️ Geri", callback_data="kat_araçlar_1"),
-            InlineKeyboardButton("🏠 Ana Menü", callback_data="main_menu")
+            InlineKeyboardButton(t("btn_back"), callback_data="sub_arac_hub"),
+            InlineKeyboardButton(t("btn_home"), callback_data="main_menu")
         ],
-        [InlineKeyboardButton("❌ Kapat", callback_data="yardim_close")]
+        [InlineKeyboardButton(t("btn_close"), callback_data="yardim_close")]
     ]
-    metin = (
-        "🛡 <b>KORUMA & GİZLİLİK ARAÇLARI</b>\n"
-        "────────────────────────\n"
-        "Özel sohbetlerde mesaj ve medya yakalama modları:\n\n"
-        f"• <b>Süreli Medya Koruması:</b> {hayalet_btn}\n"
-        f"• <b>Silinen Mesaj Koruması:</b> {antidelete_btn}\n\n"
-        "💡 <i>Yukarıdaki butonlara tıklayarak özellikleri anında açıp kapatabilirsiniz.</i>"
-    )
+    metin = t("tools_koruma_header", sureli=hayalet_btn, antidelete=antidelete_btn)
     return InlineKeyboardMarkup(keyboard), metin
 
 
 def get_araclar_cevir_content():
+    from core.locales import t
     keyboard = [
         [
             InlineKeyboardButton(".cevir", callback_data="csub:Araçlar:sub_arac_cevir:cevir"),
@@ -348,19 +322,12 @@ def get_araclar_cevir_content():
         ],
         [InlineKeyboardButton(".bypass", callback_data="csub:Araçlar:sub_arac_cevir:bypass")],
         [
-            InlineKeyboardButton("◀️ Geri", callback_data="kat_araçlar_1"),
-            InlineKeyboardButton("🏠 Ana Menü", callback_data="main_menu")
+            InlineKeyboardButton(t("btn_back"), callback_data="sub_arac_hub"),
+            InlineKeyboardButton(t("btn_home"), callback_data="main_menu")
         ],
-        [InlineKeyboardButton("❌ Kapat", callback_data="yardim_close")]
+        [InlineKeyboardButton(t("btn_close"), callback_data="yardim_close")]
     ]
-    metin = (
-        "🌐 <b>ÇEVİRİ & LİNK BYPASS ARAÇLARI</b>\n"
-        "────────────────────────\n"
-        "Detayını görmek istediğiniz komuta tıklayın:\n\n"
-        "• <code>.cevir</code> — Yanıtlanan mesajı otomatik çevirir.\n"
-        "• <code>.dil</code> — Çeviri hedef dilini ayarlar (örn: .dil tr, .dil en).\n"
-        "• <code>.bypass</code> — Ouo.io, TinyURL vb. reklamlı linkleri çözer."
-    )
+    metin = t("tools_cevir_header")
     return InlineKeyboardMarkup(keyboard), metin
 
 
@@ -403,19 +370,20 @@ def get_category_keyboard(kategori_key, sayfa):
             row.append(InlineKeyboardButton(c2_label, callback_data=f"cmd_{kategori_key}_{sayfa}_{c2}"))
         keyboard.append(row)
 
+    from core.locales import t
     nav_row = []
     if sayfa > 1:
-        nav_row.append(InlineKeyboardButton("⬅️ Önceki", callback_data=f"kat_{kategori_key}_{sayfa-1}"))
+        nav_row.append(InlineKeyboardButton(t("btn_prev"), callback_data=f"kat_{kategori_key}_{sayfa-1}"))
     nav_row.append(InlineKeyboardButton(f"📄 {sayfa}/{toplam_sayfa}", callback_data="yardim_noop"))
     if sayfa < toplam_sayfa:
-        nav_row.append(InlineKeyboardButton("Sonraki ➡️", callback_data=f"kat_{kategori_key}_{sayfa+1}"))
+        nav_row.append(InlineKeyboardButton(t("btn_next"), callback_data=f"kat_{kategori_key}_{sayfa+1}"))
 
     if nav_row:
         keyboard.append(nav_row)
 
     keyboard.append([
-        InlineKeyboardButton("◀️ Ana Menü", callback_data="main_menu"),
-        InlineKeyboardButton("❌ Kapat", callback_data="yardim_close")
+        InlineKeyboardButton(t("btn_home"), callback_data="main_menu"),
+        InlineKeyboardButton(t("btn_close"), callback_data="yardim_close")
     ])
 
     from core.locales import t
@@ -651,6 +619,30 @@ async def handle_kat_and_cmd(client, callback_query, data):
         await callback_query.answer()
         return True
 
+    from core.locales import t
+
+    if data.startswith("csub:"):
+        # Format: csub:<kategori>:<return_sub>:<komut_adi>
+        parts = data.split(":", 3)
+        if len(parts) == 4:
+            _, kat, return_sub, cmd = parts
+            detay = _find_komut_detay(kat, cmd)
+            if detay:
+                metin = _build_komut_metin(cmd, detay)
+            else:
+                clean_cmd = cmd.lower().replace("custom_", "")
+                metin = _build_komut_metin(cmd, {"aciklama": t(f"cmd_{clean_cmd}_info"), "kullanim": f".{clean_cmd}"})
+            kb = InlineKeyboardMarkup([
+                [InlineKeyboardButton(t("btn_back"), callback_data=return_sub)],
+                [
+                    InlineKeyboardButton(t("btn_home"), callback_data="main_menu"),
+                    InlineKeyboardButton(t("btn_close"), callback_data="yardim_close")
+                ]
+            ])
+            await safe_edit(callback_query, client, text=metin, reply_markup=kb)
+        await callback_query.answer()
+        return True
+
     if data.startswith("cmd_"):
         parts = data.split("_")
         kategori_key = parts[1]
@@ -660,14 +652,18 @@ async def handle_kat_and_cmd(client, callback_query, data):
         detay = _find_komut_detay(kategori_key, komut_adi)
         if detay:
             metin = _build_komut_metin(komut_adi, detay)
-            kb = InlineKeyboardMarkup([
-                [InlineKeyboardButton("◀️ Geri", callback_data=f"kat_{kategori_key}_{sayfa}")],
-                [
-                    InlineKeyboardButton("🏠 Ana Menü", callback_data="main_menu"),
-                    InlineKeyboardButton("❌ Kapat", callback_data="yardim_close")
-                ]
-            ])
-            await safe_edit(callback_query, client, text=metin, reply_markup=kb)
+        else:
+            clean_cmd = komut_adi.lower().replace("custom_", "")
+            metin = _build_komut_metin(komut_adi, {"aciklama": t(f"cmd_{clean_cmd}_info"), "kullanim": f".{clean_cmd}"})
+
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton(t("btn_back"), callback_data=f"kat_{kategori_key}_{sayfa}")],
+            [
+                InlineKeyboardButton(t("btn_home"), callback_data="main_menu"),
+                InlineKeyboardButton(t("btn_close"), callback_data="yardim_close")
+            ]
+        ])
+        await safe_edit(callback_query, client, text=metin, reply_markup=kb)
         await callback_query.answer()
         return True
 

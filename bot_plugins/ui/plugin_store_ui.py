@@ -13,42 +13,38 @@ from bot_plugins.ui.common import safe_edit
 
 async def build_eklenti_ana_menu_keyboard():
     from plugins.plugin_manager import PLUGIN_STORE_CHANNEL
+    from core.locales import t
     keyboard = [
-        [InlineKeyboardButton("🛒 Eklenti Mağazası", callback_data="eklenti_magaza_1")],
+        [InlineKeyboardButton(t("btn_plugin_store"), callback_data="eklenti_magaza_1")],
         [
-            InlineKeyboardButton("📦 Eklentilerim", callback_data="eklenti_yuklu_1"),
-            InlineKeyboardButton("🗑️ Eklenti Kaldır", callback_data="eklenti_kaldir_1")
+            InlineKeyboardButton(t("btn_my_plugins"), callback_data="eklenti_yuklu_1"),
+            InlineKeyboardButton(t("btn_remove_plugin"), callback_data="eklenti_kaldir_1")
         ],
         [
-            InlineKeyboardButton("🏠 Ana Menü", callback_data="main_menu"),
-            InlineKeyboardButton("❌ Kapat", callback_data="yardim_close")
+            InlineKeyboardButton(t("btn_home"), callback_data="main_menu"),
+            InlineKeyboardButton(t("btn_close"), callback_data="yardim_close")
         ]
     ]
-    metin = (
-        "<b>GAGARAGOGO</b> ⬝ <b>Eklenti & Mağaza</b>\n"
-        "────────────────────────\n"
-        f"Resmi mağazadaki (<code>@{PLUGIN_STORE_CHANNEL}</code>) eklentileri tek tıkla kurabilir veya özel eklentilerinizi yönetebilirsiniz.\n\n"
-        "• <b>Özel Eklenti:</b> <code>.py</code> dosyasına <code>.install</code> ile yanıt verin.\n"
-        "• <b>Mağazadan:</b> <code>.install [No]</code> veya mağazayı inceleyin."
-    )
+    metin = t("plugin_store_header", channel=PLUGIN_STORE_CHANNEL)
     return InlineKeyboardMarkup(keyboard), metin
 
 
 async def build_eklenti_magaza_keyboard(page=1):
     from plugins.plugin_manager import fetch_store_plugins, PLUGIN_STORE_CHANNEL
     userbot = utils.bot_client
+    from core.locales import t
     if not userbot:
-        return InlineKeyboardMarkup([[InlineKeyboardButton("◀️ Geri", callback_data="eklenti_ana_menu")]]), "❌ Userbot aktif değil."
+        return InlineKeyboardMarkup([[InlineKeyboardButton(t("btn_back"), callback_data="eklenti_ana_menu")]]), "❌ Userbot aktif değil."
 
     plugins = await fetch_store_plugins(userbot, limit=50)
     if not plugins:
         keyboard = [
-            [InlineKeyboardButton("🔄 Yenile", callback_data="eklenti_magaza_1")],
+            [InlineKeyboardButton(t("btn_refresh"), callback_data="eklenti_magaza_1")],
             [
-                InlineKeyboardButton("◀️ Eklentiler", callback_data="eklenti_ana_menu"),
-                InlineKeyboardButton("🏠 Ana Menü", callback_data="main_menu")
+                InlineKeyboardButton(f"◀️ {t('btn_plugin_store').replace('🛒 ', '')}", callback_data="eklenti_ana_menu"),
+                InlineKeyboardButton(t("btn_home"), callback_data="main_menu")
             ],
-            [InlineKeyboardButton("❌ Kapat", callback_data="yardim_close")]
+            [InlineKeyboardButton(t("btn_close"), callback_data="yardim_close")]
         ]
         metin = (
             f"<b>EKLENTİ MAĞAZASI</b> ⬝ <code>@{PLUGIN_STORE_CHANNEL}</code>\n"
@@ -71,20 +67,21 @@ async def build_eklenti_magaza_keyboard(page=1):
         msg_id = item["id"]
         keyboard.append([InlineKeyboardButton(f"📦 {baslik[:28]}", callback_data=f"eklenti_detay_{msg_id}")])
 
+    from core.locales import t
     nav_row = []
     if page > 1:
-        nav_row.append(InlineKeyboardButton("◀️ Geri", callback_data=f"eklenti_magaza_{page-1}"))
+        nav_row.append(InlineKeyboardButton(t("btn_prev"), callback_data=f"eklenti_magaza_{page-1}"))
     nav_row.append(InlineKeyboardButton(f"📄 {page}/{toplam_sayfa}", callback_data="yardim_noop"))
     if page < toplam_sayfa:
-        nav_row.append(InlineKeyboardButton("İleri ▶️", callback_data=f"eklenti_magaza_{page+1}"))
+        nav_row.append(InlineKeyboardButton(t("btn_next"), callback_data=f"eklenti_magaza_{page+1}"))
     if nav_row:
         keyboard.append(nav_row)
 
     keyboard.append([
-        InlineKeyboardButton("◀️ Eklenti Menüsü", callback_data="eklenti_ana_menu"),
-        InlineKeyboardButton("🏠 Ana Menü", callback_data="main_menu")
+        InlineKeyboardButton(f"◀️ {t('btn_plugin_store').replace('🛒 ', '')}", callback_data="eklenti_ana_menu"),
+        InlineKeyboardButton(t("btn_home"), callback_data="main_menu")
     ])
-    keyboard.append([InlineKeyboardButton("❌ Kapat", callback_data="yardim_close")])
+    keyboard.append([InlineKeyboardButton(t("btn_close"), callback_data="yardim_close")])
 
     metin = (
         f"🛒 <b>EKLENTİ MAĞAZASI</b> ⬝ <code>@{PLUGIN_STORE_CHANNEL}</code>\n"

@@ -205,7 +205,7 @@ async def _route_yardim_callback(client, callback_query, data):
     if data.startswith("sub_"):
         return await handle_sub_callbacks(client, callback_query, data)
 
-    if data.startswith(("kat_", "cmd_")):
+    if data.startswith(("kat_", "cmd_", "csub:")):
         return await handle_kat_and_cmd(client, callback_query, data)
 
     if data.startswith(("rm_", "rehber_")):
