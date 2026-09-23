@@ -52,11 +52,17 @@ class SaglikKontrolu(BaseHTTPRequestHandler):
         # HTTP erişim loglarının konsolu gereksiz kirletmesini engeller
         return 
 
+class GuvenliHTTPServer(HTTPServer):
+    allow_reuse_address = True
+
 def web_sunucusunu_baslat():
     """Arka plan iş parçacığında (Thread) HTTP portunu dinleyerek sunucunun kapanmasını önler."""
     port = int(os.environ.get("PORT", 8080))
-    server = HTTPServer(("0.0.0.0", port), SaglikKontrolu)  # nosec B104
-    server.serve_forever()
+    try:
+        server = GuvenliHTTPServer(("0.0.0.0", port), SaglikKontrolu)  # nosec B104
+        server.serve_forever()
+    except Exception as e:
+        logging.warning("HTTP Sağlık sunucusu başlatılamadı (Port çakışması veya yetki): %s", e)
 
 Thread(target=web_sunucusunu_baslat, daemon=True).start()
 

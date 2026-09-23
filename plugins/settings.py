@@ -51,7 +51,7 @@ async def set_yedek_grup(client, message):
         await message.edit_text(f"❌ Grup yapılandırma hatası:\n`{e}`")
 
 
-@ggr.cmd(["botlang", "setlang", "botdil"], info="Bot arayüz dilini ayarlar / Changes bot UI language.", usage=".botlang [tr/en]", category="Sistem")
+@ggr.cmd(["dil", "lang", "botlang", "setlang", "botdil"], info="Bot dilini ayarlar / Changes bot language.", usage=".dil [tr/en] veya .lang [tr/en]", category="Sistem")
 async def lang_komutu(client, message):
     """Bot dilini anında değiştirir ve veritabanına kaydeder."""
     from core.locales import get_current_lang, set_current_lang, t

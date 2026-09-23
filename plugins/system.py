@@ -259,12 +259,15 @@ async def _apply_update_now(durum):
     yeni_commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True).stdout.strip()
     
     await durum.edit_text(f"📥 <b>Yeni kodlar eşitlendi!</b> (<code>{eski_commit}</code> ➔ <code>{yeni_commit}</code>)\nKütüphaneler kontrol ediliyor...")
-    pip_res = subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements.txt", "--break-system-packages"], capture_output=True, text=True)
+    pip_cmd = [sys.executable, "-m", "pip", "install", "-r", "requirements.txt"]
+    pip_res = subprocess.run(pip_cmd + ["--break-system-packages"], capture_output=True, text=True)
+    if pip_res.returncode != 0:
+        pip_res = subprocess.run(pip_cmd, capture_output=True, text=True)
     
     if pip_res.returncode == 0:
         await durum.edit_text(f"✅ <b>Güncelleme Tamamlandı!</b> (<code>{yeni_commit}</code>)\nBot yeniden başlatılıyor...")
     else:
-        await durum.edit_text(f"⚠️ <b>Kütüphane uyarısı:</b> <code>{pip_res.stderr}</code>\nYine de yeniden başlatılıyor...")
+        logging.warning("Pip uyarısı: %s", pip_res.stderr)
         
     utils.restart_bildirimi_kaydet(
         action="update",

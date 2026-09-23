@@ -18,7 +18,7 @@ from deep_translator import GoogleTranslator
 from utils import ggr
 
 # ================= ÇEVİRİ MODÜLÜ =================
-@ggr.cmd("dil", info="Çeviri için varsayılan hedef dilinizi ayarlar.", usage=".dil [dil kodu] (Örn: .dil tr, .dil en)", category="Araçlar")
+@ggr.cmd(["ceviridil", "cevdil"], info="Çeviri (.cevir) için varsayılan hedef dilinizi ayarlar.", usage=".ceviridil [dil kodu] (Örn: .ceviridil en)", category="Araçlar")
 async def dil_ayarla(client, message):
     logging.info("Kullanıcı %s .dil komutunu çalıştırdı.", message.from_user.id if message.from_user else 'Bilinmeyen')
     if len(message.command) > 1:
