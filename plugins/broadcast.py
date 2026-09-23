@@ -175,13 +175,7 @@ def _detect_ilet_content(message, is_caption: bool, ek_metin: str):
         return message.reply_to_message, ek_metin, None, None
     if ek_metin:
         return None, None, ek_metin, None
-    return None, None, None, (
-        "❌ <b>Lütfen iletilecek bir içerik belirtin!</b>\n\n"
-        "💡 <b>Kullanım:</b>\n"
-        "• Mesaja yanıt vererek: <code>.ilet</code>\n"
-        "• Metin yazarak: <code>.ilet [Metin]</code>\n"
-        "• Fotoğraf/Video altyazısına: <code>.ilet</code> veya <code>.ilet [Açıklama]</code>"
-    )
+    return None, None, None, ggr.t("err_broadcast_content")
 
 
 async def _send_single_group_with_retry(client, chat_id, chat_title, kaynak_mesaj, gonderilecek_caption, gonderilecek_metin) -> bool:

@@ -28,16 +28,16 @@ os.makedirs(ggr_medya_temp_dir, exist_ok=True)
 async def yuvarlak_video_komutu(client, message):
     kaynak = message.reply_to_message
     if not kaynak or (not kaynak.video and not kaynak.animation and not kaynak.video_note):
-        await message.edit_text("❌ <b>Lütfen bir videoya veya GIF'e yanıt vererek <code>.yuvarlak</code> yazın!</b>")
+        await message.edit_text(ggr.t("err_video_or_gif_required"))
         return
 
-    durum = await message.edit_text("⏳ <i>Video indiriliyor...</i>")
+    durum = await message.edit_text(ggr.t("media_downloading_video"))
     input_path = os.path.join(ggr_medya_temp_dir, f"in_{message.id}.mp4")
     output_path = os.path.join(ggr_medya_temp_dir, f"note_{message.id}.mp4")
 
     try:
         await client.download_media(kaynak, file_name=input_path)
-        await durum.edit_text("🔄 <i>Yuvarlak video formatına (1:1) dönüştürülüyor...</i>")
+        await durum.edit_text(ggr.t("media_converting_note"))
 
         # FFmpeg ile kare kırpma ve 384x384 boyutlandırma
         # En fazla 60 saniye kesit alınır
@@ -55,10 +55,10 @@ async def yuvarlak_video_komutu(client, message):
         await proc.communicate()
 
         if not os.path.exists(output_path) or os.path.getsize(output_path) == 0:
-            await durum.edit_text("❌ Video dönüştürme başarısız oldu!")
+            await durum.edit_text(ggr.t("media_conversion_failed"))
             return
 
-        await durum.edit_text("📤 <i>Yuvarlak video gönderiliyor...</i>")
+        await durum.edit_text(ggr.t("media_sending_note"))
         await client.send_video_note(message.chat.id, output_path, reply_to_message_id=kaynak.id)
         await durum.delete()
 
@@ -82,16 +82,16 @@ async def yuvarlak_video_komutu(client, message):
 async def sesli_mesaj_komutu(client, message):
     kaynak = message.reply_to_message
     if not kaynak or (not kaynak.audio and not kaynak.voice and not kaynak.video and not kaynak.video_note):
-        await message.edit_text("❌ <b>Lütfen bir ses veya video dosyasına yanıt vererek <code>.ses</code> yazın!</b>")
+        await message.edit_text(ggr.t("err_audio_or_video_required"))
         return
 
-    durum = await message.edit_text("⏳ <i>Medya indiriliyor...</i>")
+    durum = await message.edit_text(ggr.t("media_downloading_video"))
     input_path = os.path.join(ggr_medya_temp_dir, f"in_audio_{message.id}")
     output_path = os.path.join(ggr_medya_temp_dir, f"voice_{message.id}.ogg")
 
     try:
         await client.download_media(kaynak, file_name=input_path)
-        await durum.edit_text("🔄 <i>Sesli mesaja (Opus OGG) dönüştürülüyor...</i>")
+        await durum.edit_text(ggr.t("media_converting_voice"))
 
         # FFmpeg ile Opus OGG sesli mesaja dönüştür
         cmd = [
@@ -105,10 +105,10 @@ async def sesli_mesaj_komutu(client, message):
         await proc.communicate()
 
         if not os.path.exists(output_path) or os.path.getsize(output_path) == 0:
-            await durum.edit_text("❌ Ses dönüştürme başarısız oldu!")
+            await durum.edit_text(ggr.t("media_voice_conversion_failed"))
             return
 
-        await durum.edit_text("📤 <i>Sesli mesaj gönderiliyor...</i>")
+        await durum.edit_text(ggr.t("media_sending_voice"))
         await client.send_voice(message.chat.id, output_path, reply_to_message_id=kaynak.id)
         await durum.delete()
 
@@ -132,10 +132,10 @@ async def sesli_mesaj_komutu(client, message):
 async def sticker_yap_komutu(client, message):
     kaynak = message.reply_to_message
     if not kaynak or (not kaynak.photo and not kaynak.document and not kaynak.sticker):
-        await message.edit_text("❌ <b>Lütfen bir fotoğrafa veya görsele yanıt vererek <code>.sticker</code> yazın!</b>")
+        await message.edit_text(ggr.t("err_image_required"))
         return
 
-    durum = await message.edit_text("⏳ <i>Görsel çıkartmaya dönüştürülüyor...</i>")
+    durum = await message.edit_text(ggr.t("media_converting_sticker"))
 
     try:
         # Görseli RAM üzerinde indir
@@ -172,16 +172,13 @@ async def tts_komutu(client, message):
         metin = (message.reply_to_message.text or message.reply_to_message.caption or "").strip()
         
     if not metin:
-        await message.edit_text(
-            "❌ <b>Lütfen seslendirilecek bir metin girin veya bir mesaja yanıt verin!</b>\n\n"
-            "💡 <b>Örnek:</b> <code>.tts Merhaba, nasılsınız?</code>"
-        )
+        await message.edit_text(ggr.t("err_text_or_reply_required", example=".tts Merhaba"))
         return
 
     if len(metin) > 300:
         metin = metin[:297] + "..."
 
-    durum = await message.edit_text("🎙 <i>Seslendiriliyor...</i>")
+    durum = await message.edit_text(ggr.t("media_generating_tts"))
 
     try:
         url = f"https://translate.google.com/translate_tts?ie=UTF-8&q={urllib.parse.quote(metin)}&tl=tr&total=1&idx=0&textlen={len(metin)}&client=tw-ob"

@@ -59,7 +59,8 @@ async def alive_menusu(client, message):
                 logging.error("Inline bot hatası: %s", e)
                 
         else:
-            await message.edit_text("❌ Yardımcı bot aktif değil. Lütfen `BOT_TOKEN` ayarını kontrol edin.")
+            from core.locales import t
+            await message.edit_text(t("err_bot_token_missing"))
     except Exception as e:
         await message.edit_text(f"❌ Alive menüsü hatası: `{e}`")
         import utils
@@ -170,7 +171,8 @@ async def ayarlar_menusu(client, message):
         except Exception as e:
             logging.error("Inline ayarlar hatası: %s", e)
             
-    await message.edit_text("❌ Yardımcı bot aktif değil. Lütfen ayarlardan `BOT_TOKEN` ekleyin.")
+    from core.locales import t
+    await message.edit_text(t("err_bot_token_missing"))
 
 
 # ================= SUNUCU DURUMU, GÜNCELLEME VE PING =================
@@ -328,14 +330,14 @@ async def ping_komutu(client, message):
     durum = await message.edit_text("🏓 Pong!")
     bitis = time.time()
     gecikme = (bitis - baslangic) * 1000
-    await durum.edit_text(f"🏓 <b>Pong!</b> <code>{gecikme:.2f}ms</code>")
+    await durum.edit_text(ggr.t("sys_ping_pong", ms=f"{gecikme:.2f}"))
 
 
 @ggr.cmd("restart", info="Python sürecini sunucuya veya terminale dokunmadan yeniden başlatır.", usage=".restart", category="Sistem")
 async def botu_yeniden_baslat(client, message):
     """Python sürecini sunucuya veya terminale dokunmadan yeniden başlatır."""
     logging.info("Kullanıcı %s .restart komutunu çalıştırdı.", message.from_user.id if message.from_user else 'Bilinmeyen')
-    await message.edit_text("🔄 <b>Bot yeniden başlatılıyor...</b> <i>(Lütfen birkaç saniye bekleyin)</i>")
+    await message.edit_text(ggr.t("sys_restarting"))
     import utils
     utils.restart_bildirimi_kaydet(
         action="restart",

@@ -650,7 +650,7 @@ async def ttcookie_kaydet(client, message):
 @ggr.cmd("tttakip", info="Bir TikTok kullanıcısını otomatik canlı yayın kayıt listesine ekler.", usage=".tttakip [kullanıcı_adı] [yayin/post]", category="Araçlar")
 async def tttakip_ekle(client, message):
     if len(message.command) < 2:
-        await message.edit_text("Hatalı kullanım. Örnek: <code>.tttakip kullanici_adi [yayin/post]</code>")
+        await message.edit_text(ggr.t("err_tttakip_usage"))
         return
         
     username = message.command[1].strip().lower().replace("@", "")

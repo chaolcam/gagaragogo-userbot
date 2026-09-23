@@ -463,8 +463,19 @@ async def handle_main_and_settings(client, callback_query, data):
             )
         except Exception as _res_err:
             logger.debug("Restart mesajı düzenlenemedi: %s", _res_err)
-        subprocess.Popen([sys.executable] + sys.argv)
-        raise SystemExit(0)
+        
+        utils.restart_bildirimi_kaydet(
+            action="restart",
+            inline_message_id=callback_query.inline_message_id,
+            chat_id=callback_query.message.chat.id if callback_query.message else None,
+            message_id=callback_query.message.id if callback_query.message else None
+        )
+        try:
+            os.execl(sys.executable, sys.executable, *sys.argv)
+        except Exception:
+            subprocess.Popen([sys.executable] + sys.argv)
+            raise SystemExit(0)
+        return True
 
     if data == "btn_update":
         await handle_btn_update(client, callback_query)
@@ -548,9 +559,27 @@ async def handle_btn_update(client, callback_query):
             "Kodlar eşitleniyor ve bot yeniden başlatılıyor..."
         )
         subprocess.run(["git", "reset", "--hard", "origin/main"], capture_output=True)
-        subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements.txt", "--break-system-packages"], capture_output=True)
-        subprocess.Popen([sys.executable] + sys.argv)
-        raise SystemExit(0)
+        try:
+            subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements.txt", "--break-system-packages"], capture_output=True, timeout=30)
+        except Exception as _pip_err:
+            logger.debug("Pip install uyarısı: %s", _pip_err)
+
+        yeni_commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True).stdout.strip() or remote_commit
+
+        utils.restart_bildirimi_kaydet(
+            action="update",
+            inline_message_id=callback_query.inline_message_id,
+            chat_id=callback_query.message.chat.id if callback_query.message else None,
+            message_id=callback_query.message.id if callback_query.message else None,
+            eski_commit=eski_commit,
+            yeni_commit=yeni_commit
+        )
+
+        try:
+            os.execl(sys.executable, sys.executable, *sys.argv)
+        except Exception:
+            subprocess.Popen([sys.executable] + sys.argv)
+            raise SystemExit(0)
     except Exception as e:
         await callback_query.edit_message_text(f"❌ Güncelleme hatası: {e}")
 
@@ -643,14 +672,19 @@ def _build_komut_metin(komut_adi, detay):
     kullanim = detay.get("kullanim", f".{komut_adi}")
     clean_cmd = komut_adi.lower().replace("custom_", "")
     
-    # Try localized command description from active locale JSON, fallback to registered info
+    # Try localized command description and usage from active locale JSON
     loc_key = f"cmd_{clean_cmd}_info"
     desc = t(loc_key)
     if desc == loc_key:
         desc = raw_desc
 
+    usage_key = f"cmd_{clean_cmd}_usage"
+    usage_val = t(usage_key)
+    if usage_val == usage_key:
+        usage_val = kullanim
+
     title = t("cmd_info_title", command=clean_cmd)
     desc_label = t("cmd_desc", desc=desc)
-    usage_label = t("cmd_usage", usage=kullanim)
+    usage_label = t("cmd_usage", usage=usage_val)
 
     return f"{title}\n────────────────────────\n{desc_label}\n\n{usage_label}"

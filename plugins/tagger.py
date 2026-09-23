@@ -170,13 +170,13 @@ async def tag_komutu(client, message):
     if subcmd in ["dur", "stop", "iptal", "cancel"]:
         if ggr_aktif_etiketler.get(chat_id):
             ggr_aktif_etiketler[chat_id] = False
-            await message.edit_text("🛑 <b>Etiketleme durduruldu!</b>")
+            await message.edit_text(ggr.t("tagger_stopped"))
         else:
-            await message.edit_text("ℹ️ Şu anda bu grupta aktif bir etiketleme işlemi yok.")
+            await message.edit_text(ggr.t("tagger_no_active"))
         return
 
     if ggr_aktif_etiketler.get(chat_id):
-        await message.edit_text("⚠️ <b>Bu grupta zaten devam eden bir etiketleme var!</b>\nDurdurmak için: <code>.tag dur</code>")
+        await message.edit_text(ggr.t("tagger_already_running"))
         return
 
     sadece_admin, ek_mesaj = _parse_tag_arguments(cmd, args, subcmd)

@@ -55,7 +55,7 @@ async def rapidapi_yonet(client, message):
     if args and args[0].lower() in ["sil", "reset", "clear", "kaldir"]:
         ggr.set("rapidapi_keys", "")
         await ggr.sync_cloud(client)
-        await message.edit_text("🗑️ <b>RapidAPI Anahtarları Başarıyla Silindi!</b>\nBulut veritabanından temizlendi.")
+        await message.edit_text(ggr.t("rapidapi_cleared"))
         return
         
     # 2. Anahtar Ekleme / Güncelleme
@@ -63,19 +63,14 @@ async def rapidapi_yonet(client, message):
         girilen = message.text.split(maxsplit=1)[1].strip()
         anahtarlar = [k.strip() for k in girilen.replace("\n", ",").split(",") if k.strip() and k.strip() != "0"]
         if not anahtarlar:
-            await message.edit_text("❌ Geçersiz anahtar formatı! Lütfen geçerli bir RapidAPI anahtarı girin.")
+            await message.edit_text(ggr.t("rapidapi_invalid"))
             return
             
         kaydedilecek = ", ".join(anahtarlar)
         ggr.set("rapidapi_keys", kaydedilecek)
         await ggr.sync_cloud(client)
         
-        await message.edit_text(
-            f"✅ <b>RapidAPI Anahtarı Başarıyla Kaydedildi!</b>\n\n"
-            f"🔑 <b>Aktif Anahtar Sayısı:</b> <code>{len(anahtarlar)}</code>\n"
-            f"🔒 <b>Bulut Veritabanına Yedeklendi:</b> Sunucunuz yeniden başlasa veya Render yeniden build alsa bile anahtarınız asla kaybolmaz!\n"
-            f"🚀 Artık <code>.ig</code> komutunu kullanabilirsiniz."
-        )
+        await message.edit_text(ggr.t("rapidapi_saved", count=len(anahtarlar)))
         return
 
     # 3. Argümansız Kullanım: Durum Göster veya Rehber
@@ -197,7 +192,7 @@ def extract_media_url(item):
 @ggr.cmd(["ig", "igstory", "igpost"], info="Instagram profili için butonlu hikaye, gönderi ve öne çıkanlar menüsü açar.", usage=".ig [kullanıcı_adı]", category="Araçlar")
 async def ig_interactive(client, message):
     if len(message.command) < 2:
-        await message.edit_text("❌ Kullanım: `.ig kullanıcı_adı`")
+        await message.edit_text(ggr.t("err_missing_args"))
         return
         
     username = message.command[1].strip("@")
@@ -209,7 +204,7 @@ async def ig_interactive(client, message):
     # Yardımcı botu sorgula
     import utils
     if not hasattr(utils, "YARDIMCI_BOT_USERNAME") or not utils.YARDIMCI_BOT_USERNAME:
-        await message.edit_text("❌ Yardımcı bot aktif değil. Inline menü çalışmaz.")
+        await message.edit_text(ggr.t("err_bot_not_active_inline"))
         return
         
     try:
@@ -223,6 +218,6 @@ async def ig_interactive(client, message):
             )
             await message.delete()
         else:
-            await message.edit_text("❌ Inline sonuç alınamadı.")
+            await message.edit_text(ggr.t("err_general", error="No inline results"))
     except Exception as e:
-        await message.edit_text(f"❌ Hata: {str(e)}")
+        await message.edit_text(ggr.t("err_general", error=str(e)))

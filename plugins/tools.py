@@ -33,7 +33,7 @@ async def dil_ayarla(client, message):
 async def ceviri_yap(client, message):
     logging.info("Kullanıcı %s .cevir komutunu çalıştırdı.", message.from_user.id if message.from_user else 'Bilinmeyen')
     if not message.reply_to_message or not message.reply_to_message.text:
-        await message.edit_text("❌ Lütfen çevirmek istediğiniz bir metin mesajını yanıtlayın.")
+        await message.edit_text(ggr.t("err_reply_text_required"))
         return
         
     hedef_dil = ggr.get("cevir_hedef_dil", "tr")
@@ -445,10 +445,10 @@ async def whois_user(client, message):
         return
 
     if not hedef_user:
-        await message.edit_text("❌ Hedef kullanıcı tespit edilemedi.")
+        await message.edit_text(ggr.t("whois_user_not_found"))
         return
 
-    durum = await message.edit_text("🔍 <i>Kullanıcı bilgileri taranıyor...</i>")
+    durum = await message.edit_text(ggr.t("whois_searching"))
 
     try:
         chat_detay = None
@@ -467,26 +467,26 @@ async def whois_user(client, message):
         metin = _format_whois_text(hedef_user, chat_detay, ortak_sayisi)
         await durum.edit_text(metin, disable_web_page_preview=True)
     except Exception as e:
-        await durum.edit_text(f"❌ Bilgi çekilirken hata: <code>{e}</code>")
+        await durum.edit_text(ggr.t("err_general", error=str(e)))
 
 # ================= OCR (GÖRSELDEN METİN OKUMA) =================
 @ggr.cmd("ocr", info="Yanıtlanan görseldeki yazıları okur (OCR).", usage="Görsele yanıtlayarak: .ocr [dil]", category="Araçlar")
 async def ocr_read(client, message):
     if not message.reply_to_message or not (message.reply_to_message.photo or message.reply_to_message.document):
-        await message.edit_text("❌ Lütfen metin içeren bir fotoğrafa veya görsele yanıt vererek <code>.ocr</code> yazın.")
+        await message.edit_text(ggr.t("err_image_required"))
         return
 
     lang = "tur"
     if len(message.command) > 1:
         lang = message.command[1].lower()
 
-    durum = await message.edit_text("🔍 <i>Görsel indiriliyor ve yazı taranıyor (OCR)...</i>")
+    durum = await message.edit_text(ggr.t("ocr_reading"))
 
     temp_file = None
     try:
         temp_file = await client.download_media(message.reply_to_message)
         if not temp_file or not os.path.exists(temp_file):
-            await durum.edit_text("❌ Görsel indirilemedi.")
+            await durum.edit_text(ggr.t("err_image_required"))
             return
 
         with open(temp_file, "rb") as f:
@@ -506,19 +506,18 @@ async def ocr_read(client, message):
             okunan = parsed_results[0].get("ParsedText", "").strip()
             if okunan:
                 metin = (
-                    "📝 <b>Görselden Okunan Metin (OCR):</b>\n"
-                    "────────────────────────\n"
+                    ggr.t("ocr_result_header") +
                     f"<code>{ggr.safe_html(okunan[:3900])}</code>"
                 )
                 await durum.edit_text(metin)
             else:
-                await durum.edit_text("⚠️ Görselde okunabilir herhangi bir metin tespit edilemedi.")
+                await durum.edit_text(ggr.t("ocr_no_text"))
         else:
             hata = res_json.get("ErrorMessage", ["Bilinmeyen hata"])
             hata_mesaji = hata[0] if isinstance(hata, list) else str(hata)
-            await durum.edit_text(f"❌ OCR Okuma Başarısız: <code>{hata_mesaji}</code>")
+            await durum.edit_text(ggr.t("err_general", error=hata_mesaji))
     except Exception as e:
-        await durum.edit_text(f"❌ OCR İşlemi Sırasında Hata: <code>{e}</code>")
+        await durum.edit_text(ggr.t("err_general", error=str(e)))
     finally:
         if temp_file and os.path.exists(temp_file):
             try:

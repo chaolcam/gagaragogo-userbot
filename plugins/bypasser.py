@@ -148,7 +148,7 @@ async def bypass_cmd(client, message):
         
     raw_links = re.findall(r'https?://[^\s<>"]+', target_text)
     if not raw_links:
-        await message.edit_text("❌ Lütfen çözülecek link(ler) girin ya da link içeren bir mesajı yanıtlayarak `.bypass` yazın.\n\nÖrnekler:\n• Tek link: `.bypass https://ouo.press/xxxxx`\n• Çoklu link: `.bypass link1 link2 link3`\n• Mesaja yanıtla: Mesajı yanıtlayıp `.bypass`")
+        await message.edit_text(ggr.t("err_no_links_found"))
         return
         
     # Linklerin sonundaki noktalama işaretlerini temizle ve tekrarları kaldır
@@ -163,20 +163,18 @@ async def bypass_cmd(client, message):
     # 1. TEK LİNK DURUMU
     if toplam == 1:
         url = links[0]
-        await message.edit_text(f"⏳ <i>Link çözülüyor:</i> <code>{url}</code>\nLütfen bekleyin...")
+        await message.edit_text(ggr.t("bypass_resolving_single", url=url))
         try:
             final_url = await zincirleme_bypass(url)
             if final_url:
                 await message.edit_text(
-                    "✅ <b>Bypass Başarılı!</b>\n\n"
-                    f"🔗 <b>Orijinal:</b> <code>{url}</code>\n"
-                    f"🎯 <b>Hedef:</b>\n<code>{final_url}</code>", 
+                    ggr.t("bypass_success_single", orig_url=url, dest_url=final_url), 
                     disable_web_page_preview=True
                 )
             else:
-                await message.edit_text("❌ Link çözülemedi veya yönlendirme bulunamadı.")
+                await message.edit_text(ggr.t("bypass_failed_single"))
         except Exception as e:
-            await message.edit_text(f"❌ Hata: <code>{str(e)}</code>")
+            await message.edit_text(ggr.t("err_general", error=str(e)))
         return
 
     # 2. ÇOKLU LİNK DURUMU (Birden fazla link)

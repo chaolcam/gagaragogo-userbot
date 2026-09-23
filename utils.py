@@ -685,6 +685,11 @@ class GgrEngine:
         return progress_bar(percent, length)
 
     @staticmethod
+    def t(key, lang=None, **kwargs):
+        from core.locales import t as _loc_t
+        return _loc_t(key, lang=lang, **kwargs)
+
+    @staticmethod
     async def sync_cloud(client=None):
         return await tek_bulut_db_guncelle(client)
 

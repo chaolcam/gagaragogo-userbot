@@ -23,7 +23,7 @@ async def set_yedek_grup(client, message):
     elif str(message.chat.id).startswith("-100"):
         yeni_id = message.chat.id
     else:
-        await message.edit_text("❌ Kullanım: `.setyedekgrup [id]` veya oluşturduğunuz grup içinde doğrudan `.setyedekgrup` yazın.")
+        await message.edit_text(ggr.t("err_setyedekgrup_usage"))
         return
 
     try:
@@ -69,4 +69,4 @@ async def lang_komutu(client, message):
         set_current_lang("en")
         await message.edit_text(t("lang_changed", lang="en"))
     else:
-        await message.edit_text("❌ Geçersiz dil! Kullanım: `.botlang tr` veya `.botlang en`")
+        await message.edit_text(ggr.t("err_missing_args"))

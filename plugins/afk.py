@@ -61,11 +61,7 @@ async def afk_modunu_ac(client, message):
     })
     await ggr.sync_cloud(client)
     
-    await message.edit_text(
-        f"💤 <b>AFK Modu Aktif Edildi!</b>\n\n"
-        f"📝 <b>Sebep:</b> <i>{ggr.safe_html(reason)}</i>\n\n"
-        f"⏱️ <i>Geri dönene kadar özel mesaj atanlara veya sizi etiketleyenlere otomatik bilgi verilecek ve bildirimler kaydedilecek.</i>"
-    )
+    await message.edit_text(ggr.t("afk_enabled", reason=ggr.safe_html(reason)))
 
 
 # Gelen etiket veya özel mesajları yanıtlama handler'ı

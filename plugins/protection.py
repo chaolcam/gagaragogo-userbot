@@ -50,12 +50,12 @@ async def antidelete_ayar(client, message):
         arg = message.command[1].lower()
         if arg == "on":
             ggr.set("antidelete_durumu", True)
-            await message.edit_text("✅ <b>Anti-Delete Modu Açıldı!</b>\nÖzel sohbetlerde silinen mesajlar Ana Admin Grubundaki <code>Silinen Mesajlar</code> konusuna kaydedilecek.")
+            await message.edit_text(ggr.t("antidelete_on"))
         elif arg == "off":
             ggr.set("antidelete_durumu", False)
-            await message.edit_text("❌ <b>Anti-Delete Modu Kapatıldı!</b>\nArtık silinen mesajlar yakalanmayacak.")
+            await message.edit_text(ggr.t("antidelete_off"))
         else:
-            await message.edit_text("Hatalı kullanım: <code>.antidelete on</code> veya <code>.antidelete off</code>")
+            await message.edit_text(ggr.t("err_missing_args"))
     else:
         durum = ggr.get("antidelete_durumu", False)
         durum_metni = "AÇIK ✅" if durum else "KAPALI ❌"
@@ -136,12 +136,12 @@ async def sureli_ayar(client, message):
         arg = message.command[1].lower()
         if arg == "on":
             ggr.set("hayalet_durumu", True)
-            await message.edit_text("⏳ <b>Süreli Medya Modu Açıldı!</b>\nTek gösterimlik medyalar Ana Admin Grubundaki <code>Süreli Medyalar</code> konusuna kaydedilecek.")
+            await message.edit_text(ggr.t("sureli_on"))
         elif arg == "off":
             ggr.set("hayalet_durumu", False)
-            await message.edit_text("❌ <b>Süreli Medya Modu Kapatıldı!</b>\nArtık tek gösterimlik medyalar yakalanmayacak.")
+            await message.edit_text(ggr.t("sureli_off"))
         else:
-            await message.edit_text("Hatalı kullanım: <code>.sureli on</code> veya <code>.sureli off</code>")
+            await message.edit_text(ggr.t("err_missing_args"))
     else:
         durum = ggr.get("hayalet_durumu", False)
         durum_metni = "AÇIK ⏳" if durum else "KAPALI ❌"

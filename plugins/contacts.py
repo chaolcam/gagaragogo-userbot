@@ -305,12 +305,7 @@ async def cmd_grup_aktar(client: Client, message: Message):
     """
     args = message.text.split()[1:] if message.text else []
     if len(args) < 2:
-        await message.edit_text(
-            "❌ <b>Eksik parametre!</b>\n\n"
-            "Kullanım: <code>.grupaktar [Kaynak No] [Hedef No] [Adet]</code>\n"
-            "<i>Örnek: <code>.grupaktar 1 2 100</code> (1. gruptan 100 kişiyi 2. gruba aktarır)</i>\n"
-            "💡 Veya butonlarla yönetmek için: <code>.rehbermenu</code>"
-        )
+        await message.edit_text(ggr.t("err_grupaktar_usage"))
         return
 
     gruplar = await get_sorted_user_groups(client)
@@ -321,7 +316,7 @@ async def cmd_grup_aktar(client: Client, message: Message):
         limit = max(1, min(500, int(args[2])))
 
     if not src_group or not tgt_group:
-        await message.edit_text("❌ <b>Kaynak veya hedef grup bulunamadı. Lütfen <code>.rehber</code> yazarak numaraları kontrol edin.</b>")
+        await message.edit_text(ggr.t("err_chat_not_found"))
         return
 
     src_id = src_group["id"]
@@ -713,20 +708,17 @@ async def cmd_rehbersil(client: Client, message: Message):
             target_user = None
 
     if not target_user:
-        await message.edit_text(
-            "❌ <b>Kullanıcı belirlenemedi!</b>\n"
-            "Bir kullanıcının mesajını yanıtlayarak <code>.rehbersil</code> yazın veya kullanıcı adı/ID girin."
-        )
+        await message.edit_text(ggr.t("err_target_not_found"))
         return
 
-    durum = await message.edit_text("⏳ <i>Kişi rehberden siliniyor...</i>")
+    durum = await message.edit_text("⏳ <i>...</i>")
     try:
         await client.delete_contacts([target_user.id])
         await durum.edit_text(
-            f"🗑️ <b>{ggr.safe_html(target_user.first_name)}</b> rehberinizden başarıyla silindi."
+            ggr.t("contacts_user_deleted", name=ggr.safe_html(target_user.first_name))
         )
     except Exception as e:
-        await durum.edit_text(f"❌ <b>Hata:</b> <code>{ggr.safe_html(str(e))}</code>")
+        await durum.edit_text(ggr.t("err_general", error=str(e)))
 
 
 @ggr.cmd(

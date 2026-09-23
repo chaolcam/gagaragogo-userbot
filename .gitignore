@@ -24,7 +24,7 @@ tiktok_downloads/
 # Custom Plugins (runtime storage)
 plugins/custom_*.py
 eklentiler/
-
+scripts/
 # Security
 .env
 

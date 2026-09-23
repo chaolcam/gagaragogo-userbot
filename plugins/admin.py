@@ -81,7 +81,7 @@ async def ban_user(client, message):
     """Gruptaki bir kullanıcıyı kalıcı veya süreli olarak yasaklar."""
     user, until_date, string_zaman, reason = await extract_target_time_reason(client, message)
     if not user:
-        await message.edit_text("❌ Kimi yasaklayacağımı bulamadım.")
+        await message.edit_text(ggr.t("err_target_not_found"))
         return
         
     try:
@@ -93,35 +93,35 @@ async def ban_user(client, message):
         else:
             await client.ban_chat_member(message.chat.id, user_id)
             
-        metin = f"🔨 <a href=\"tg://user?id={user_id}\">{ggr.safe_html(user_name)}</a> başarıyla yasaklandı!"
-        if string_zaman: metin += f"\n⏳ <b>Süre:</b> <code>{string_zaman}</code>"
-        if reason: metin += f"\n📝 <b>Sebep:</b> <code>{reason}</code>"
+        metin = ggr.t("admin_banned_msg", user_id=user_id, user_name=ggr.safe_html(user_name))
+        if string_zaman: metin += f"\n" + ggr.t("admin_duration_label", duration=string_zaman)
+        if reason: metin += f"\n" + ggr.t("admin_reason_label", reason=reason)
         await message.edit_text(metin)
     except Exception as e:
-        await message.edit_text(f"❌ Yasaklama başarısız: <code>{e}</code>")
+        await message.edit_text(ggr.t("err_general", error=str(e)))
 
 @ggr.cmd("unban", info="Kullanıcının yasağını kaldırır.", usage="Yanıtlayarak: .unban | ID: .unban 1234", category="Admin", filter=filters.group)
 async def unban_user(client, message):
     """Kullanıcının grup yasağını kaldırır."""
     user, _, _, _ = await extract_target_time_reason(client, message)
     if not user:
-        await message.edit_text("❌ Kimi açacağımı bulamadım.")
+        await message.edit_text(ggr.t("err_target_not_found"))
         return
         
     try:
         user_id = getattr(user, "id", user)
         user_name = getattr(user, "first_name", str(user))
         await client.unban_chat_member(message.chat.id, user_id)
-        await message.edit_text(f"🕊 <a href=\"tg://user?id={user_id}\">{ggr.safe_html(user_name)}</a> yasağı kaldırıldı!")
+        await message.edit_text(ggr.t("admin_unbanned_msg", user_id=user_id, user_name=ggr.safe_html(user_name)))
     except Exception as e:
-        await message.edit_text(f"❌ İşlem başarısız: <code>{e}</code>")
+        await message.edit_text(ggr.t("err_general", error=str(e)))
 
 @ggr.cmd("mute", info="Kullanıcıyı susturur.", usage="Yanıtlayarak: .mute [zaman] [sebep] | Örn: .mute 2h Küfür", category="Admin", filter=filters.group)
 async def mute_user(client, message):
     """Kullanıcının grupta mesaj yazmasını engeller (susturur)."""
     user, until_date, string_zaman, reason = await extract_target_time_reason(client, message)
     if not user:
-        await message.edit_text("❌ Kimi susturacağımı bulamadım. Yanıt verin veya @kullanici belirtin.")
+        await message.edit_text(ggr.t("err_target_not_found"))
         return
         
     try:
@@ -133,19 +133,19 @@ async def mute_user(client, message):
         else:
             await client.restrict_chat_member(message.chat.id, user_id, ChatPermissions(can_send_messages=False))
             
-        metin = f"🤐 <a href=\"tg://user?id={user_id}\">{ggr.safe_html(user_name)}</a> başarıyla susturuldu!"
-        if string_zaman: metin += f"\n⏳ <b>Süre:</b> <code>{string_zaman}</code>"
-        if reason: metin += f"\n📝 <b>Sebep:</b> <code>{reason}</code>"
+        metin = ggr.t("admin_muted_msg", user_id=user_id, user_name=ggr.safe_html(user_name))
+        if string_zaman: metin += f"\n" + ggr.t("admin_duration_label", duration=string_zaman)
+        if reason: metin += f"\n" + ggr.t("admin_reason_label", reason=reason)
         await message.edit_text(metin)
     except Exception as e:
-        await message.edit_text(f"❌ Susturma başarısız: <code>{e}</code>")
+        await message.edit_text(ggr.t("err_general", error=str(e)))
 
 @ggr.cmd("unmute", info="Kullanıcının susturmasını kaldırır.", usage="Yanıtlayarak: .unmute | ID: .unmute 1234", category="Admin", filter=filters.group)
 async def unmute_user(client, message):
     """Kullanıcının susturmasını kaldırarak tüm mesaj gönderme yetkilerini geri verir."""
     user, _, _, _ = await extract_target_time_reason(client, message)
     if not user:
-        await message.edit_text("❌ Kimi açacağımı bulamadım.")
+        await message.edit_text(ggr.t("err_target_not_found"))
         return
         
     try:
@@ -162,15 +162,15 @@ async def unmute_user(client, message):
             can_pin_messages=True
         )
         await client.restrict_chat_member(message.chat.id, user_id, tam_yetki)
-        await message.edit_text(f"🔊 <a href=\"tg://user?id={user_id}\">{ggr.safe_html(user_name)}</a> kullanıcısının susturması kaldırıldı!")
+        await message.edit_text(ggr.t("admin_unmuted_msg", user_id=user_id, user_name=ggr.safe_html(user_name)))
     except Exception as e:
-        await message.edit_text(f"❌ İşlem başarısız: <code>{e}</code>")
+        await message.edit_text(ggr.t("err_general", error=str(e)))
 
 @ggr.cmd("purge", info="Yanıtlanan mesajdan itibaren (kendisi dahil) tüm mesajları siler.", usage="Yanıtlayarak: .purge", category="Admin")
 async def purge_messages(client, message):
     """Yanıtlanan mesajdan mevcut komut mesajına kadar olan tüm mesajları topluca siler."""
     if not message.reply_to_message:
-        await message.edit_text("❌ Lütfen silinmeye başlanacak mesaja yanıt verin.")
+        await message.edit_text(ggr.t("err_reply_required"))
         return
 
     start_id = message.reply_to_message.id
@@ -260,7 +260,7 @@ LOCK_FIELDS = {
 @ggr.cmd("lock", info="Grupta belirli bir medya veya işlem türünü kilitler.", usage=".lock [msg/media/sticker/link/poll/invite/all]", category="Admin")
 async def lock_chat(client, message):
     if not message.chat or message.chat.type.name not in ["GROUP", "SUPERGROUP"]:
-        await message.edit_text("❌ Bu komut yalnızca gruplarda kullanılabilir.")
+        await message.edit_text(ggr.t("err_groups_only"))
         return
         
     args = message.command[1:] if len(message.command) > 1 else []
@@ -321,7 +321,7 @@ async def lock_chat(client, message):
 @ggr.cmd("unlock", info="Grupta kilitlenen bir yetkiyi tekrar açar.", usage=".unlock [msg/media/sticker/link/poll/invite/all]", category="Admin")
 async def unlock_chat(client, message):
     if not message.chat or message.chat.type.name not in ["GROUP", "SUPERGROUP"]:
-        await message.edit_text("❌ Bu komut yalnızca gruplarda kullanılabilir.")
+        await message.edit_text(ggr.t("err_groups_only"))
         return
         
     args = message.command[1:] if len(message.command) > 1 else []
