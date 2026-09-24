@@ -70,11 +70,12 @@ async def build_rehber_menu_main(userbot, force_refresh: bool = False, back_targ
 
     rehber_sayisi = await get_cached_contacts_count(userbot)
 
+    from core.locales import t
     metin = (
-        "📇 <b>GagaraGogo Rehber & Grup Yönetim Merkezi</b>\n"
-        "───────────────────────────\n"
-        f"📊 <b>Rehberdeki Kişi:</b> <code>{rehber_sayisi}</code> | 👥 <b>Kayıtlı Grup:</b> <code>{len(gruplar)}</code>\n\n"
-        t("menu_contacts_desc_full")
+        t("menu_contacts_title")
+        + "───────────────────────────\n"
+        + t("menu_contacts_stats", rehber_sayisi=rehber_sayisi, grup_sayisi=len(gruplar))
+        + t("menu_contacts_desc_full")
     )
 
     from core.locales import t

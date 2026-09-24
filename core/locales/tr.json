@@ -286,5 +286,6 @@
   "menu_bc_list_title": "📢 <b>Toplu İletim Grup Listesi</b>\n\n",
   "status_open": "Açık",
   "status_closed": "Kapalı",
-  "menu_bc_list_hint": "\n💡 Durumunu değiştirmek istediğiniz grubun numarasına tıklayın."
+  "menu_bc_list_hint": "\n💡 Durumunu değiştirmek istediğiniz grubun numarasına tıklayın.",
+  "menu_contacts_stats": "📊 <b>Rehberdeki Kişi:</b> <code>{rehber_sayisi}</code> | 👥 <b>Kayıtlı Grup:</b> <code>{grup_sayisi}</code>\n\n"
 }
