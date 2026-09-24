@@ -77,7 +77,7 @@ def get_main_menu_keyboard():
         "eğlence": 30,
         "eglence": 30,
         "sistem": 40,
-        t("cat_broadcast", lang).lower(): 50,
+        t("cat_broadcast").lower(): 50,
         "medya": 60
     }
     kategoriler = [k for k in KOMUT_BILGILERI.keys() if k.lower() != "ayarlar"]
