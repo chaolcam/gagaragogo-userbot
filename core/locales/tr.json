@@ -287,5 +287,13 @@
   "status_open": "Açık",
   "status_closed": "Kapalı",
   "menu_bc_list_hint": "\n💡 Durumunu değiştirmek istediğiniz grubun numarasına tıklayın.",
-  "menu_contacts_stats": "📊 <b>Rehberdeki Kişi:</b> <code>{rehber_sayisi}</code> | 👥 <b>Kayıtlı Grup:</b> <code>{grup_sayisi}</code>\n\n"
+  "menu_contacts_stats": "📊 <b>Rehberdeki Kişi:</b> <code>{rehber_sayisi}</code> | 👥 <b>Kayıtlı Grup:</b> <code>{grup_sayisi}</code>\n\n",
+  "status_latest": "Son Sürüm",
+  "status_update_avail": "Yeni Güncelleme Mevcut",
+  "btn_settings_back": "◀️ Ayarlar",
+  "btn_close_menu": "❌ Menüyü Kapat",
+  "btn_close_x": "❌ Kapat",
+  "menu_update_check": "<b>GÜNCELLEME DENETİMİ</b>\n────────────────────────\n",
+  "sys_update_found": "🔄 <b>Yeni Güncelleme Bulundu!</b> (<code>{eski_commit}</code> ➔ <code>{remote_commit}</code>)\nKodlar eşitleniyor ve bot yeniden başlatılıyor...",
+  "btn_recheck": "🔄 Tekrar Kontrol Et"
 }

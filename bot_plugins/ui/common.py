@@ -40,11 +40,13 @@ def check_update_status():
     try:
         r_res = subprocess.run(["git", "rev-parse", "--short", "origin/main"], capture_output=True, text=True)
         remote = r_res.stdout.strip()
+        from core.locales import t
         if remote and remote != commit:
-            return commit, "Yeni Güncelleme Mevcut"
-        return commit, "Son Sürüm"
+            return commit, t("status_update_avail")
+        return commit, t("status_latest")
     except Exception:
-        return commit, "Son Sürüm"
+        from core.locales import t
+        return commit, t("status_latest")
 
 
 def make_progress_bar(current: int, total: int, length: int = 10) -> str:

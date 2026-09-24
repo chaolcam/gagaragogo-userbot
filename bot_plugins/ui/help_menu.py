@@ -95,18 +95,14 @@ def get_main_menu_keyboard():
         return "📦"
 
     def get_kat_label(k_key, fallback_name):
-        map_keys = {
-            "admin": "cat_admin",
-            "araçlar": "cat_tools",
-            "araclar": "cat_tools",
-            "sistem": "cat_system",
-            "medya": "cat_media",
-            "eğlence": "cat_fun",
-            "eglence": "cat_fun",
-            "grup & iletim": "cat_broadcast"
-        }
-        loc_k = map_keys.get(k_key.lower())
-        return t(loc_k) if loc_k else fallback_name
+        k_lower = k_key.lower()
+        if "admin" in k_lower: return t("cat_admin")
+        if "araç" in k_lower or "arac" in k_lower: return t("cat_tools")
+        if "sistem" in k_lower: return t("cat_system")
+        if "medya" in k_lower: return t("cat_media")
+        if "eğlen" in k_lower or "eglen" in k_lower: return t("cat_fun")
+        if "grup" in k_lower: return t("cat_broadcast")
+        return fallback_name
 
     num_kat = len(kategoriler)
     if num_kat % 2 == 1:
@@ -527,26 +523,25 @@ async def handle_btn_update(client, callback_query):
         remote_commit = subprocess.run(["git", "rev-parse", "--short", "origin/main"], capture_output=True, text=True).stdout.strip() or eski_commit
 
         if eski_commit == remote_commit:
+            from core.locales import t
             metin = (
-                "<b>GÜNCELLEME DENETİMİ</b>\n"
-                "────────────────────────\n"
-                "✅ <b>Tebrikler, botunuz en son sürümde!</b>\n\n"
-                f"📌 <b>Mevcut Sürüm:</b> <code>{eski_commit} (Son Sürüm)</code>\n"
-                f"📡 <b>GitHub:</b> <code>{remote_commit}</code>"
+                t("menu_update_check")
+                + t("sys_already_up_to_date", commit=f"{eski_commit} ({t('status_latest')})")
+                + f"\n📡 <b>GitHub:</b> <code>{remote_commit}</code>"
             )
             kb = InlineKeyboardMarkup([
-                [InlineKeyboardButton("🔄 Tekrar Kontrol Et", callback_data="btn_update")],
+                [InlineKeyboardButton(t("btn_recheck"), callback_data="btn_update")],
                 [
-                    InlineKeyboardButton("◀️ Ayarlar", callback_data="ayarlar_menu"),
-                    InlineKeyboardButton("🏠 Ana Menü", callback_data="main_menu"),
+                    InlineKeyboardButton(t("btn_settings_back"), callback_data="ayarlar_menu"),
+                    InlineKeyboardButton(t("btn_home"), callback_data="main_menu"),
                 ],
             ])
             await callback_query.edit_message_text(text=metin, reply_markup=kb)
             return
 
+        from core.locales import t
         await callback_query.edit_message_text(
-            f"🔄 <b>Yeni Güncelleme Bulundu!</b> (<code>{eski_commit}</code> ➔ <code>{remote_commit}</code>)\n"
-            "Kodlar eşitleniyor ve bot yeniden başlatılıyor..."
+            t("sys_update_found", eski_commit=eski_commit, remote_commit=remote_commit)
         )
         subprocess.run(["git", "reset", "--hard", "origin/main"], capture_output=True)
         try:

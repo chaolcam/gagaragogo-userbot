@@ -287,5 +287,13 @@
   "status_open": "Open",
   "status_closed": "Closed",
   "menu_bc_list_hint": "\n💡 Click a group's number to toggle its status.",
-  "menu_contacts_stats": "📊 <b>Contacts:</b> <code>{rehber_sayisi}</code> | 👥 <b>Saved Groups:</b> <code>{grup_sayisi}</code>\n\n"
+  "menu_contacts_stats": "📊 <b>Contacts:</b> <code>{rehber_sayisi}</code> | 👥 <b>Saved Groups:</b> <code>{grup_sayisi}</code>\n\n",
+  "status_latest": "Latest",
+  "status_update_avail": "Update Available",
+  "btn_settings_back": "◀️ Settings",
+  "btn_close_menu": "❌ Close Menu",
+  "btn_close_x": "❌ Close",
+  "menu_update_check": "<b>UPDATE CHECK</b>\n────────────────────────\n",
+  "sys_update_found": "🔄 <b>New Update Found!</b> (<code>{eski_commit}</code> ➔ <code>{remote_commit}</code>)\nSynchronizing code and restarting the bot...",
+  "btn_recheck": "🔄 Check Again"
 }

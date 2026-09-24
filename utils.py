@@ -421,12 +421,13 @@ async def _update_restart_inline(bot_app, inline_message_id, metin):
     """Inline mesaj üzerinden durum güncellemesi yapar."""
     try:
         from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+        from core.locales import t
         kb = InlineKeyboardMarkup([
             [
-                InlineKeyboardButton("🏠 Ana Menü", callback_data="main_menu"),
-                InlineKeyboardButton("⚙️ Ayarlar", callback_data="ayarlar_menu")
+                InlineKeyboardButton(t("btn_home"), callback_data="main_menu"),
+                InlineKeyboardButton(t("btn_settings"), callback_data="ayarlar_menu")
             ],
-            [InlineKeyboardButton("❌ Kapat", callback_data="yardim_close")]
+            [InlineKeyboardButton(t("btn_close_x"), callback_data="yardim_close")]
         ])
         try:
             await bot_app.edit_inline_text(inline_message_id, text=metin, reply_markup=kb)
@@ -448,8 +449,9 @@ async def _update_restart_chat(user_app, bot_app, chat_id, message_id, metin):
         if bot_app:
             try:
                 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+                from core.locales import t
                 kb = InlineKeyboardMarkup([
-                    [InlineKeyboardButton("🏠 Ana Menü", callback_data="main_menu")]
+                    [InlineKeyboardButton(t("btn_home"), callback_data="main_menu")]
                 ])
                 await bot_app.edit_message_text(chat_id, message_id, metin, reply_markup=kb)
                 logging.info("✅ [RESTART] Yardımcı bot sohbet mesajını güncelledi.")
