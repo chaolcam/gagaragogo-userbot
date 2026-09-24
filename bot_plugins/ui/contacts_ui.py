@@ -74,11 +74,7 @@ async def build_rehber_menu_main(userbot, force_refresh: bool = False, back_targ
         "📇 <b>GagaraGogo Rehber & Grup Yönetim Merkezi</b>\n"
         "───────────────────────────\n"
         f"📊 <b>Rehberdeki Kişi:</b> <code>{rehber_sayisi}</code> | 👥 <b>Kayıtlı Grup:</b> <code>{len(gruplar)}</code>\n\n"
-        "Lütfen yapmak istediğiniz işlemi seçin:\n"
-        "• <b>Gruptan Gruba Aktar:</b> Bir gruptan üyeleri toplayıp diğer gruba ekler.\n"
-        "• <b>Gruptan Rehbere Çek:</b> Seçtiğiniz grubun üyelerini rehberinize kaydeder.\n"
-        "• <b>Rehberden Gruba Ekle:</b> Rehberinizdeki kişileri seçilen gruba davet eder.\n\n"
-        "⚠️ <i>Dikkat: Toplu ve otonom işlemlerde hesabınızın Telegram tarafından spam yemesi veya kısıtlanması durumunda sorumluluk kullanıcıya aittir.</i>"
+        t("menu_contacts_desc_full")
     )
 
     from core.locales import t
@@ -86,7 +82,7 @@ async def build_rehber_menu_main(userbot, force_refresh: bool = False, back_targ
         [InlineKeyboardButton(t("btn_g2g"), callback_data="rm_act_g2g")],
         [
             InlineKeyboardButton(t("btn_g2r"), callback_data="rm_act_cek"),
-            InlineKeyboardButton("📤 Rehberden Gruba Ekle", callback_data="rm_act_ekle")
+            InlineKeyboardButton(t("btn_r2g"), callback_data="rm_act_ekle")
         ],
         [
             InlineKeyboardButton(t("btn_list_groups"), callback_data="rm_list_1"),

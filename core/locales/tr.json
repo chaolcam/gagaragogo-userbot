@@ -280,5 +280,11 @@
   "btn_ilet_otomesaj": "⏰ Otomatik Mesaj (.otomesaj)",
   "btn_ilet_rehber": "📇 Rehber & Grup Yönetim Merkezi (.rehbermenu)",
   "menu_ilet_anlik_title": "📢 <b>ANLIK TOPLU İLETİM</b>\n────────────────────────\nMesaj veya medyaları seçili gruplarınıza tek seferde iletir:\n\n• <code>.ilet</code> — Yanıtlanan mesajı seçili tüm gruplara yollar.\n• <code>.ilet [yazı]</code> — Yazılan metni doğrudan tüm gruplara gönderir.\n• <code>.iletmenu</code> — Gönderilecek grupları açıp kapatabileceğiniz panel.",
-  "btn_ilet_groups_menu": "📋 Grup Seçim Menüsü (.iletmenu)"
+  "btn_ilet_groups_menu": "📋 Grup Seçim Menüsü (.iletmenu)",
+  "btn_r2g": "📤 Rehberden Gruba Ekle",
+  "menu_contacts_desc_full": "Lütfen yapmak istediğiniz işlemi seçin:\n• <b>Gruptan Gruba Aktar:</b> Bir gruptan üyeleri toplayıp diğer gruba ekler.\n• <b>Gruptan Rehbere Çek:</b> Seçtiğiniz grubun üyelerini rehberinize kaydeder.\n• <b>Rehberden Gruba Ekle:</b> Rehberinizdeki kişileri seçilen gruba davet eder.\n\n⚠️ <i>Dikkat: Toplu ve otonom işlemlerde hesabınızın Telegram tarafından spam yemesi veya kısıtlanması durumunda sorumluluk kullanıcıya aittir.</i>",
+  "menu_bc_list_title": "📢 <b>Toplu İletim Grup Listesi</b>\n\n",
+  "status_open": "Açık",
+  "status_closed": "Kapalı",
+  "menu_bc_list_hint": "\n💡 Durumunu değiştirmek istediğiniz grubun numarasına tıklayın."
 }

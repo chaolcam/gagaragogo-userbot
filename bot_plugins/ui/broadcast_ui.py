@@ -86,13 +86,14 @@ async def build_ilet_menu_keyboard(page=1):
     end_idx = start_idx + per_page
     sayfa_gruplari = gruplar[start_idx:end_idx]
 
-    metin = "📢 <b>Toplu İletim Grup Listesi</b>\n\n"
+    from core.locales import t
+    metin = t("menu_bc_list_title")
     for i, g in enumerate(sayfa_gruplari, start=start_idx + 1):
-        durum_ikon = "✅ Açık" if is_group_active(g["id"]) else "⛔ Kapalı"
+        durum_ikon = f"✅ {t('status_open')}" if is_group_active(g["id"]) else f"⛔ {t('status_closed')}"
         title = utils.guvenli_isim(g["title"][:26])
         metin += f"{i}. {title} — {durum_ikon}\n"
 
-    metin += "\n💡 Durumunu değiştirmek istediğiniz grubun numarasına tıklayın."
+    metin += t("menu_bc_list_hint")
 
     keyboard = []
     current_row = []
@@ -142,7 +143,8 @@ async def handle_ilet_callbacks(client, callback_query, data):
             if 1 <= idx <= len(gruplar):
                 hedef = gruplar[idx - 1]
                 yeni_durum = toggle_group(hedef["id"])
-                durum_str = "AÇIK ✅" if yeni_durum else "KAPALI ⛔"
+                from core.locales import t
+                durum_str = f"{t('status_open').upper()} ✅" if yeni_durum else f"{t('status_closed').upper()} ⛔"
                 kb, metin = await build_ilet_menu_keyboard(page)
                 await safe_edit(callback_query, client, text=metin, reply_markup=kb)
                 await callback_query.answer(f"{idx}. {hedef['title'][:20]} -> {durum_str}")

@@ -280,5 +280,11 @@
   "btn_ilet_otomesaj": "⏰ Auto Message (.otomesaj)",
   "btn_ilet_rehber": "📇 Contacts & Group Center (.rehbermenu)",
   "menu_ilet_anlik_title": "📢 <b>INSTANT BULK BROADCAST</b>\n────────────────────────\nForwards messages or media to selected groups at once:\n\n• <code>.ilet</code> — Forwards the replied message to all selected groups.\n• <code>.ilet [text]</code> — Sends the written text directly to all groups.\n• <code>.iletmenu</code> — Panel to toggle which groups to send to.",
-  "btn_ilet_groups_menu": "📋 Group Selection Menu (.iletmenu)"
+  "btn_ilet_groups_menu": "📋 Group Selection Menu (.iletmenu)",
+  "btn_r2g": "📤 Add from Contacts to Group",
+  "menu_contacts_desc_full": "Please select an action:\n• <b>Group to Group:</b> Scrapes members from one group and adds to another.\n• <b>Group to Contacts:</b> Saves group members to your Telegram contacts.\n• <b>Contacts to Group:</b> Invites your contacts to a selected group.\n\n⚠️ <i>Warning: In mass and autonomous operations, the user bears responsibility if your account is rate-limited or spammed by Telegram.</i>",
+  "menu_bc_list_title": "📢 <b>Broadcast Group List</b>\n\n",
+  "status_open": "Open",
+  "status_closed": "Closed",
+  "menu_bc_list_hint": "\n💡 Click a group's number to toggle its status."
 }
