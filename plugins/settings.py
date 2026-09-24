@@ -64,9 +64,15 @@ async def lang_komutu(client, message):
     secim = args[0].lower()
     if secim in ["tr", "turkce", "türkçe"]:
         set_current_lang("tr")
+        from core.database import tek_bulut_db_guncelle
+        import asyncio
+        asyncio.create_task(tek_bulut_db_guncelle())
         await message.edit_text(t("lang_changed", lang="tr"))
     elif secim in ["en", "english", "ingilizce"]:
         set_current_lang("en")
+        from core.database import tek_bulut_db_guncelle
+        import asyncio
+        asyncio.create_task(tek_bulut_db_guncelle())
         await message.edit_text(t("lang_changed", lang="en"))
     else:
-        await message.edit_text(ggr.t("err_missing_args"))
+        await message.edit_text(ggr.t("err_missing_args"))

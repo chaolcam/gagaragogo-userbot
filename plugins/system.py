@@ -251,7 +251,8 @@ async def _apply_update_now(durum):
 
     remote_commit = subprocess.run(["git", "rev-parse", "--short", "origin/main"], capture_output=True, text=True).stdout.strip()
     if eski_commit and remote_commit and eski_commit == remote_commit:
-        await durum.edit_text(f"✅ <b>Bot zaten en güncel sürümde!</b>\n\n📌 <b>Mevcut Sürüm:</b> <code>{eski_commit}</code>")
+        from core.locales import t
+        await durum.edit_text(t("sys_up_to_date", old_commit=eski_commit))
         return
 
     await durum.edit_text(f"🔄 <b>Yeni sürüm indiriliyor...</b> (<code>{eski_commit}</code> ➔ <code>{remote_commit}</code>)")
@@ -265,7 +266,8 @@ async def _apply_update_now(durum):
         pip_res = subprocess.run(pip_cmd, capture_output=True, text=True)
     
     if pip_res.returncode == 0:
-        await durum.edit_text(f"✅ <b>Güncelleme Tamamlandı!</b> (<code>{yeni_commit}</code>)\nBot yeniden başlatılıyor...")
+        from core.locales import t
+        await durum.edit_text(t("sys_update_done", new_commit=yeni_commit))
     else:
         logging.warning("Pip uyarısı: %s", pip_res.stderr)
         
@@ -291,7 +293,8 @@ async def _check_update_status(durum):
         
     remote_commit = subprocess.run(["git", "rev-parse", "--short", "origin/main"], capture_output=True, text=True).stdout.strip()
     if eski_commit == remote_commit:
-        await durum.edit_text(f"✅ <b>Bot güncel sürümde!</b>\n\n📌 <b>Mevcut Commit:</b> <code>{eski_commit}</code>")
+        from core.locales import t
+        await durum.edit_text(t("sys_up_to_date", old_commit=eski_commit))
         return
 
     log_res = subprocess.run(["git", "log", "HEAD..origin/main", "--oneline"], capture_output=True, text=True)
@@ -323,7 +326,8 @@ async def botu_guncelle(client, message):
     except FileNotFoundError:
         await durum.edit_text("❌ Sunucuda <code>git</code> bulunamadı.")
     except Exception as e:
-        await durum.edit_text(f"❌ <b>Güncelleme sırasında hata:</b>\n<code>{e}</code>")
+        from core.locales import t
+        await durum.edit_text(t("sys_update_err", e=str(e)))
 
 
 @ggr.cmd("ping", info="Bot ile Telegram sunucuları arasındaki gecikme süresini (ping ms) ölçer.", usage=".ping", category="Sistem")

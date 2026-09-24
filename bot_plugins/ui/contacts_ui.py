@@ -83,13 +83,13 @@ async def build_rehber_menu_main(userbot, force_refresh: bool = False, back_targ
 
     from core.locales import t
     keyboard = [
-        [InlineKeyboardButton("🔄 Gruptan Gruba Üye Aktar", callback_data="rm_act_g2g")],
+        [InlineKeyboardButton(t("btn_g2g"), callback_data="rm_act_g2g")],
         [
-            InlineKeyboardButton("📥 Gruptan Rehbere Çek", callback_data="rm_act_cek"),
+            InlineKeyboardButton(t("btn_g2r"), callback_data="rm_act_cek"),
             InlineKeyboardButton("📤 Rehberden Gruba Ekle", callback_data="rm_act_ekle")
         ],
         [
-            InlineKeyboardButton("📋 Grupları Sıralı Gör", callback_data="rm_list_1"),
+            InlineKeyboardButton(t("btn_list_groups"), callback_data="rm_list_1"),
             InlineKeyboardButton(t("btn_refresh"), callback_data="rm_rf")
         ],
         [

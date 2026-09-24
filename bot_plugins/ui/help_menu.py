@@ -77,7 +77,7 @@ def get_main_menu_keyboard():
         "eğlence": 30,
         "eglence": 30,
         "sistem": 40,
-        "grup & iletim": 50,
+        t("cat_broadcast", lang).lower(): 50,
         "medya": 60
     }
     kategoriler = [k for k in KOMUT_BILGILERI.keys() if k.lower() != "ayarlar"]
@@ -88,7 +88,7 @@ def get_main_menu_keyboard():
         isim_low = isim.lower()
         if "admin" in isim_low: return "🛡"
         if "araç" in isim_low or "arac" in isim_low: return "🛠"
-        if "grup" in isim_low or "ilet" in isim_low or "toplu" in isim_low: return "📢"
+        if "grup" in isim_low or "ilet" in isim_low or "toplu" in isim_low or "broadcast" in isim_low: return "📢"
         if "sistem" in isim_low: return "💻"
         if "eğlence" in isim_low or "eglence" in isim_low: return "🎮"
         if "medya" in isim_low: return "🎬"
@@ -489,6 +489,9 @@ async def handle_main_and_settings(client, callback_query, data):
         cur = get_current_lang()
         yeni = "en" if cur == "tr" else "tr"
         set_current_lang(yeni)
+        from core.database import tek_bulut_db_guncelle
+        import asyncio
+        asyncio.create_task(tek_bulut_db_guncelle())
         keyboard, metin = get_settings_keyboard()
         await safe_edit(callback_query, client, text=metin, reply_markup=keyboard)
         await callback_query.answer(f"Dil değiştirildi: {yeni.upper()}", show_alert=True)

@@ -17,22 +17,15 @@ def get_ilet_hub_content():
     """Grup & İletim ana geçiş menüsü."""
     from core.locales import t
     keyboard = [
-        [InlineKeyboardButton("📢 Anlık İletim (.ilet)", callback_data="sub_ilet_anlik")],
-        [InlineKeyboardButton("⏰ Otomatik Mesaj (.otomesaj)", callback_data="sub_ilet_otomesaj")],
-        [InlineKeyboardButton("📇 Rehber & Grup Yönetim Merkezi (.rehbermenu)", callback_data="sub_ilet_rehber")],
+        [InlineKeyboardButton(t("btn_ilet_anlik"), callback_data="sub_ilet_anlik")],
+        [InlineKeyboardButton(t("btn_ilet_otomesaj"), callback_data="sub_ilet_otomesaj")],
+        [InlineKeyboardButton(t("btn_ilet_rehber"), callback_data="sub_ilet_rehber")],
         [
             InlineKeyboardButton(t("btn_home"), callback_data="main_menu"),
             InlineKeyboardButton(t("btn_close"), callback_data="yardim_close")
         ]
     ]
-    metin = (
-        "<b>GAGARAGOGO</b> ⬝ <b>Grup & İletim Yönetimi</b>\n"
-        "────────────────────────\n"
-        "Yönetmek istediğiniz modülü seçin:\n\n"
-        "• <b>Anlık İletim:</b> Seçtiğiniz gruplara tek dokunuşla anında mesaj veya medya gönderimi.\n"
-        "• <b>Otomatik Mesaj:</b> Belirli zaman aralıklarıyla otomatik tekrarlanan mesaj motoru.\n"
-        "• <b>Rehber & Grup:</b> Grupları üye sayısına göre sıralama, üye çekme ve ekleme."
-    )
+    metin = t("menu_ilet_hub_title")
     return InlineKeyboardMarkup(keyboard), metin
 
 
@@ -40,21 +33,14 @@ def get_ilet_anlik_content():
     """Anlık iletim (.ilet) detay menüsü."""
     from core.locales import t
     keyboard = [
-        [InlineKeyboardButton("📋 Grup Seçim Menüsü (.iletmenu)", callback_data="open_ilet_groups")],
+        [InlineKeyboardButton(t("btn_ilet_groups_menu"), callback_data="open_ilet_groups")],
         [
             InlineKeyboardButton(t("btn_back"), callback_data="sub_ilet_hub"),
             InlineKeyboardButton(t("btn_home"), callback_data="main_menu")
         ],
         [InlineKeyboardButton(t("btn_close"), callback_data="yardim_close")]
     ]
-    metin = (
-        "📢 <b>ANLIK TOPLU İLETİM</b>\n"
-        "────────────────────────\n"
-        "Mesaj veya medyaları seçili gruplarınıza tek seferde iletir:\n\n"
-        "• <code>.ilet</code> — Yanıtlanan mesajı seçili tüm gruplara yollar.\n"
-        "• <code>.ilet [yazı]</code> — Yazılan metni doğrudan tüm gruplara gönderir.\n"
-        "• <code>.iletmenu</code> — Gönderilecek grupları açıp kapatabileceğiniz panel."
-    )
+    metin = t("menu_ilet_anlik_title")
     return InlineKeyboardMarkup(keyboard), metin
 
 

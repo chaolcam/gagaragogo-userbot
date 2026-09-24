@@ -412,19 +412,10 @@ def restart_bildirimi_kaydet(action="restart", inline_message_id=None, chat_id=N
 
 def _build_restart_message(action, yeni_commit):
     """Yeniden başlatma veya güncelleme durum bildirim metnini oluşturur."""
+    from core.locales import t
     if action == "update":
-        return (
-            "✅ <b>Gagaragogo Userbot Başarıyla Güncellendi!</b>\n"
-            "────────────────────────\n"
-            f"📌 <b>Aktif Sürüm:</b> <code>{yeni_commit} (Son Sürüm)</code>\n\n"
-            "🚀 <i>Tüm sistemler ve eklentiler yüklendi, botunuz kullanıma hazır!</i>"
-        )
-    return (
-        "✅ <b>Gagaragogo Userbot Başarıyla Başlatıldı!</b>\n"
-        "────────────────────────\n"
-        f"📌 <b>Aktif Sürüm:</b> <code>{yeni_commit}</code>\n\n"
-        "🚀 <i>Yeniden başlatma tamamlandı, botunuz kullanıma hazır!</i>"
-    )
+        return t("sys_restart_done_msg", new_commit=yeni_commit)
+    return t("sys_restart_done_started", new_commit=yeni_commit)
 
 async def _update_restart_inline(bot_app, inline_message_id, metin):
     """Inline mesaj üzerinden durum güncellemesi yapar."""
