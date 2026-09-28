@@ -2,7 +2,10 @@
   "instagram_ui_medya_arsive_ig_konusuna_basar": "Media has been successfully sent to the archive (IG Topic)!",
   "instagram_ui_i_ndiriliyor_lutfen_bekleyin": "Downloading, please wait....",
   "instagram_ui_menu": "◀️ Menu",
-  "instagram_ui_arsive_i_ndir": "📥 Download to Archive\",\n\"auto_next\": \"Next ▶️\",\n\"auto_previous\": \"◀️ Previous\",\n\"auto_data_being_retrieved_please_wait\": \"Data is being retrieved, please wait...",
+  "instagram_ui_arsive_i_ndir": "📥 Download to Archive",
+  "auto_next": "Next ▶️",
+  "auto_previous": "◀️ Previous",
+  "auto_data_being_retrieved_please_wait": "Data is being retrieved, please wait...",
   "instagram_ui_sonraki": "Next ▶️",
   "instagram_ui_onceki": "◀️ Previous",
   "instagram_ui_veriler_cekiliyor_lutfen_bekle": "Retrieving data, please wait...",
@@ -11,5 +14,7 @@
   "instagram_ui_arsive_yukleme_hatasi_arch_err": "Error uploading to archive: {arch_err}",
   "instagram_ui_one_cikanlar": "⭐ Featured Posts",
   "instagram_ui_gonderiler": "🖼 Posts",
-  "instagram_ui_hikayeler": "📸 Stories\",\n\"auto_close\": \"❌ Close\",\n\"auto_task_list\": \"◀️ Task List"
+  "instagram_ui_hikayeler": "📸 Stories",
+  "auto_close": "❌ Close",
+  "auto_task_list": "◀️ Task List"
 }

@@ -2,6 +2,8 @@
   "inline_help_bu_butonlar_sadece_bot_sahibin": "⛔ These buttons belong only to the bot owner!",
   "inline_help_one_cikanlar": "⭐ Featured Posts",
   "inline_help_gonderiler": "🖼 Posts",
-  "inline_help_hikayeler": "📸 Stories\",\n\"auto_close\": \"❌ Close\",\n\"auto_task_list\": \"◀️ Task List",
+  "inline_help_hikayeler": "📸 Stories",
+  "auto_close": "❌ Close",
+  "auto_task_list": "◀️ Task List",
   "inline_help_hata_var_1": "Error: {var_1}"
 }

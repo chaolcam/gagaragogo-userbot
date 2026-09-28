@@ -1,3 +1,5 @@
 {
-  "log_safe_edit_uyars_s_21": "safe_edit warning: %s\",\n\"log_error_message_delivery_27\": \"Error message could not be delivered: %s\",\n\"log__afk_status_cloud_and_54\": \"💤 AFK status loaded from cloud database (Reason: %s)"
+  "log_safe_edit_uyars_s_21": "safe_edit warning: %s",
+  "log_error_message_delivery_27": "Error message could not be delivered: %s",
+  "log__afk_status_cloud_and_54": "💤 AFK status loaded from cloud database (Reason: %s)"
 }

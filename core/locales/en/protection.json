@@ -9,7 +9,9 @@
   "log_kullanc_s_antidelete_45": "User %s ran the .antidelete command.",
   "log_antidelete_direkt_ko_60": "Antidelete direct copy failed, downloading attempted: %s",
   "log_antidelete_bypass_ha_29": "Anti-Delete Bypass Error: %s",
-  "log_kullanc_s_sureli_kom_41": "User %s .ran the timed command.\",\n\"log_timed_media_capture_32\": \"Timed media capture error: %s\",\n\"log_ghost_download_error_26\": \"Ghost download error: %s",
+  "log_kullanc_s_sureli_kom_41": "User %s .ran the timed command.",
+  "log_timed_media_capture_32": "Timed media capture error: %s",
+  "log_ghost_download_error_26": "Ghost download error: %s",
   "log_sreli_medya_yakalama_32": "Timed media capture error: %s",
   "log_hayalet_indirme_hata_26": "Ghost download error: %s"
 }
