@@ -88,21 +88,21 @@ def get_main_menu_keyboard():
     def get_icon(isim):
         isim_low = isim.lower()
         if "admin" in isim_low: return "🛡"
-        if "araç" in isim_low or "arac" in isim_low: return "🛠"
-        if "grup" in isim_low or "ilet" in isim_low or "toplu" in isim_low or "broadcast" in isim_low: return "📢"
-        if "sistem" in isim_low: return "💻"
-        if "eğlence" in isim_low or "eglence" in isim_low: return "🎮"
-        if "medya" in isim_low: return "🎬"
+        if "araç" in isim_low or "arac" in isim_low or "tools" in isim_low: return "🛠"
+        if "grup" in isim_low or "ilet" in isim_low or "toplu" in isim_low or "broadcast" in isim_low or "transmission" in isim_low: return "📢"
+        if "sistem" in isim_low or "system" in isim_low: return "💻"
+        if "eğlence" in isim_low or "eglence" in isim_low or "fun" in isim_low: return "🎮"
+        if "medya" in isim_low or "media" in isim_low: return "🎬"
         return "📦"
 
     def get_kat_label(k_key, fallback_name):
         k_lower = k_key.lower()
         if "admin" in k_lower: return t("cat_admin")
-        if "araç" in k_lower or "arac" in k_lower: return t("cat_tools")
-        if "sistem" in k_lower: return t("cat_system")
-        if "medya" in k_lower: return t("cat_media")
-        if "eğlen" in k_lower or "eglen" in k_lower: return t("cat_fun")
-        if "grup" in k_lower: return t("cat_broadcast")
+        if "araç" in k_lower or "arac" in k_lower or "tools" in k_lower: return t("cat_tools")
+        if "sistem" in k_lower or "system" in k_lower: return t("cat_system")
+        if "medya" in k_lower or "media" in k_lower: return t("cat_media")
+        if "eğlen" in k_lower or "eglen" in k_lower or "fun" in k_lower: return t("cat_fun")
+        if "grup" in k_lower or "ilet" in k_lower or "broadcast" in k_lower or "transmission" in k_lower: return t("cat_broadcast")
         return fallback_name
 
     num_kat = len(kategoriler)
