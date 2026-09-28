@@ -6,7 +6,7 @@
 # Copyright (c) 2026 chaolcam
 # -----------------------------------------------------------------------------
 
-from core.locales import t
+
 import os
 import json
 import logging
