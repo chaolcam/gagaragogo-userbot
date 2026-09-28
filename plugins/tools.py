@@ -5,6 +5,7 @@
 # License: GNU GPL v3.0
 # Copyright (c) 2026 chaolcam
 # -----------------------------------------------------------------------------
+from core.locales import t
 import os
 import re
 import shutil
@@ -16,22 +17,23 @@ import requests
 from pyrogram.types import InputMediaPhoto, InputMediaVideo, InputMediaDocument
 from deep_translator import GoogleTranslator
 from utils import ggr
+from core.locales import t
 
 # ================= ÇEVİRİ MODÜLÜ =================
-@ggr.cmd(["ceviridil", "cevdil"], info="Çeviri (.cevir) için varsayılan hedef dilinizi ayarlar.", usage=".ceviridil [dil kodu] (Örn: .ceviridil en)", category="Araçlar")
+@ggr.cmd(["ceviridil", "cevdil"], info=t("cmd_info_eviri_55"), usage=t("cmd_usage_ceviridil_42"), category=t("cat_aralar"))
 async def dil_ayarla(client, message):
-    logging.info("Kullanıcı %s .dil komutunu çalıştırdı.", message.from_user.id if message.from_user else 'Bilinmeyen')
+    logging.info(t("log_kullanc_s_dil_komutu_38"), message.from_user.id if message.from_user else 'Bilinmeyen')
     if len(message.command) > 1:
         yeni_dil = message.command[1].lower()
         ggr.set("cevir_hedef_dil", yeni_dil)
-        await message.edit_text(f"🌍 <b>Çeviri Dili Ayarlandı!</b>\nArtık <code>.cevir</code> komutunu kullandığınızda mesajlar otomatik olarak <code>{yeni_dil}</code> diline çevrilecek.")
+        await message.edit_text(t("tools_b_ceviri_dili_ayarlandi_b_nartik_code_ce", yeni_dil = yeni_dil))
     else:
         mevcut_dil = ggr.get("cevir_hedef_dil", "tr")
-        await message.edit_text(f"Lütfen bir dil kodu belirtin. (Örn: <code>.dil en</code>)\n\n🌍 <b>Mevcut Hedef Dil:</b> <code>{mevcut_dil}</code>")
+        await message.edit_text(t("tools_lutfen_bir_dil_kodu_belirtin_orn_code_di", mevcut_dil = mevcut_dil))
 
-@ggr.cmd(["cevir", "çevir"], info="Yanıtladığınız mesajı ayarladığınız varsayılan dile otomatik çevirir.", usage="Yanıtlayarak: .cevir", category="Araçlar")
+@ggr.cmd(["cevir", t("tools_translate")], info=t("cmd_info_yantladnz_69"), usage=t("cmd_usage_yantlayarak_20"), category=t("cat_aralar"))
 async def ceviri_yap(client, message):
-    logging.info("Kullanıcı %s .cevir komutunu çalıştırdı.", message.from_user.id if message.from_user else 'Bilinmeyen')
+    logging.info(t("log_kullanc_s_cevir_komu_40"), message.from_user.id if message.from_user else 'Bilinmeyen')
     if not message.reply_to_message or not message.reply_to_message.text:
         await message.edit_text(ggr.t("err_reply_text_required"))
         return
@@ -39,14 +41,14 @@ async def ceviri_yap(client, message):
     hedef_dil = ggr.get("cevir_hedef_dil", "tr")
     kaynak_metin = message.reply_to_message.text
     
-    await message.edit_text("⏳ <i>Çevriliyor...</i>")
+    await message.edit_text(t("tools_i_cevriliyor_i"))
     
     try:
         ceviri = GoogleTranslator(source='auto', target=hedef_dil).translate(kaynak_metin)
-        sonuc_metni = f"🌍 <b>Çeviri ({hedef_dil}):</b>\n\n<code>{ggr.safe_html(ceviri)}</code>"
+        sonuc_metni = t("tools_translation_result", lang=hedef_dil, text=ggr.safe_html(ceviri))
         await message.edit_text(sonuc_metni)
     except Exception as e:
-        await message.edit_text(f"❌ Çeviri başarısız oldu:\n<code>{e}</code>")
+        await message.edit_text(t("tools_ceviri_basarisiz_oldu_n_code_e_code", e = e))
 
 
 # ================= SOSYAL MEDYA İNDİRİCİ =================
@@ -84,7 +86,7 @@ def download_tiktok_tikwm(url, download_dir):
                     f.write(vid_data)
                 return username
     except Exception as e:
-        logging.warning("TikWM hatası (%s), yt-dlp deneniyor...", e)
+        logging.warning(t("log_tikwm_hatas_s_ytdlp__38"), e)
     return None
 
 def download_twitter_media(url, download_dir):
@@ -205,27 +207,27 @@ async def _process_single_social_url(client, url, download_dir, hedef_chat, hede
     ]
 
     if not dosyalar:
-        raise ValueError("Medya bulunamadı veya engellendi (Gizli profil vb).")
+        raise ValueError(t("tools_media_not_found"))
 
     await _send_media_files(client, dosyalar, hedef_chat, hedef_konu_mevcut)
 
 
-@ggr.cmd(["yt", "tt", "x", "rd"], info="YouTube, TikTok, Twitter ve Reddit medyalarını indirir.", usage=".yt [link] | .tt [link]", category="Araçlar")
+@ggr.cmd(["yt", "tt", "x", "rd"], info=t("cmd_info_youtube_55"), usage=".yt [link] | .tt [link]", category=t("cat_aralar"))
 async def sosyal_indirici(client, message):
     """YouTube, TikTok, Twitter ve Reddit linklerini toplu/tekil indirip Telegram'a yükler."""
     links = message.text.split()[1:]
-    logging.info("Kullanıcı %s sosyal indirme komutunu çalıştırdı. İstekler: %s", message.from_user.id if message.from_user else 'Bilinmeyen', links)
+    logging.info(t("log_kullanc_s_sosyal_ind_61"), message.from_user.id if message.from_user else 'Bilinmeyen', links)
     if not links:
         try:
-            await message.edit_text("❌ Kullanım: `.yt link1 link2` veya `.ig link` vb.")
+            await message.edit_text(t("tools_kullanim_yt_link1_link2_veya_i"))
         except Exception:
-            await message.reply_text("❌ Kullanım: `.yt link1 link2` veya `.ig link` vb.")
+            await message.reply_text(t("tools_kullanim_yt_link1_link2_veya_i"))
         return
 
     try:
-        durum_mesaji = await message.edit_text(f"⏳ {len(links)} adet medya aranıyor ve indiriliyor...")
+        durum_mesaji = await message.edit_text(t("tools_var_1_adet_medya_araniyor_ve_indiriliyor", var_1 = len(links)))
     except Exception:
-        durum_mesaji = await message.reply_text(f"⏳ {len(links)} adet medya aranıyor ve indiriliyor...")
+        durum_mesaji = await message.reply_text(t("tools_var_1_adet_medya_araniyor_ve_indiriliyor", var_1 = len(links)))
 
     hedef_chat = message.chat.id
     hedef_konu = getattr(message, "message_thread_id", None)
@@ -239,7 +241,7 @@ async def sosyal_indirici(client, message):
     hata_loglari = []
 
     for url_idx, url in enumerate(links, 1):
-        await durum_mesaji.edit_text(f"⏳ İndiriliyor ({url_idx}/{len(links)})...\n🔗 `{url}`")
+        await durum_mesaji.edit_text(t("tools_i_ndiriliyor_url_idx_var_1_n_url", url_idx = url_idx, var_1 = len(links), url = url))
 
         indirme_idsi = str(uuid.uuid4())
         download_dir = os.path.join("downloads", indirme_idsi)
@@ -259,7 +261,7 @@ async def sosyal_indirici(client, message):
                 except Exception as _exc:
                     logging.debug("Suppressed: %s", _exc)
 
-    sonuc_metni = f"✅ <b>İşlem Tamamlandı!</b>\n📥 İndirilen Link: <code>{basarili}</code> | ❌ Hatala: <code>{hatali}</code>\n"
+    sonuc_metni = t("tools_download_completed", basarili=basarili, hatali=hatali)
     if hata_loglari:
         sonuc_metni += "\n📋 <b>HATA RAPORU:</b>\n" + "\n".join(hata_loglari)
     if len(sonuc_metni) > 4000:
@@ -278,7 +280,7 @@ async def _send_single_tg_media(client, m, hedef_chat, hedef_konu):
     try:
         dosya_yolu = await client.download_media(m)
         if not (dosya_yolu and os.path.exists(dosya_yolu) and os.path.getsize(dosya_yolu) > 0):
-            return False, "Telegram boş dosya indirdi, es geçildi."
+            return False, t("tools_tg_empty_file")
 
         if m.photo:
             await client.send_photo(chat_id=hedef_chat, photo=dosya_yolu, reply_to_message_id=hedef_konu)
@@ -326,7 +328,7 @@ async def _fetch_single_tg_msg(client, link, durum_mesaji, i, total_links):
         msg = await client.get_messages(chat_id_super, msg_id)
     except Exception as e:
         if "Peer" in str(e).capitalize() or "PEER_ID_INVALID" in str(e):
-            await durum_mesaji.edit_text(f"🕵️‍♂️ Gizli grup aranıyor ({i}/{total_links})...")
+            await durum_mesaji.edit_text(t("tools_gizli_grup_araniyor_i_total_links", i = i, total_links = total_links))
             msg = None
         else:
             raise e
@@ -349,24 +351,24 @@ async def _process_tg_album(client, album_mesajlari, hedef_chat, hedef_konu, hat
             if not ok:
                 hata_loglari.append(f"❌ Msg {m.id}: {err_msg}")
         except Exception as e:
-            hata_loglari.append(f"❌ Msg {m.id}: Yüklenirken Hata - {str(e)}")
+            hata_loglari.append(t("tools_msg_upload_err", msg_id=m.id, err=str(e)))
 
 
-@ggr.cmd(["tg", "indir"], info="Telegram medya mesajını veya bağlantısını indirip Yedek grubuna gönderir.", usage=".tg [link] veya yanıta .indir", category="Araçlar")
+@ggr.cmd(["tg", "indir"], info=t("cmd_info_telegram_73"), usage=t("cmd_usage_tg_29"), category=t("cat_aralar"))
 async def manuel_linkten_tg(client, message):
-    logging.info("Kullanıcı %s .tg komutunu çalıştırdı.", message.from_user.id if message.from_user else 'Bilinmeyen')
+    logging.info(t("log_kullanc_s_tg_komutun_37"), message.from_user.id if message.from_user else 'Bilinmeyen')
     try:
-        durum_mesaji = await message.edit_text("⏳ Sistem yanıt verdi, linkler taranıyor...")
+        durum_mesaji = await message.edit_text(t("tools_sistem_yanit_verdi_linkler_tar"))
         text_to_search = message.text or ""
         if message.reply_to_message:
             text_to_search += " " + (message.reply_to_message.text or message.reply_to_message.caption or "")
 
         links = _extract_tg_links(text_to_search)
         if not links:
-            await durum_mesaji.edit_text("❌ Kullanım: .tg https://t.me/...")
+            await durum_mesaji.edit_text(t("tools_kullanim_tg_https_t_me"))
             return
 
-        await durum_mesaji.edit_text(f"⏳ Toplu indirme başlatılıyor... Toplam Link: {len(links)}")
+        await durum_mesaji.edit_text(t("tools_toplu_indirme_baslatiliyor_toplam_link_v", var_1 = len(links)))
         hedef_chat, hedef_konu = _resolve_target_thread(message)
 
         basarili, hatali = 0, 0
@@ -374,7 +376,7 @@ async def manuel_linkten_tg(client, message):
 
         for i, link in enumerate(links, 1):
             try:
-                await durum_mesaji.edit_text(f"⏳ İndiriliyor ({i}/{len(links)})...")
+                await durum_mesaji.edit_text(t("tools_i_ndiriliyor_i_var_1", i = i, var_1 = len(links)))
                 album = await _fetch_single_tg_msg(client, link, durum_mesaji, i, len(links))
                 await _process_tg_album(client, album, hedef_chat, hedef_konu, hata_loglari)
                 basarili += 1
@@ -383,7 +385,7 @@ async def manuel_linkten_tg(client, message):
                 hatali += 1
                 hata_loglari.append(f"❌ Msg {link.split('/')[-1]}: {str(e)}")
 
-        sonuc_metni = f"✅ <b>İşlem Tamamlandı!</b>\n📥 İşlenen Link: <code>{basarili}</code> | ❌ Hatalı: <code>{hatali}</code>\n"
+        sonuc_metni = t("tools_process_completed", basarili=basarili, hatali=hatali)
         if hata_loglari:
             sonuc_metni += "\n📋 <b>HATA RAPORU:</b>\n" + "\n".join(hata_loglari)
             
@@ -392,8 +394,8 @@ async def manuel_linkten_tg(client, message):
 
         await durum_mesaji.edit_text(sonuc_metni)
     except Exception as e: 
-        await ggr.log(f"🚨 .tg komutu kritik hatası:\n{str(e)}")
-        await message.edit_text(f"Kritik Hata: {str(e)}")
+        await ggr.log(t("tools_tg_critical_log_err", err=str(e)))
+        await message.edit_text(t("tools_kritik_hata_var_1", var_1 = str(e)))
 
 
 # ================= WHOIS & PROFİL ANALİZİ =================
@@ -414,34 +416,32 @@ def _format_whois_text(hedef_user, chat_detay, ortak_sayisi):
     soyad = ggr.safe_html(hedef_user.last_name or "")
     kullanici_adi = f"@{hedef_user.username}" if hedef_user.username else "Yok"
     bio = ggr.safe_html(getattr(chat_detay, "bio", "") or "Biyografi yok")
-    bot_mu = "Evet 🤖" if hedef_user.is_bot else "Hayır 👤"
-    dogrulanmis = "Evet ✅" if getattr(hedef_user, "is_verified", False) else "Hayır ❌"
-    scam = "Evet ⚠️ (Şüpheli)" if (getattr(hedef_user, "is_scam", False) or getattr(hedef_user, "is_fake", False)) else "Temiz 🛡️"
-    premium = "Evet ⭐" if getattr(hedef_user, "is_premium", False) else "Hayır"
+    bot_mu = "Evet 🤖" if hedef_user.is_bot else t("tools_no_user")
+    dogrulanmis = "Evet ✅" if getattr(hedef_user, "is_verified", False) else t("tools_no")
+    scam = t("tools_yes_scam") if (getattr(hedef_user, "is_scam", False) or getattr(hedef_user, "is_fake", False)) else "Temiz 🛡️"
+    premium = "Evet ⭐" if getattr(hedef_user, "is_premium", False) else t("tools_no_plain")
 
-    return (
-        f"👤 <b>KULLANICI BİLGİSİ (WHOIS)</b>\n"
-        f"────────────────────────\n"
-        f"• <b>İsim:</b> {ad} {soyad}\n"
-        f"• <b>Kullanıcı Adı:</b> {kullanici_adi}\n"
-        f"• <b>Kullanıcı ID:</b> <code>{hedef_user.id}</code>\n"
-        f"• <b>Kalıcı Profil:</b> <a href=\"tg://user?id={hedef_user.id}\">Profili Aç</a>\n"
-        f"• <b>Veri Merkezi (DC):</b> <code>{dc_id or 'Bilinmiyor'}</code>\n"
-        f"• <b>Tür:</b> {bot_mu}\n"
-        f"• <b>Doğrulanmış:</b> {dogrulanmis}\n"
-        f"• <b>Premium:</b> {premium}\n"
-        f"• <b>Güvenlik Durumu:</b> {scam}\n"
-        f"• <b>Ortak Gruplar:</b> <code>{ortak_sayisi}</code> adet\n"
-        f"• <b>Biyografi:</b> <i>{bio}</i>"
+    return t("tools_whois_info",
+        ad=ad,
+        soyad=soyad,
+        kullanici_adi=kullanici_adi,
+        id=hedef_user.id,
+        dc_id=dc_id or 'Bilinmiyor',
+        bot_mu=bot_mu,
+        dogrulanmis=dogrulanmis,
+        premium=premium,
+        scam=scam,
+        ortak_sayisi=ortak_sayisi,
+        bio=bio
     )
 
 
-@ggr.cmd(["whois", "info"], info="Kullanıcı hakkında detaylı kimlik ve profil analizi yapar.", usage=".whois [kullanıcı_adı | id | yanıtla]", category="Araçlar")
+@ggr.cmd(["whois", "info"], info=t("cmd_info_kullanc_58"), usage=t("cmd_usage_whois_37"), category=t("cat_aralar"))
 async def whois_user(client, message):
     try:
         hedef_user = await _resolve_whois_target_user(client, message)
     except Exception as e:
-        await message.edit_text(f"❌ Kullanıcı bulunamadı: <code>{e}</code>")
+        await message.edit_text(t("tools_kullanici_bulunamadi_code_e_code", e = e))
         return
 
     if not hedef_user:
@@ -470,7 +470,7 @@ async def whois_user(client, message):
         await durum.edit_text(ggr.t("err_general", error=str(e)))
 
 # ================= OCR (GÖRSELDEN METİN OKUMA) =================
-@ggr.cmd("ocr", info="Yanıtlanan görseldeki yazıları okur (OCR).", usage="Görsele yanıtlayarak: .ocr [dil]", category="Araçlar")
+@ggr.cmd("ocr", info=t("cmd_info_yantlanan_42"), usage=t("cmd_usage_grsele_32"), category=t("cat_aralar"))
 async def ocr_read(client, message):
     if not message.reply_to_message or not (message.reply_to_message.photo or message.reply_to_message.document):
         await message.edit_text(ggr.t("err_image_required"))

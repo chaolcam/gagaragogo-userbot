@@ -5,6 +5,7 @@
 # License: GNU GPL v3.0
 # Copyright (c) 2026 chaolcam
 # -----------------------------------------------------------------------------
+from core.locales import t
 import os
 import re
 import json
@@ -14,6 +15,7 @@ import logging
 from pyrogram import Client, filters, errors
 from utils import ggr
 import utils
+from core.locales import t
 
 ggr_otomesaj_db_file = "otomesaj.json"
 ggr_otomesaj_bekleme = 0.8
@@ -33,7 +35,7 @@ def otomesaj_db_yukle():
         with open(ggr_otomesaj_db_file, "r", encoding="utf-8") as f:
             return json.load(f)
     except Exception as e:
-        logging.error("otomesaj.json okuma hatası: %s", e)
+        logging.error(t("log_otomesajjson_okuma_h_30"), e)
         return {}
 
 
@@ -50,7 +52,7 @@ def otomesaj_db_kaydet(data, sync_cloud=True):
             except Exception as _exc:
                 logging.debug("Suppressed: %s", _exc)
     except Exception as e:
-        logging.error("otomesaj.json kaydetme hatası: %s", e)
+        logging.error(t("log_otomesajjson_kaydetm_33"), e)
 
 
 def get_next_task_id(db):
@@ -164,7 +166,7 @@ async def _send_otomesaj_to_target(client, chat_id, chat_key, kaynak_mesaj, once
         try:
             await client.delete_messages(chat_id, son_mesajlar[chat_key])
         except Exception as _exc:
-            logging.debug("Önceki otomesaj silinemedi: %s", _exc)
+            logging.debug(t("log_nceki_otomesaj_silin_30"), _exc)
 
     try:
         sent_msg = await kaynak_mesaj.copy(chat_id)
@@ -182,7 +184,7 @@ async def _send_otomesaj_to_target(client, chat_id, chat_key, kaynak_mesaj, once
         except Exception:
             return False
     except Exception as err:
-        logging.warning("Otomesaj iletim hatası (Chat: %s): %s", chat_id, err)
+        logging.warning(t("log_otomesaj_iletim_hata_37"), chat_id, err)
         return False
 
 
@@ -202,10 +204,10 @@ async def execute_task_broadcast(client, task_id, task_data):
     try:
         kaynak_mesaj = await client.get_messages("me", saved_msg_id)
         if not kaynak_mesaj or kaynak_mesaj.empty:
-            logging.error("Otomesaj #%s Kayıtlı Mesajlar'dan mesaj çekilemedi.", task_id)
+            logging.error(t("log_otomesaj_s_kaytl_mes_51"), task_id)
             return 0, 0
     except Exception as e:
-        logging.error("Otomesaj #%s kaynak mesaj çekme hatası: %s", task_id, e)
+        logging.error(t("log_otomesaj_s_kaynak_me_42"), task_id, e)
         return 0, 0
 
     basarili = 0
@@ -227,14 +229,14 @@ async def execute_task_broadcast(client, task_id, task_data):
         db[str(task_id)]["son_mesajlar"] = son_mesajlar
         otomesaj_db_kaydet(db, sync_cloud=True)
 
-    logging.info("📢 Otomesaj #%s (%s) tamamlandı: %s başarılı, %s hata.", task_id, baslik, basarili, hatali)
+    logging.info(t("log__otomesaj_s_s_tamaml_53"), task_id, baslik, basarili, hatali)
     return basarili, hatali
 
 
 async def otomesaj_monitor_loop(client):
     """Arka planda her 30 saniyede bir görevleri kontrol eden ana zamanlayıcı."""
     await asyncio.sleep(10)  # Bot ilk açılırken sistemin oturması için bekle
-    logging.info("⏰ Otomatik Mesaj İletim Motoru (Otomesaj) Başlatıldı!")
+    logging.info(t("log__otomatik_mesaj_ilet_53"))
     
     while True:
         try:
@@ -253,7 +255,7 @@ async def otomesaj_monitor_loop(client):
                 # Zamanı gelmiş mi kontrol et
                 if (now - son_gonderim) >= aralik_sn:
                     task_id = int(task_id_str)
-                    logging.info("🚀 Otomesaj #%s zamanı geldi, iletiliyor...", task_id)
+                    logging.info(t("log__otomesaj_s_zaman_ge_42"), task_id)
                     
                     basarili, hatali = await execute_task_broadcast(client, task_id, task)
                     
@@ -278,7 +280,7 @@ async def otomesaj_monitor_loop(client):
                 otomesaj_db_kaydet(db, sync_cloud=True)
                 
         except Exception as e:
-            logging.error("Otomesaj döngü hatası: %s", e)
+            logging.error(t("log_otomesaj_dng_hatas_s_25"), e)
             
         await asyncio.sleep(30)
 
@@ -294,14 +296,11 @@ async def _handle_otomesaj_ekle(client, message, args):
 
     if not kaynak_mesaj and not ek_metin:
         await message.edit_text(
-            "❌ <b>Lütfen kaydedilecek bir içerik belirtin!</b>\n\n"
-            "💡 <b>Kullanım:</b>\n"
-            "• Mesaja yanıt vererek: <code>.otomesaj ekle [Başlık]</code>\n"
-            "• Metin yazarak: <code>.otomesaj ekle [Metin]</code>"
+            t("automessage_b_lutfen_kaydedilecek_bir_icerik_belirti")
         )
         return
 
-    durum = await message.edit_text("⏳ <i>Mesaj kaydediliyor ve ayarlanıyor...</i>")
+    durum = await message.edit_text(t("automessage_i_mesaj_kaydediliyor_ve_ayarla"))
 
     if not kaynak_mesaj:
         saved = await client.send_message("me", ek_metin)
@@ -352,16 +351,10 @@ async def _handle_otomesaj_ekle(client, message, args):
                     logging.debug("Suppressed: %s", _exc)
                 return
         except Exception as e:
-            logging.warning("Inline otomesaj menü gönderme hatası: %s", e)
+            logging.warning(t("log_inline_otomesaj_men__40"), e)
 
     await durum.edit_text(
-        f"⏸ <b>Otomesaj #{task_id} Kaydedildi! (Ayarlama Bekliyor)</b>\n\n"
-        f"📌 <b>Başlık:</b> <code>{baslik}</code>\n"
-        f"⏱ <b>Süre:</b> 1 saat (60 dk)\n"
-        f"👥 <b>Hedef:</b> {len(varsayilan_gruplar)} grup seçildi.\n\n"
-        "⚙️ <i>Mesajınız duraklatılmış olarak eklendi. İstemediğiniz gruplara yanlışlıkla gitmemesi için "
-        "aşağıdaki yönetim panelinden hedef grupları ve süreyi ayarladıktan sonra görevi aktifleştirin.</i>\n\n"
-        "💡 Yönetmek için: <code>.otomesaj</code>"
+        t("automessage_otomesaj_kaydedildi", task_id=task_id, baslik=baslik, grup_sayisi=len(varsayilan_gruplar))
     )
 
 
@@ -369,12 +362,7 @@ async def _handle_otomesaj_sure(message, args):
     """Otomesaj süresini günceller."""
     if len(args) < 3:
         await message.edit_text(
-            "❌ <b>Hatalı Kullanım!</b>\n\n"
-            "💡 <b>Örnekler:</b>\n"
-            "• <code>.otomesaj sure 1 2.5 saat</code>\n"
-            "• <code>.otomesaj sure 1 45 dk</code>\n"
-            "• <code>.otomesaj sure 1 1.5 gun</code>\n"
-            "• <code>.otomesaj sure 1 90</code>"
+            t("automessage_b_hatali_kullanim_b_b_ornekler_b_code_ot")
         )
         return
 
@@ -383,52 +371,47 @@ async def _handle_otomesaj_sure(message, args):
     dakika = parse_sure(sure_giris)
 
     if not dakika:
-        await message.edit_text(f"❌ Geçersiz süre: <code>{sure_giris}</code>\nÖrnek: <code>2.5 saat</code>, <code>45 dk</code>, <code>1 gün</code>")
+        await message.edit_text(t("automessage_gecersiz_sure_code_sure_giris_code_norne", sure_giris = sure_giris))
         return
 
     db = otomesaj_db_yukle()
     if task_id_str not in db:
-        await message.edit_text(f"❌ Görev #{task_id_str} bulunamadı!")
+        await message.edit_text(t("automessage_gorev_task_id_str_bulunamadi", task_id_str = task_id_str))
         return
 
     db[task_id_str]["aralik_dakika"] = dakika
     otomesaj_db_kaydet(db, sync_cloud=True)
 
     await message.edit_text(
-        f"✅ <b>Otomesaj #{task_id_str} Süresi Güncellendi!</b>\n\n"
-        f"📌 <b>Başlık:</b> <code>{db[task_id_str]['baslik']}</code>\n"
-        f"⏱ <b>Yeni Süre:</b> <code>{format_sure(dakika)}</code> ({dakika:.1f} dakika)"
+        t("automessage_otomesaj_sure_guncellendi", task_id=task_id_str, baslik=db[task_id_str]['baslik'], sure_str=format_sure(dakika), dk=dakika)
     )
 
 
 async def _handle_otomesaj_sil(message, args):
     """Otomesaj görevini siler."""
     if len(args) < 2:
-        await message.edit_text("❌ Kullanım: <code>.otomesaj sil [id]</code> (Örn: <code>.otomesaj sil 1</code>)")
+        await message.edit_text(t("automessage_kullanim_code_otomesaj_sil_id_"))
         return
 
     task_id_str = args[1]
     db = otomesaj_db_yukle()
     if task_id_str not in db:
-        await message.edit_text(f"❌ Görev #{task_id_str} bulunamadı!")
+        await message.edit_text(t("automessage_gorev_task_id_str_bulunamadi", task_id_str = task_id_str))
         return
 
     silinen = db.pop(task_id_str)
     otomesaj_db_kaydet(db, sync_cloud=True)
-    await message.edit_text(f"🗑 <b>Otomesaj #{task_id_str} ({silinen['baslik']}) silindi.</b>")
+    await message.edit_text(t("automessage_b_otomesaj_task_id_str_var_1_silindi_b", task_id_str = task_id_str, var_1 = silinen['baslik']))
 
 
 async def _handle_otomesaj_panel(client, message):
     """Ana otomesaj yönetim panelini sunar."""
-    durum = await message.edit_text("🔄 <i>Otomesaj paneli yükleniyor...</i>")
+    durum = await message.edit_text(t("automessage_i_otomesaj_paneli_yukleniyor_i"))
     db = otomesaj_db_yukle()
 
     if not db:
         await durum.edit_text(
-            "ℹ️ <b>Kayıtlı otomatik mesajınız bulunmuyor.</b>\n\n"
-            "💡 <b>Yeni Mesaj Eklemek İçin:</b>\n"
-            "Herhangi bir mesaja yanıt vererek:\n"
-            "<code>.otomesaj ekle [Başlık]</code> yazabilirsiniz."
+            t("automessage_b_kayitli_otomatik_mesajiniz_bulunmuyor_")
         )
         return
 
@@ -448,7 +431,7 @@ async def _handle_otomesaj_panel(client, message):
                 await durum.delete()
                 return
         except Exception as e:
-            logging.warning("Inline otomesaj menü hatası: %s", e)
+            logging.warning(t("log_inline_otomesaj_men__31"), e)
 
     metin = "⏰ <b>Kayıtlı Otomatik Mesaj Görevleri:</b>\n\n"
     for tid, t in db.items():
@@ -464,7 +447,7 @@ async def _handle_otomesaj_panel(client, message):
     await durum.edit_text(metin)
 
 
-@ggr.cmd(["otomesaj", "otomesajlar"], info="Otomatik zamanlanmış mesaj yönetim panelini açar.", usage=".otomesaj | .otomesaj ekle [başlık]", category="Grup & İletim")
+@ggr.cmd(["otomesaj", "otomesajlar"], info=t("cmd_info_otomatik_49"), usage=t("cmd_usage_otomesaj_35"), category=t("cat_grupiletim"))
 async def otomesaj_komutu(client, message):
     """Otomatik mesaj ana komutu ve alt komutları yönetir."""
     args = message.text.split()[1:] if message.text else []

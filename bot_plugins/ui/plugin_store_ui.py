@@ -5,6 +5,7 @@
 # License: GNU GPL v3.0
 # Copyright (c) 2026 chaolcam
 # -----------------------------------------------------------------------------
+from core.locales import t
 import logging
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 import utils

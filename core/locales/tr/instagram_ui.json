@@ -1,0 +1,15 @@
+{
+  "instagram_ui_medya_arsive_ig_konusuna_basar": "Medya arşive (IG Konusuna) başarıyla gönderildi!",
+  "instagram_ui_i_ndiriliyor_lutfen_bekleyin": "İndiriliyor, lütfen bekleyin...",
+  "instagram_ui_menu": "◀️ Menü",
+  "instagram_ui_arsive_i_ndir": "📥 Arşive İndir",
+  "instagram_ui_sonraki": "Sonraki ▶️",
+  "instagram_ui_onceki": "◀️ Önceki",
+  "instagram_ui_veriler_cekiliyor_lutfen_bekle": "Veriler çekiliyor, lütfen bekleyin...",
+  "instagram_ui_rapidapi_anahtariniz_yok_lutfen_sohbette": "⚠️ RapidAPI anahtarınız yok! Lütfen sohbette .rapidapi [anahtar] yazarak anahtarınızı ekleyin.",
+  "instagram_ui_medya_yuklenirken_hata_olustu_send_err": "Medya yüklenirken hata oluştu: {send_err}",
+  "instagram_ui_arsive_yukleme_hatasi_arch_err": "Arşive yükleme hatası: {arch_err}",
+  "instagram_ui_one_cikanlar": "⭐ Öne Çıkanlar",
+  "instagram_ui_gonderiler": "🖼 Gönderiler",
+  "instagram_ui_hikayeler": "📸 Hikayeler"
+}

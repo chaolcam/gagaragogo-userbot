@@ -13,6 +13,7 @@ from pyrogram.enums import ParseMode
 import logging
 from cachetools import LRUCache
 from utils import ggr, create_forum_topic_helper
+from core.locales import t
 
 async def get_or_create_antidelete_topic(client, hedef_chat):
     """Ana admin grubunda silinen mesajlar için otomatik forum konusu oluşturur/getirir."""
@@ -23,7 +24,7 @@ async def get_or_create_antidelete_topic(client, hedef_chat):
             if topic_id:
                 ggr.set("antidelete_topic_id", topic_id)
         except Exception as e:
-            logging.error("Anti-delete forum topic oluşturma hatası: %s", e)
+            logging.error(t("log_antidelete_forum_top_44"), e)
     return topic_id
 
 async def get_or_create_sureli_topic(client, hedef_chat):
@@ -35,7 +36,7 @@ async def get_or_create_sureli_topic(client, hedef_chat):
             if topic_id:
                 ggr.set("sureli_topic_id", topic_id)
         except Exception as e:
-            logging.error("Süreli medya forum topic oluşturma hatası: %s", e)
+            logging.error(t("log_sreli_medya_forum_to_45"), e)
     return topic_id
 
 
@@ -43,9 +44,9 @@ async def get_or_create_sureli_topic(client, hedef_chat):
 # 512 MB RAM optimizasyonu: Özel sohbetler için son 500 mesaj önbellekte tutulur
 ggr_mesaj_onbellegi = LRUCache(maxsize=500)
 
-@ggr.cmd("antidelete", info="Özel sohbetlerde (DM) silinen mesajları yakalama modunu açar veya kapatır.", usage=".antidelete on | .antidelete off", category="Araçlar")
+@ggr.cmd("antidelete", info=t("cmd_info_zel_74"), usage=".antidelete on | .antidelete off", category=t("cat_aralar"))
 async def antidelete_ayar(client, message):
-    logging.info("Kullanıcı %s .antidelete komutunu çalıştırdı.", message.from_user.id if message.from_user else 'Bilinmeyen')
+    logging.info(t("log_kullanc_s_antidelete_45"), message.from_user.id if message.from_user else 'Bilinmeyen')
     if len(message.command) > 1:
         arg = message.command[1].lower()
         if arg == "on":
@@ -59,7 +60,7 @@ async def antidelete_ayar(client, message):
     else:
         durum = ggr.get("antidelete_durumu", False)
         durum_metni = "AÇIK ✅" if durum else "KAPALI ❌"
-        await message.edit_text(f"Özel Sohbet Anti-Delete: <b>{durum_metni}</b>\n\n📌 Kayıt Hedefi: <code>Ana Admin Grubu</code>")
+        await message.edit_text(t("protection_ozel_sohbet_anti_delete_b_durum_metni_b_", durum_metni = durum_metni))
 
 @ggr.on(filters.private, group=-20)
 async def mesaj_hafizala(client, message):
@@ -86,7 +87,7 @@ async def _forward_deleted_msg(client, orjinal, hedef_chat, topic_id):
         await kopyalanan.reply(bilgi_metni)
         return
     except Exception as _copy_err:
-        logging.debug("Antidelete direkt kopyalama başarısız, indirme deneniyor: %s", _copy_err)
+        logging.debug(t("log_antidelete_direkt_ko_60"), _copy_err)
 
     try:
         if orjinal.media:
@@ -104,9 +105,9 @@ async def _forward_deleted_msg(client, orjinal, hedef_chat, topic_id):
             else:
                 await client.send_document(chat_id=hedef_chat, document=indirilen, caption=bilgi_metni, reply_to_message_id=topic_id)
         else:
-            await client.send_message(chat_id=hedef_chat, text=f"{bilgi_metni}\n📝 <b>Mesaj:</b>\n\n{ggr.safe_html(orjinal.text)}", reply_to_message_id=topic_id)
+            await client.send_message(chat_id=hedef_chat, text=t("protection_bilgi_metni_n_b_mesaj_b_n_n_var_1", bilgi_metni = bilgi_metni, var_1 = ggr.safe_html(orjinal.text)), reply_to_message_id=topic_id)
     except Exception as e:
-        logging.error("Anti-Delete Bypass Hatası: %s", e)
+        logging.error(t("log_antidelete_bypass_ha_29"), e)
 
 
 @Client.on_deleted_messages()
@@ -129,9 +130,9 @@ async def silinen_mesajlari_yakala(client, messages):
 
 
 # ================= SÜRELİ MEDYA MODÜLÜ =================
-@ggr.cmd("sureli", info="Tek gösterimlik süreli medyaları otomatik yakalayıp kaydeder.", usage=".sureli on | .sureli off", category="Araçlar")
+@ggr.cmd("sureli", info=t("cmd_info_tek_61"), usage=".sureli on | .sureli off", category=t("cat_aralar"))
 async def sureli_ayar(client, message):
-    logging.info("Kullanıcı %s .sureli komutunu çalıştırdı.", message.from_user.id if message.from_user else 'Bilinmeyen')
+    logging.info(t("log_kullanc_s_sureli_kom_41"), message.from_user.id if message.from_user else 'Bilinmeyen')
     if len(message.command) > 1:
         arg = message.command[1].lower()
         if arg == "on":
@@ -145,7 +146,7 @@ async def sureli_ayar(client, message):
     else:
         durum = ggr.get("hayalet_durumu", False)
         durum_metni = "AÇIK ⏳" if durum else "KAPALI ❌"
-        await message.edit_text(f"Süreli Medya Modu: <b>{durum_metni}</b>\n\n📌 Kayıt Hedefi: <code>Ana Admin Grubu</code>")
+        await message.edit_text(t("protection_sureli_medya_modu_b_durum_metni_b_n_n_ka", durum_metni = durum_metni))
 
 
 def _is_ghost_media(message) -> bool:
@@ -204,6 +205,6 @@ async def sureli_medya_yakalayici(client, message):
         try:
             await _send_ghost_media_backup(client, message, dl, hedef_chat, topic_id)
         except Exception as e:
-            logging.error("Süreli medya yakalama hatası: %s", e)
+            logging.error(t("log_sreli_medya_yakalama_32"), e)
     except Exception as e:
-        logging.error("Hayalet indirme hatası: %s", e)
+        logging.error(t("log_hayalet_indirme_hata_26"), e)

@@ -1,0 +1,7 @@
+{
+  "bypasser_b_toplu_bypass_baslatildi_b_toplam_code_": "⏳ <b>Bulk Bypass Started:</b> Total <code>{toplam}</code> links detected...\\\\n(0/{total} completed)",
+  "bypasser_i_linkler_cozuluyor_i_idx_toplam_n_code_": "⏳ <i>Links are being resolved:</i> ({idx}/{total})\\\\n<code>{url}</code>\",\n\"auto_b_panel_opening_error_b_n_co\": \"❌ <b>An error occurred while opening the panel:</b>\\\\n<code>{var_1}</code>\",\n\"auto_b_error_b_code_var_1_code\": \"❌ <b>Error:</b> <code>{var_1}</code>\",\n\"auto_b_group_not_found_b_once_code_rehber_cod\": \"❌ <b>Group not found!</b>\\n\\nFirst <code>.find out the group number by typing contacts</code>.\\NUSE: <code>.contact [Group No] [PCs]</code>\\n<i>Example: <code>.with guide 1 50</code></i>",
+  "cmd_info_ouoio_107": "Ouo.io, Ouo.Press, TinyURL, Bitly, CleanURI, and bypasses all short/ad-supported links to extract the actual target URL.",
+  "cmd_usage_bypass_48": ".bypass [link] or by responding to the link .bypass",
+  "log_droplink_bypass_dene_35": "Droplink bypass test error: %s"
+}

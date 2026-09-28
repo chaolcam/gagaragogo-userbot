@@ -5,6 +5,7 @@
 # License: GNU GPL v3.0
 # Copyright (c) 2026 chaolcam
 # -----------------------------------------------------------------------------
+from core.locales import t
 import os
 import sys
 import ast
@@ -18,6 +19,7 @@ from pyrogram import Client, filters
 from pyrogram.enums import ParseMode
 
 from utils import ggr
+from core.locales import t
 
 # Sabit resmi eklenti mağazası kanalı
 ggr_plugin_store_channel = "gagaragogoplugin"
@@ -55,7 +57,7 @@ def save_custom_plugins(data):
         with open(ggr_custom_plugins_file, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
     except Exception as e:
-        logging.error("custom_plugins.json yazma hatası: %s", e)
+        logging.error(t("log_custom_pluginsjson_y_36"), e)
 
 def is_builtin(name):
     clean = name.lower().strip()
@@ -85,7 +87,7 @@ def load_plugin_runtime(client, module_name):
         else:
             mod = importlib.import_module(module_name)
     except Exception as e:
-        logging.error("Modül import hatası (%s): %s", module_name, e)
+        logging.error(t("log_modl_import_hatas_s__28"), module_name, e)
         return False, f"İçe aktarma hatası: {str(e)}"
 
     registered = []
@@ -98,10 +100,10 @@ def load_plugin_runtime(client, module_name):
                     client.add_handler(handler, group)
                     registered.append((handler, group))
                 except Exception as he:
-                    logging.warning("Handler ekleme uyarısı: %s", he)
+                    logging.warning(t("log_handler_ekleme_uyars_26"), he)
 
     ggr_active_handlers[module_name] = registered
-    logging.info("✅ %s eklentisi %s işleyici ile canlı yüklendi.", module_name, len(registered))
+    logging.info(t("log__s_eklentisi_s_ileyi_46"), module_name, len(registered))
     return True, f"{len(registered)} işleyici aktif edildi."
 
 def unload_plugin_runtime(client, module_name):
@@ -115,7 +117,7 @@ def unload_plugin_runtime(client, module_name):
                 client.remove_handler(handler, group)
                 removed_count += 1
             except Exception as e:
-                logging.warning("Handler kaldırma hatası: %s", e)
+                logging.warning(t("log_handler_kaldrma_hata_27"), e)
 
     # Modülü sys.modules'dan kaldır
     if module_name in sys.modules:
@@ -144,7 +146,7 @@ async def fetch_store_plugins(client, limit=50):
                     "boyut": message.document.file_size
                 })
     except Exception as e:
-        logging.warning("Mağaza kanalından eklentiler çekilemedi (%s): %s", ggr_plugin_store_channel, e)
+        logging.warning(t("log_maaza_kanalndan_ekle_48"), ggr_plugin_store_channel, e)
     return plugins
 
 async def install_plugin_from_file(client, temp_file_path, raw_name, kaynak="dosya", kanal_msg_id=None, aciklama=None):
@@ -181,7 +183,7 @@ async def install_plugin_from_file(client, temp_file_path, raw_name, kaynak="dos
         sent = await client.send_document("me", document=target_path, caption=backup_caption)
         yedek_msg_id = sent.id
     except Exception as be:
-        logging.warning("Kayıtlı mesajlara eklenti yedekleme hatası: %s", be)
+        logging.warning(t("log_kaytl_mesajlara_ekle_46"), be)
 
     # 5. Metadata kaydet
     custom_plugins = get_custom_plugins()
@@ -238,7 +240,7 @@ async def uninstall_custom_plugin(client, plugin_name):
         try:
             os.remove(target_path)
         except Exception as fe:
-            logging.warning("Dosya silme hatası (%s): %s", target_path, fe)
+            logging.warning(t("log_dosya_silme_hatas_s__27"), target_path, fe)
 
     # Metadata'dan çıkar
     if clean_name in custom_plugins:
@@ -264,10 +266,10 @@ async def uninstall_custom_plugin(client, plugin_name):
 async def _install_from_reply(client, message, doc):
     """Yanıtlanan belgeden eklenti yükler."""
     if not doc.file_name or not doc.file_name.endswith(".py"):
-        await message.edit_text("❌ Lütfen <code>.py</code> uzantılı geçerli bir Python eklenti dosyasına yanıt verin!")
+        await message.edit_text(t("plugin_manager_lutfen_code_py_code_uzantili_g"))
         return
 
-    await message.edit_text("⏳ <i>Eklenti dosyası indiriliyor ve kontrol ediliyor...</i>")
+    await message.edit_text(t("plugin_manager_i_eklenti_dosyasi_indiriliyor_"))
     os.makedirs("downloads", exist_ok=True)
     temp_path = os.path.join("downloads", f"temp_{doc.file_name}")
 
@@ -279,7 +281,7 @@ async def _install_from_reply(client, message, doc):
         )
         await message.edit_text(msg)
     except Exception as e:
-        await message.edit_text(f"❌ Yükleme sırasında beklenmeyen hata oluştu: {str(e)}")
+        await message.edit_text(t("plugin_manager_yukleme_sirasinda_beklenmeyen_hata_olust", var_1 = str(e)))
     finally:
         if os.path.exists(temp_path):
             try:
@@ -310,13 +312,12 @@ async def _resolve_store_target_msg(client, target_num):
 
 async def _install_from_store(client, message, target_num):
     """Mağazadan numara ile eklenti indirip kurar."""
-    await message.edit_text(f"⏳ <i>@{ggr_plugin_store_channel} kanalındaki #{target_num} eklenti aranıyor...</i>")
+    await message.edit_text(t("plugin_manager_i_ggr_plugin_store_channel_kanalindaki_t", ggr_plugin_store_channel = ggr_plugin_store_channel, target_num = target_num))
     try:
         target_msg = await _resolve_store_target_msg(client, target_num)
         if not target_msg or not target_msg.document:
             await message.edit_text(
-                f"❌ <b>Eklenti Bulunamadı!</b>\n\n"
-                f"@{ggr_plugin_store_channel} kanalında #{target_num} numaralı geçerli bir <code>.py</code> eklentisi bulunamadı."
+                t("plugin_manager_eklenti_bulunamadi", channel=ggr_plugin_store_channel, msg_id=target_num)
             )
             return
 
@@ -345,10 +346,10 @@ async def _install_from_store(client, message, target_num):
                 except Exception as _del_err:
                     logging.debug("Temp file remove failed: %s", _del_err)
     except Exception as e:
-        await message.edit_text(f"❌ Mağazadan indirme hatası: {str(e)}")
+        await message.edit_text(t("plugin_manager_magazadan_indirme_hatasi_var_1", var_1 = str(e)))
 
 
-@ggr.cmd(["install"], info="Telegram'daki bir .py dosyasına yanıt vererek veya mağazadan (.install 4) canlı eklenti kurar.", usage=".install (yanıtlayarak) veya .install [sayı]", category="Araçlar")
+@ggr.cmd(["install"], info=t("cmd_info_telegramdaki_94"), usage=t("cmd_usage_install_44"), category=t("cat_aralar"))
 async def cmd_install(client, message):
     args = message.text.split()[1:] if message.text else []
 
@@ -361,35 +362,26 @@ async def cmd_install(client, message):
         return
 
     await message.edit_text(
-        "💡 <b>Nasıl Eklenti Yüklenir?</b>\n\n"
-        "1️⃣ <b>Kendi Eklentinizi Yüklemek İçin:</b>\n"
-        "Sohbetteki herhangi bir <code>.py</code> eklenti dosyasına yanıt vererek <code>.install</code> yazın.\n\n"
-        "2️⃣ <b>Resmi Mağazadan Yüklemek İçin:</b>\n"
-        f"@{ggr_plugin_store_channel} kanalındaki eklenti numarasını belirtin: <code>.install 4</code>\n\n"
-        "3️⃣ <b>İnline Menü:</b>\n"
-        "<code>.yardim</code> yazarak <b>[ 🔌 Eklentiler & Mağaza ]</b> butonundan tek tıkla kurabilirsiniz."
+        t("plugin_manager_nasil_eklenti_yuklenir", channel=ggr_plugin_store_channel)
     )
 
 
-@ggr.cmd(["uninstall"], info="Yalnızca sonradan yüklenmiş olan özel bir eklentiyi hafızadan ve sistemden kaldırır.", usage=".uninstall [eklenti_adı]", category="Araçlar")
+@ggr.cmd(["uninstall"], info=t("cmd_info_yalnzca_84"), usage=t("cmd_usage_uninstall_24"), category=t("cat_aralar"))
 async def cmd_uninstall(client, message):
     args = message.text.split()[1:] if message.text else []
     if not args:
         await message.edit_text(
-            "❌ <b>Eklenti Adı Belirtmelisiniz!</b>\n\n"
-            "Kullanım: <code>.uninstall [eklenti_adı]</code>\n"
-            "Örnek: <code>.uninstall afk</code>\n\n"
-            "💡 Yüklü eklentileri görmek için <code>.plugins</code> yazabilirsiniz."
+            t("plugin_manager_b_eklenti_adi_belirtmelisiniz_b_kullanim")
         )
         return
 
     plugin_name = args[0]
-    await message.edit_text(f"⏳ <i><code>{plugin_name}</code> eklentisi kaldırılıyor...</i>")
+    await message.edit_text(t("plugin_manager_i_code_plugin_name_code_eklentisi_kaldir", plugin_name = plugin_name))
     success, res_msg = await uninstall_custom_plugin(client, plugin_name)
     await message.edit_text(res_msg)
 
 
-@ggr.cmd(["plugins"], info="Tüm dahili sistem eklentilerini ve sonradan yüklenen özel eklentileri listeler.", usage=".plugins", category="Araçlar")
+@ggr.cmd(["plugins"], info=t("cmd_info_tm_79"), usage=".plugins", category=t("cat_aralar"))
 async def cmd_plugins(client, message):
     custom_plugins = get_custom_plugins()
 

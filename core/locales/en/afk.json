@@ -1,0 +1,5 @@
+{
+  "cmd_info_afk_32": "Turns on AFK (Away/Busy) mode.",
+  "cat_aralar": "Tools",
+  "log__afk_durumu_bulut_ve_54": "💤 AFK status uploaded from cloud database (Reason: %s)"
+}

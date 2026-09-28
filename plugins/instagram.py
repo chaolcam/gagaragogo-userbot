@@ -5,6 +5,7 @@
 # License: GNU GPL v3.0
 # Copyright (c) 2026 chaolcam
 # -----------------------------------------------------------------------------
+from core.locales import t
 import os
 import random
 import asyncio
@@ -47,7 +48,7 @@ def get_rapidapi_headers():
         raise Exception("RAPIDAPI_KEYS tanımlanmamış. Instagram özelliklerini kullanmak için geçerli bir RapidAPI anahtarı gereklidir.")
     return random.choice(keys)
 
-@ggr.cmd(["rapidapi", "rapidkey", "igkey"], info="Instagram özellikleri için RapidAPI anahtarlarını yönetir.", usage=".rapidapi [anahtar1, anahtar2 | sil]", category="Araçlar")
+@ggr.cmd(["rapidapi", "rapidkey", "igkey"], info=t("cmd_info_instagram_58"), usage=".rapidapi [anahtar1, anahtar2 | sil]", category=t("cat_aralar"))
 async def rapidapi_yonet(client, message):
     args = message.text.split()[1:] if message.text else []
     
@@ -85,12 +86,7 @@ async def rapidapi_yonet(client, message):
         maskeli_metin = "\n• ".join(maskeli_list)
         
         await message.edit_text(
-            f"✅ <b>RapidAPI Anahtarınız Aktif!</b>\n\n"
-            f"🔑 <b>Kayıtlı Anahtarlar ({len(mevcut_anahtarlar)} Adet):</b>\n• {maskeli_metin}\n\n"
-            f"🔒 <b>Telegram Bulut Veritabanı</b>'na kayıtlıdır. Sunucu yeniden başlasa bile otomatik korunur.\n\n"
-            f"• <i>Yeni anahtar eklemek/güncellemek:</i> <code>.rapidapi [yeni_anahtar]</code>\n"
-            f"• <i>Anahtarları silmek:</i> <code>.rapidapi sil</code>"
-        )
+            t("instagram_b_rapidapi_anahtariniz_aktif_b", var_1=len(mevcut_anahtarlar), maskeli_metin=maskeli_metin)        )
     else:
         await message.edit_text(RAPIDAPI_YARDIM_METNI, disable_web_page_preview=True)
 
@@ -189,7 +185,7 @@ def extract_media_url(item):
         return item["image_versions2"]["candidates"][0]["url"], "jpg"
     return None, None
 
-@ggr.cmd(["ig", "igstory", "igpost"], info="Instagram profili için butonlu hikaye, gönderi ve öne çıkanlar menüsü açar.", usage=".ig [kullanıcı_adı]", category="Araçlar")
+@ggr.cmd(["ig", "igstory", "igpost"], info=t("cmd_info_instagram_75"), usage=t("cmd_usage_ig_19"), category=t("cat_aralar"))
 async def ig_interactive(client, message):
     if len(message.command) < 2:
         await message.edit_text(ggr.t("err_missing_args"))

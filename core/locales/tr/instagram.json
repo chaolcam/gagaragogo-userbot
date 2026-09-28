@@ -1,0 +1,6 @@
+{
+  "instagram_b_rapidapi_anahtariniz_aktif_b": "✅ <b>RapidAPI Anahtarınız Aktif!</b>\n\n🔑 <b>Kayıtlı Anahtarlar ({var_1} Adet):</b>\n• {maskeli_metin}\n\n🔒 <b>Telegram Bulut Veritabanı</b>'na kayıtlıdır. Sunucu yeniden başlasa bile otomatik korunur.\n\n• <i>Yeni anahtar eklemek/güncellemek:</i> <code>.rapidapi [yeni_anahtar]</code>\n• <i>Anahtarları silmek:</i> <code>.rapidapi sil</code>",
+  "cmd_info_instagram_58": "Instagram özellikleri için RapidAPI anahtarlarını yönetir.",
+  "cmd_info_instagram_75": "Instagram profili için butonlu hikaye, gönderi ve öne çıkanlar menüsü açar.",
+  "cmd_usage_ig_19": ".ig [kullanıcı_adı]"
+}

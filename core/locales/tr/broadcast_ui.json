@@ -1,0 +1,15 @@
+{
+  "broadcast_ui_kapat": "❌ Kapat",
+  "broadcast_ui_gorev_listesi": "◀️ Görev Listesi",
+  "broadcast_ui_bu_gorevi_sil": "🗑 Bu Görevi Sil",
+  "broadcast_ui_hedef_gruplari_sec": "👥 Hedef Grupları Seç",
+  "broadcast_ui_simdi_gonder": "⚡ Şimdi Gönder",
+  "broadcast_ui_i_letim_menusu": "◀️ İletim Menüsü",
+  "broadcast_ui_yeni_gorev_ekleme_rehberi": "➕ Yeni Görev Ekleme Rehberi",
+  "broadcast_ui_hata_olustu": "Hata oluştu.",
+  "broadcast_ui_grup_bulunamadi": "❌ Grup bulunamadı",
+  "broadcast_ui_userbot_aktif_degil": "❌ Userbot aktif değil!",
+  "broadcast_ui_otomesaj_yonetim_paneli": "⚙️ Otomesaj Yönetim Paneli",
+  "task_started_or_stopped": "TODO: task_started_or_stopped",
+  "broadcast_ui_sure_sure_str": "⏱ Süre: {sure_str}"
+}

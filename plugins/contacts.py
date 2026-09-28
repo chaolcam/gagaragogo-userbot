@@ -5,6 +5,7 @@
 # License: GNU GPL v3.0
 # Copyright (c) 2026 chaolcam
 # -----------------------------------------------------------------------------
+from core.locales import t
 import asyncio
 import time
 import logging
@@ -44,6 +45,7 @@ def is_active_user(u) -> bool:
 
 from pyrogram.raw.functions.channels import GetChannels
 from pyrogram.raw.types import InputChannel
+from core.locales import t
 
 # Ön bellek (grupların her defasında tekrar tekrar MTProto üzerinden çekilmesini hızlandırır)
 _cached_groups: List[Dict] = []
@@ -102,7 +104,7 @@ async def _fallback_dialog_groups(client: Client, groups_map: Dict[int, Dict]):
                         "is_supergroup": "super" in chat_type_str or getattr(chat, "type", None) == ChatType.SUPERGROUP,
                     }
     except Exception as e:
-        logging.warning("[Rehber Plugin] get_dialogs fallback uyarısı: %s", e)
+        logging.warning(t("log_rehber_plugin_get_di_48"), e)
 
 
 async def _batch_update_channel_counts(client: Client, input_channels: List[InputChannel], groups_map: Dict[int, Dict]):
@@ -118,7 +120,7 @@ async def _batch_update_channel_counts(client: Client, input_channels: List[Inpu
                 if cid in groups_map and cnt is not None:
                     groups_map[cid]["count"] = int(cnt)
     except Exception as e:
-        logging.warning("[Rehber Plugin] GetChannels toplu sorgu uyarısı: %s", e)
+        logging.warning(t("log_rehber_plugin_getcha_51"), e)
 
 
 async def get_sorted_user_groups(client: Client, force_refresh: bool = False) -> List[Dict]:
@@ -140,7 +142,7 @@ async def get_sorted_user_groups(client: Client, force_refresh: bool = False) ->
         raw_chats = await client.invoke(GetAllChats(except_ids=[]))
         groups_map, input_channels = _parse_raw_chats_to_map(raw_chats)
     except Exception as e:
-        logging.warning("[Rehber Plugin] GetAllChats uyarısı: %s", e)
+        logging.warning(t("log_rehber_plugin_getall_39"), e)
 
     await _fallback_dialog_groups(client, groups_map)
     await _batch_update_channel_counts(client, input_channels, groups_map)
@@ -228,9 +230,9 @@ def _format_rehber_panel_text(gruplar: List[Dict], sayfa: int, toplam_sayfa: int
 
 @ggr.cmd(
     ["rehbermenu", "rehber", "rehberpanel", "contacts"],
-    info="Grup ve rehber yönetim panelini açar. Butonlarla üye aktarımı ve yönetimi sağlar.",
+    info=t("cmd_info_grup_81"),
     usage=".rehbermenu (veya .rehber | .rehber [sayfa] | .rehber yenile)",
-    category="Grup & İletim"
+    category=t("cat_grupiletim")
 )
 async def cmd_rehber_panel(client: Client, message: Message):
     """
@@ -264,13 +266,13 @@ async def cmd_rehber_panel(client: Client, message: Message):
                     await message.delete()
                     return
             except Exception as e:
-                logging.warning("[Rehber Plugin] Inline menü uyarısı (%s), metin paneline geçiliyor...", e)
+                logging.warning(t("log_rehber_plugin_inline_69"), e)
 
-        durum = await message.edit_text("🔄 <i>Gruplar taranıyor ve üye sayılarına göre sıralanıyor...</i>")
+        durum = await message.edit_text(t("contacts_i_gruplar_taraniyor_ve_uye_say"))
 
         gruplar = await get_sorted_user_groups(client, force_refresh=force_refresh)
         if not gruplar:
-            await durum.edit_text("ℹ️ Üye olduğunuz herhangi bir grup bulunamadı.")
+            await durum.edit_text(t("contacts_uye_oldugunuz_herhangi_bir_gru"))
             return
 
         try:
@@ -285,16 +287,16 @@ async def cmd_rehber_panel(client: Client, message: Message):
         panel_metni = _format_rehber_panel_text(gruplar, sayfa, toplam_sayfa, rehber_sayisi)
         await durum.edit_text(panel_metni)
     except Exception as e:
-        logging.error("[Rehber Plugin] Panel hatası: %s", e)
+        logging.error(t("log_rehber_plugin_panel__32"), e)
         try:
-            await message.edit_text(f"❌ <b>Panel açılırken bir hata oluştu:</b>\n<code>{ggr.safe_html(str(e))}</code>")
+            await message.edit_text(t("contacts_b_panel_acilirken_bir_hata_olustu_b_n_co", var_1 = ggr.safe_html(str(e))))
         except Exception as _exc:
             logging.debug("Suppressed: %s", _exc)
 
 
 @ggr.cmd(
     ["grupaktar", "g2g", "grubagrup"],
-    info="Bir gruptaki üyeleri doğrudan diğer gruba aktarır.",
+    info=t("cmd_info_bir_50"),
     usage=".grupaktar [kaynak_grup_no] [hedef_grup_no] [adet (30/50/100/200)]",
     category=None
 )
@@ -323,9 +325,10 @@ async def cmd_grup_aktar(client: Client, message: Message):
     tgt_id = tgt_group["id"]
 
     durum = await message.edit_text(
-        f"⏳ <b>{ggr.safe_html(src_group['title'])}</b> grubundan üyeler toplanıp "
-        f"<b>{ggr.safe_html(tgt_group['title'])}</b> grubuna aktarılmaya başlanıyor...\n"
-        f"Hedef: <b>{limit}</b> kişi."
+        t("contacts_aktarim_basliyor", 
+          src=ggr.safe_html(src_group['title']), 
+          tgt=ggr.safe_html(tgt_group['title']), 
+          limit=limit)
     )
 
     basarili = 0
@@ -352,12 +355,11 @@ async def cmd_grup_aktar(client: Client, message: Message):
             except UserChannelsTooMuch:
                 hatali += 1
             except ChatAdminRequired:
-                await durum.edit_text("❌ <b>Hata:</b> Hedef gruba üye ekleme yetkiniz yok.")
+                await durum.edit_text(t("contacts_b_hata_b_hedef_gruba_uye_eklem"))
                 return
             except PeerFlood:
                 await durum.edit_text(
-                    "⚠️ <b>Telegram Sınırı (PeerFlood):</b> Hesabınız geçici grup davet sınırına ulaştı.\n"
-                    f"Şu ana kadar eklenen: <code>{basarili}</code> kişi."
+                    t("contacts_peerflood_error", basarili=basarili)
                 )
                 return
             except FloodWait as fw:
@@ -371,39 +373,28 @@ async def cmd_grup_aktar(client: Client, message: Message):
             if time.time() - son_guncelleme > 3:
                 yuzde = int((basarili / limit) * 100)
                 await durum.edit_text(
-                    f"🔄 <b>Gruptan Gruba Aktarım Sürüyor...</b>\n"
-                    f"───────────────────────────\n"
-                    f"📥 <b>Kaynak:</b> <b>{ggr.safe_html(src_group['title'])}</b>\n"
-                    f"📤 <b>Hedef:</b> <b>{ggr.safe_html(tgt_group['title'])}</b>\n"
-                    f"📊 <b>İlerleme:</b> <code>{basarili}/{limit}</code> (%{yuzde})\n"
-                    f"✅ <b>Eklenen:</b> <code>{basarili}</code>\n"
-                    f"🔒 <b>Gizlilik Engeli:</b> <code>{gizlilik}</code>\n"
-                    f"⏭️ <b>Zaten Grupta:</b> <code>{zaten}</code>\n"
-                    f"❌ <b>Diğer Hatalar:</b> <code>{hatali}</code>\n"
-                    f"⏳ <i>Lütfen bekleyin...</i>"
+                    t("contacts_aktarim_suruyor", 
+                      src=ggr.safe_html(src_group['title']), 
+                      tgt=ggr.safe_html(tgt_group['title']),
+                      basarili=basarili, limit=limit, yuzde=yuzde,
+                      gizlilik=gizlilik, zaten=zaten, hatali=hatali)
                 )
                 son_guncelleme = time.time()
 
         await durum.edit_text(
-            "🎉 <b>Aktarım Başarıyla Tamamlandı!</b>\n"
-            "───────────────────────────\n"
-            f"📥 <b>Kaynak:</b> <b>{ggr.safe_html(src_group['title'])}</b>\n"
-            f"📤 <b>Hedef:</b> <b>{ggr.safe_html(tgt_group['title'])}</b>\n"
-            f"🎯 <b>Hedef:</b> <code>{limit}</code> kişi\n\n"
-            f"✅ <b>Başarıyla Eklenen:</b> <code>{basarili}</code> kişi\n"
-            f"🔒 <b>Gizlilik Nedeniyle Eklenemeyen:</b> <code>{gizlilik}</code>\n"
-            f"⏭️ <b>Zaten Üye Olan:</b> <code>{zaten}</code>\n"
-            f"❌ <b>Diğer Hatalar:</b> <code>{hatali}</code>\n"
-            f"───────────────────────────\n"
-            f"💡 <i>Tüm işlemler güvenli aralıklarla tamamlandı!</i>"
+            t("contacts_aktarim_tamamlandi", 
+              src=ggr.safe_html(src_group['title']), 
+              tgt=ggr.safe_html(tgt_group['title']),
+              basarili=basarili, limit=limit,
+              gizlilik=gizlilik, zaten=zaten, hatali=hatali)
         )
     except Exception as e:
-        await durum.edit_text(f"❌ <b>Hata:</b> <code>{ggr.safe_html(str(e))}</code>")
+        await durum.edit_text(t("contacts_b_hata_b_code_var_1_code", var_1 = ggr.safe_html(str(e))))
 
 
 @ggr.cmd(
     ["rehberekle", "cekrehbere"],
-    info="Seçilen gruptaki üyeleri Telegram rehberinize kaydeder.",
+    info=t("cmd_info_seilen_55"),
     usage=".rehberekle [grup_no] [adet (30/50/100/200)]",
     category=None
 )
@@ -436,16 +427,12 @@ async def cmd_rehberekle(client: Client, message: Message):
 
     if not hedef_grup:
         await message.edit_text(
-            "❌ <b>Grup bulunamadı!</b>\n\n"
-            "Önce <code>.rehber</code> yazarak grup numarasını öğrenin.\n"
-            "Kullanım: <code>.rehberekle [Grup No] [Adet]</code>\n"
-            "<i>Örnek: <code>.rehberekle 1 50</code></i>"
+            t("contacts_b_grup_bulunamadi_b_once_code_rehber_cod")
         )
         return
 
     durum = await message.edit_text(
-        f"⏳ <b>{ggr.safe_html(hedef_grup['title'])}</b> grubundan üyeler toplanıyor...\n"
-        f"Hedef: <b>{limit}</b> kişi."
+        t("contacts_rehbere_ekleme_basliyor", grp=ggr.safe_html(hedef_grup['title']), limit=limit)
     )
 
     basarili = 0
@@ -482,8 +469,7 @@ async def cmd_rehberekle(client: Client, message: Message):
                 await asyncio.sleep(1.0)
             except FloodWait as fw:
                 await durum.edit_text(
-                    f"⚠️ <b>FloodWait Sınırı:</b> Telegram {fw.value} saniye beklemenizi istedi.\n"
-                    f"İşlem duraklatıldı."
+                    t("contacts_flood_bekleme", sure=fw.value)
                 )
                 await asyncio.sleep(fw.value + 1)
             except Exception:
@@ -495,32 +481,23 @@ async def cmd_rehberekle(client: Client, message: Message):
             if time.time() - son_guncelleme > 3:
                 yuzde = int((basarili / limit) * 100)
                 await durum.edit_text(
-                    f"📥 <b>Gruptan Rehbere Ekleme Sürüyor...</b>\n"
-                    f"───────────────────────────\n"
-                    f"👥 <b>Grup:</b> <b>{ggr.safe_html(hedef_grup['title'])}</b>\n"
-                    f"📊 <b>İlerleme:</b> <code>{basarili}/{limit}</code> (%{yuzde})\n"
-                    f"✅ <b>Eklenen:</b> <code>{basarili}</code>\n"
-                    f"⏭️ <b>Zaten Rehberde:</b> <code>{zaten_ekli}</code>\n"
-                    f"❌ <b>Hata:</b> <code>{hatali}</code>\n"
-                    f"⏳ <i>Lütfen bekleyin...</i>"
+                    t("contacts_rehbere_ekleniyor", 
+                      grp=ggr.safe_html(hedef_grup['title']), 
+                      basarili=basarili, limit=limit, yuzde=yuzde,
+                      zaten=zaten_ekli, hatali=hatali)
                 )
                 son_guncelleme = time.time()
 
         await durum.edit_text(
-            "✅ <b>Rehbere Ekleme İşlemi Başarıyla Tamamlandı!</b>\n"
-            "───────────────────────────\n"
-            f"👥 <b>Kaynak Grup:</b> <b>{ggr.safe_html(hedef_grup['title'])}</b>\n"
-            f"🎯 <b>Hedef:</b> <code>{limit}</code> kişi\n"
-            f"✅ <b>Başarıyla Eklenen:</b> <code>{basarili}</code> kişi\n"
-            f"⏭️ <b>Zaten Rehberde Olan:</b> <code>{zaten_ekli}</code>\n"
-            f"❌ <b>Eklenemeyen / Hata:</b> <code>{hatali}</code>\n"
-            "───────────────────────────\n"
-            "💡 <i>Kişileri başka gruba eklemek için: <code>.grubaekle [Grup No] {limit}</code></i>"
+            t("contacts_rehbere_ekleme_tamamlandi", 
+              grp=ggr.safe_html(hedef_grup['title']), 
+              limit=limit, basarili=basarili,
+              zaten=zaten_ekli, hatali=hatali)
         )
 
     except Exception as e:
         await durum.edit_text(
-            f"❌ <b>İşlem sırasında hata oluştu:</b>\n<code>{ggr.safe_html(str(e))}</code>"
+            t("contacts_b_i_slem_sirasinda_hata_olustu_b_n_code_", var_1 = ggr.safe_html(str(e)))
         )
 
 
@@ -562,7 +539,7 @@ async def _execute_contact_addition(client: Client, chat_id: int, contact):
 
 @ggr.cmd(
     ["grubaekle", "davetet"],
-    info="Rehberinizdeki kişileri seçilen gruba toplu olarak davet eder.",
+    info=t("cmd_info_rehberinizdeki_62"),
     usage=".grubaekle [grup_no] [adet (30/50/100/200)]",
     category=None
 )
@@ -580,25 +557,22 @@ async def cmd_grubaekle(client: Client, message: Message):
 
     if not hedef_grup:
         await message.edit_text(
-            "❌ <b>Hedef grup bulunamadı!</b>\n\n"
-            "Önce <code>.rehber</code> yazarak grup numarasını öğrenin.\n"
-            "Kullanım: <code>.grubaekle [Grup No] [Adet]</code>\n"
-            "<i>Örnek: <code>.grubaekle 2 50</code></i>"
+            t("contacts_b_hedef_grup_bulunamadi_b_once_code_rehb")
         )
         return
 
     durum = await message.edit_text(
-        f"⏳ Rehber taranıyor ve <b>{ggr.safe_html(hedef_grup['title'])}</b> grubuna davet hazırlanıyor..."
+        t("contacts_rehber_taraniyor_ve_b_var_1_b_grubuna_da", var_1 = ggr.safe_html(hedef_grup['title']))
     )
 
     try:
         contacts = await client.get_contacts()
     except Exception as e:
-        await durum.edit_text(f"❌ Rehber alınamadı: <code>{ggr.safe_html(str(e))}</code>")
+        await durum.edit_text(t("contacts_rehber_alinamadi_code_var_1_code", var_1 = ggr.safe_html(str(e))))
         return
 
     if not contacts:
-        await durum.edit_text("ℹ️ Rehberinizde eklenebilecek hiç kişi bulunmuyor.")
+        await durum.edit_text(t("contacts_rehberinizde_eklenebilecek_hic"))
         return
 
     basarili = 0
@@ -622,12 +596,11 @@ async def cmd_grubaekle(client: Client, message: Message):
         elif res == "privacy":
             gizlilik_engeli += 1
         elif res == "admin_required":
-            await durum.edit_text("❌ <b>Hata:</b> Bu gruba üye ekleme yetkiniz yok veya grup kapalı.")
+            await durum.edit_text(t("contacts_b_hata_b_bu_gruba_uye_ekleme_y"))
             return
         elif res == "peer_flood":
             await durum.edit_text(
-                "⚠️ <b>PeerFlood (Spam Sınırı):</b> Telegram hesabınız geçici olarak grup davet kısıtlamasına girdi.\n"
-                f"Şu ana kadar başarıyla eklenen: <code>{basarili}</code> kişi."
+                t("contacts_peerflood_error", basarili=basarili)
             )
             return
         else:
@@ -636,35 +609,24 @@ async def cmd_grubaekle(client: Client, message: Message):
         if time.time() - son_guncelleme > 3:
             yuzde = int((basarili / limit) * 100)
             await durum.edit_text(
-                f"📤 <b>Rehberden Gruba Ekleme Sürüyor...</b>\n"
-                f"───────────────────────────\n"
-                f"👥 <b>Hedef Grup:</b> <b>{ggr.safe_html(hedef_grup['title'])}</b>\n"
-                f"📊 <b>İlerleme:</b> <code>{basarili}/{limit}</code> (%{yuzde})\n"
-                f"✅ <b>Eklenen:</b> <code>{basarili}</code>\n"
-                f"🔒 <b>Gizlilik Engeli:</b> <code>{gizlilik_engeli}</code>\n"
-                f"⏭️ <b>Zaten Grupta:</b> <code>{zaten_grupta}</code>\n"
-                f"❌ <b>Diğer Hatalar:</b> <code>{diger_hatalar}</code>\n"
-                f"⏳ <i>Lütfen bekleyin...</i>"
+                t("contacts_gruba_ekleme_suruyor",
+                  grp=ggr.safe_html(hedef_grup['title']), 
+                  basarili=basarili, limit=limit, yuzde=yuzde,
+                  gizlilik=gizlilik_engeli, zaten=zaten_grupta, hatali=diger_hatalar)
             )
             son_guncelleme = time.time()
 
     await durum.edit_text(
-        "✅ <b>Gruba Ekleme İşlemi Başarıyla Tamamlandı!</b>\n"
-        "───────────────────────────\n"
-        f"👥 <b>Hedef Grup:</b> <b>{ggr.safe_html(hedef_grup['title'])}</b>\n"
-        f"🎯 <b>Hedef:</b> <code>{limit}</code> kişi\n"
-        f"✅ <b>Başarıyla Eklenen:</b> <code>{basarili}</code> kişi\n"
-        f"🔒 <b>Gizlilik Engeli Olan:</b> <code>{gizlilik_engeli}</code> kişi\n"
-        f"⏭️ <b>Zaten Üye Olan:</b> <code>{zaten_grupta}</code> kişi\n"
-        f"❌ <b>Diğer Nedenlerle Eklenemeyen:</b> <code>{diger_hatalar}</code>\n"
-        "───────────────────────────\n"
-        "🎉 <i>Tüm işlemler güvenli aralıklarla tamamlandı!</i>"
+        t("contacts_gruba_ekleme_tamamlandi",
+          grp=ggr.safe_html(hedef_grup['title']), 
+          limit=limit, basarili=basarili,
+          gizlilik=gizlilik_engeli, zaten=zaten_grupta, hatali=diger_hatalar)
     )
 
 
 @ggr.cmd(
     ["rehbersayi", "rehberkac"],
-    info="Rehberinizdeki toplam kayıtlı kişi sayısını gösterir.",
+    info=t("cmd_info_rehberinizdeki_53"),
     usage=".rehbersayi",
     category=None
 )
@@ -672,23 +634,20 @@ async def cmd_rehbersayi(client: Client, message: Message):
     """
     Kullanıcının rehberindeki toplam kayıtlı kişi sayısını gösterir.
     """
-    durum = await message.edit_text("🔄 <i>Rehber sayılıyor...</i>")
+    durum = await message.edit_text(t("contacts_i_rehber_sayiliyor_i"))
     try:
         count = await client.get_contacts_count()
         await durum.edit_text(
-            f"📇 <b>Telegram Rehber Durumu</b>\n"
-            f"───────────────────────────\n"
-            f"👤 <b>Toplam Kayıtlı Kişi:</b> <code>{count}</code>\n\n"
-            f"💡 <i>Grup ve rehber yönetimi için <code>.rehber</code> yazabilirsiniz.</i>"
+            t("contacts_rehber_durumu", toplam=count)
         )
     except Exception as e:
-        await durum.edit_text(f"❌ <b>Hata:</b> <code>{ggr.safe_html(str(e))}</code>")
+        await durum.edit_text(t("contacts_b_hata_b_code_var_1_code", var_1 = ggr.safe_html(str(e))))
 
 
 @ggr.cmd(
     ["rehbersil"],
-    info="Bir kullanıcının mesajını yanıtlayarak veya kullanıcı adı/ID belirterek rehberden siler.",
-    usage=".rehbersil (yanıtlayarak)",
+    info=t("cmd_info_bir_88"),
+    usage=t("cmd_usage_rehbersil_25"),
     category=None
 )
 async def cmd_rehbersil(client: Client, message: Message):
@@ -711,7 +670,7 @@ async def cmd_rehbersil(client: Client, message: Message):
         await message.edit_text(ggr.t("err_target_not_found"))
         return
 
-    durum = await message.edit_text("⏳ <i>...</i>")
+    durum = await message.edit_text(t("contacts_i_i"))
     try:
         await client.delete_contacts([target_user.id])
         await durum.edit_text(
@@ -723,7 +682,7 @@ async def cmd_rehbersil(client: Client, message: Message):
 
 @ggr.cmd(
     ["rehbertemizle"],
-    info="Rehberdeki kişileri toplu olarak temizler (Onay gerektirir).",
+    info=t("cmd_info_rehberdeki_60"),
     usage=".rehbertemizle onayla",
     category=None
 )
@@ -735,22 +694,19 @@ async def cmd_rehbertemizle(client: Client, message: Message):
     args = message.text.split()[1:] if message.text else []
     if not args or args[0].lower() != "onayla":
         await message.edit_text(
-            "⚠️ <b>DİKKAT: Rehber Temizleme İşlemi!</b>\n\n"
-            "Bu işlem Telegram rehberinizdeki <b>TÜM</b> kişileri silecektir.\n"
-            "Onaylamak için tam olarak şu komutu yazın:\n"
-            "👉 <code>.rehbertemizle onayla</code>"
+            t("contacts_b_di_kkat_rehber_temizleme_i_slemi_b_bu_")
         )
         return
 
-    durum = await message.edit_text("🔄 <i>Rehber taranıyor...</i>")
+    durum = await message.edit_text(t("contacts_i_rehber_taraniyor_i"))
     try:
         contacts = await client.get_contacts()
         if not contacts:
-            await durum.edit_text("ℹ️ Rehberiniz zaten boş.")
+            await durum.edit_text(t("contacts_rehberiniz_zaten_bos"))
             return
 
         toplam = len(contacts)
-        await durum.edit_text(f"🗑️ <b>{toplam}</b> kişi rehberden temizleniyor, lütfen bekleyin...")
+        await durum.edit_text(t("contacts_b_toplam_b_kisi_rehberden_temizleniyor_l", toplam = toplam))
 
         contact_ids = [c.id for c in contacts]
         silinen = 0
@@ -761,8 +717,7 @@ async def cmd_rehbertemizle(client: Client, message: Message):
             await asyncio.sleep(0.5)
 
         await durum.edit_text(
-            f"✅ <b>Rehber Temizlendi!</b>\n"
-            f"Toplam <code>{silinen}</code> kişi başarıyla rehberden kaldırıldı."
+            t("contacts_rehber_tamamen_temizlendi", silinen=silinen)
         )
     except Exception as e:
-        await durum.edit_text(f"❌ <b>Hata:</b> <code>{ggr.safe_html(str(e))}</code>")
+        await durum.edit_text(t("contacts_b_hata_b_code_var_1_code", var_1 = ggr.safe_html(str(e))))

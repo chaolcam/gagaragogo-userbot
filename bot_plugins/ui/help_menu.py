@@ -5,6 +5,7 @@
 # License: GNU GPL v3.0
 # Copyright (c) 2026 chaolcam
 # -----------------------------------------------------------------------------
+from core.locales import t
 import os
 import sys
 import time
@@ -131,11 +132,11 @@ def get_main_menu_keyboard():
                 InlineKeyboardButton(f"{get_icon(KOMUT_BILGILERI[k2]['isim'])} {l2}", callback_data=f"kat_{k2}_1")
             ])
         keyboard.append([
-            InlineKeyboardButton("🔌 Eklentiler", callback_data="eklenti_ana_menu"),
-            InlineKeyboardButton("⚙️ Ayarlar", callback_data="ayarlar_menu")
+            InlineKeyboardButton(t("help_menu_eklentiler"), callback_data="eklenti_ana_menu"),
+            InlineKeyboardButton(t("help_menu_ayarlar"), callback_data="ayarlar_menu")
         ])
 
-    keyboard.append([InlineKeyboardButton("❌ Menüyü Kapat", callback_data="yardim_close")])
+    keyboard.append([InlineKeyboardButton(t("help_menu_menuyu_kapat"), callback_data="yardim_close")])
     return InlineKeyboardMarkup(keyboard)
 
 
@@ -242,17 +243,17 @@ def get_araclar_indir_content():
     from core.locales import t
     keyboard = [
         [
-            InlineKeyboardButton(".tg", callback_data="csub:Araçlar:sub_arac_indir:tg"),
-            InlineKeyboardButton(".tt", callback_data="csub:Araçlar:sub_arac_indir:tt"),
-            InlineKeyboardButton(".yt", callback_data="csub:Araçlar:sub_arac_indir:yt")
+            InlineKeyboardButton(t("help_menu_tg"), callback_data="csub:Araçlar:sub_arac_indir:tg"),
+            InlineKeyboardButton(t("help_menu_tt"), callback_data="csub:Araçlar:sub_arac_indir:tt"),
+            InlineKeyboardButton(t("help_menu_yt"), callback_data="csub:Araçlar:sub_arac_indir:yt")
         ],
         [
-            InlineKeyboardButton(".ig", callback_data="csub:Araçlar:sub_arac_indir:ig"),
-            InlineKeyboardButton(".rapidapi", callback_data="csub:Araçlar:sub_arac_indir:rapidapi")
+            InlineKeyboardButton(t("help_menu_ig"), callback_data="csub:Araçlar:sub_arac_indir:ig"),
+            InlineKeyboardButton(t("help_menu_rapidapi"), callback_data="csub:Araçlar:sub_arac_indir:rapidapi")
         ],
         [
-            InlineKeyboardButton(".tttakip", callback_data="csub:Araçlar:sub_arac_indir:tttakip"),
-            InlineKeyboardButton(".tttakiptencikar", callback_data="csub:Araçlar:sub_arac_indir:tttakiptencikar")
+            InlineKeyboardButton(t("help_menu_tttakip"), callback_data="csub:Araçlar:sub_arac_indir:tttakip"),
+            InlineKeyboardButton(t("help_menu_tttakiptencikar"), callback_data="csub:Araçlar:sub_arac_indir:tttakiptencikar")
         ],
         [
             InlineKeyboardButton(t("btn_back"), callback_data="sub_arac_hub"),
@@ -268,12 +269,12 @@ def get_araclar_donustur_content():
     from core.locales import t
     keyboard = [
         [
-            InlineKeyboardButton(".yuvarlak", callback_data="csub:Araçlar:sub_arac_donustur:yuvarlak"),
-            InlineKeyboardButton(".ses", callback_data="csub:Araçlar:sub_arac_donustur:ses")
+            InlineKeyboardButton(t("help_menu_yuvarlak"), callback_data="csub:Araçlar:sub_arac_donustur:yuvarlak"),
+            InlineKeyboardButton(t("help_menu_ses"), callback_data="csub:Araçlar:sub_arac_donustur:ses")
         ],
         [
-            InlineKeyboardButton(".sticker", callback_data="csub:Araçlar:sub_arac_donustur:sticker"),
-            InlineKeyboardButton(".tts", callback_data="csub:Araçlar:sub_arac_donustur:tts")
+            InlineKeyboardButton(t("help_menu_sticker"), callback_data="csub:Araçlar:sub_arac_donustur:sticker"),
+            InlineKeyboardButton(t("help_menu_tts"), callback_data="csub:Araçlar:sub_arac_donustur:tts")
         ],
         [
             InlineKeyboardButton(t("btn_back"), callback_data="sub_arac_hub"),
@@ -296,8 +297,8 @@ def get_araclar_koruma_content():
         [InlineKeyboardButton(t("btn_sureli_label", status=hayalet_btn), callback_data="toggle_sureli_from_koruma")],
         [InlineKeyboardButton(t("btn_antidelete_label", status=antidelete_btn), callback_data="toggle_antidelete_from_koruma")],
         [
-            InlineKeyboardButton(".antidelete", callback_data="csub:Araçlar:sub_arac_koruma:antidelete"),
-            InlineKeyboardButton(".sureli", callback_data="csub:Araçlar:sub_arac_koruma:sureli")
+            InlineKeyboardButton(t("help_menu_antidelete"), callback_data="csub:Araçlar:sub_arac_koruma:antidelete"),
+            InlineKeyboardButton(t("help_menu_sureli"), callback_data="csub:Araçlar:sub_arac_koruma:sureli")
         ],
         [
             InlineKeyboardButton(t("btn_back"), callback_data="sub_arac_hub"),
@@ -313,10 +314,10 @@ def get_araclar_cevir_content():
     from core.locales import t
     keyboard = [
         [
-            InlineKeyboardButton(".cevir", callback_data="csub:Araçlar:sub_arac_cevir:cevir"),
-            InlineKeyboardButton(".dil", callback_data="csub:Araçlar:sub_arac_cevir:dil")
+            InlineKeyboardButton(t("help_menu_cevir"), callback_data="csub:Araçlar:sub_arac_cevir:cevir"),
+            InlineKeyboardButton(t("help_menu_dil"), callback_data="csub:Araçlar:sub_arac_cevir:dil")
         ],
-        [InlineKeyboardButton(".bypass", callback_data="csub:Araçlar:sub_arac_cevir:bypass")],
+        [InlineKeyboardButton(t("help_menu_bypass"), callback_data="csub:Araçlar:sub_arac_cevir:bypass")],
         [
             InlineKeyboardButton(t("btn_back"), callback_data="sub_arac_hub"),
             InlineKeyboardButton(t("btn_home"), callback_data="main_menu")
@@ -337,7 +338,7 @@ def get_category_keyboard(kategori_key, sayfa):
                 break
 
     if not kategori_data:
-        return InlineKeyboardMarkup([[InlineKeyboardButton("◀️ Geri", callback_data="main_menu")]]), "Kategori bulunamadı."
+        return InlineKeyboardMarkup([[InlineKeyboardButton(t("help_menu_geri"), callback_data="main_menu")]]), "Kategori bulunamadı."
 
     kategori_adi = kategori_data["isim"]
     komutlar = kategori_data.get("komutlar", {})
@@ -401,7 +402,7 @@ async def handle_yardim_close(client, callback_query):
 
     if deleted:
         try:
-            await callback_query.answer("🗑️ Menü kapatıldı.", show_alert=False)
+            await callback_query.answer(t("help_menu_menu_kapatildi"), show_alert=False)
         except Exception as _ans_err:
             logger.debug("Callback answer hatası: %s", _ans_err)
         return
@@ -411,7 +412,7 @@ async def handle_yardim_close(client, callback_query):
     except Exception as _rm_err:
         logger.debug("Reply markup kaldırılamadı: %s", _rm_err)
     try:
-        await callback_query.answer("Menü kapatıldı.", show_alert=False)
+        await callback_query.answer(t("help_menu_menu_kapatildi"), show_alert=False)
     except Exception as _ans_err:
         logger.debug("Callback answer hatası: %s", _ans_err)
 
@@ -438,7 +439,7 @@ async def handle_main_and_settings(client, callback_query, data):
         return True
 
     if data == "btn_restart":
-        await callback_query.answer("🔄 Bot yeniden başlatılıyor...", show_alert=True)
+        await callback_query.answer(t("help_menu_bot_yeniden_baslatiliyor"), show_alert=True)
         try:
             await callback_query.edit_message_text(
                 "🔄 <b>Bot yeniden başlatılıyor...</b>\n"
@@ -469,7 +470,7 @@ async def handle_main_and_settings(client, callback_query, data):
         utils.ayar_kaydet("hayalet_durumu", not mevcut)
         keyboard, metin = get_settings_keyboard()
         await safe_edit(callback_query, client, text=metin, reply_markup=keyboard)
-        await callback_query.answer("Süreli modu değiştirildi.")
+        await callback_query.answer(t("help_menu_sureli_modu_degistirildi"))
         return True
 
     if data == "toggle_antidelete":
@@ -477,7 +478,7 @@ async def handle_main_and_settings(client, callback_query, data):
         utils.ayar_kaydet("antidelete_durumu", not mevcut)
         keyboard, metin = get_settings_keyboard()
         await safe_edit(callback_query, client, text=metin, reply_markup=keyboard)
-        await callback_query.answer("Anti-Delete modu değiştirildi.")
+        await callback_query.answer(t("help_menu_anti_delete_modu_degistirildi"))
         return True
 
     if data == "toggle_lang":
@@ -490,18 +491,18 @@ async def handle_main_and_settings(client, callback_query, data):
         asyncio.create_task(tek_bulut_db_guncelle())
         keyboard, metin = get_settings_keyboard()
         await safe_edit(callback_query, client, text=metin, reply_markup=keyboard)
-        await callback_query.answer(f"Dil değiştirildi: {yeni.upper()}", show_alert=True)
+        await callback_query.answer(t("lang_changed", lang=yeni.upper()), show_alert=True)
         return True
 
     if data in ("toggle_sureli_from_koruma", "toggle_antidelete_from_koruma"):
         if data == "toggle_sureli_from_koruma":
             mevcut = utils.ayar_getir("hayalet_durumu", False)
             utils.ayar_kaydet("hayalet_durumu", not mevcut)
-            await callback_query.answer("Süreli medya modu değiştirildi.")
+            await callback_query.answer(t("help_menu_sureli_medya_modu_degistirildi"))
         else:
             mevcut = utils.ayar_getir("antidelete_durumu", False)
             utils.ayar_kaydet("antidelete_durumu", not mevcut)
-            await callback_query.answer("Anti-Delete modu değiştirildi.")
+            await callback_query.answer(t("help_menu_anti_delete_modu_degistirildi"))
         kb, metin = get_araclar_koruma_content()
         await safe_edit(callback_query, client, text=metin, reply_markup=kb)
         return True

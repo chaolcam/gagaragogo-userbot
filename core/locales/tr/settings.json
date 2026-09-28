@@ -1,0 +1,6 @@
+{
+  "settings_grup_yeni_id_ana_merkez_olarak_baglaniyo": "⏳ Grup (`{yeni_id}`) ana merkez olarak bağlanıyor, forum konuları açılıyor ve yapılandırılıyor...",
+  "settings_grup_yapilandirma_hatasi_n_e": "❌ Grup yapılandırma hatası:\\n`{e}`",
+  "settings_admin_grubu_yapilandirildi": "✅ <b>Admin Grubu Başarıyla Yapılandırıldı!</b>\\n\\n🆔 <b>Grup ID:</b> <code>{chat_id}</code>\\n{title}📌 Karşılama ve güvenlik uyarısı mesajı gruba sabitlendi.\\n🔒 Telegram Kayıtlı Mesajlar'daki TEK kalıcı bulut veritabanı güncellendi!\\n\\n<i>Bot her yeniden başladığında bu grubu hatırlayacak ve asla yeni grup açmayacaktır.</i>",
+  "cmd_info_ana_53": "Ana Admin / Arşiv Grup ID'sini manuel olarak ayarlar."
+}

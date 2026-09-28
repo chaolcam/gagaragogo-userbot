@@ -9,6 +9,7 @@ import logging
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 import utils
 from bot_plugins.ui.common import safe_edit, format_sure
+from core.locales import t
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +49,7 @@ def get_ilet_otomesaj_content():
     """Otomatik mesaj (.otomesaj) detay menüsü."""
     from core.locales import t
     keyboard = [
-        [InlineKeyboardButton("⚙️ Otomesaj Yönetim Paneli", callback_data="otomsg_list")],
+        [InlineKeyboardButton(t("broadcast_ui_otomesaj_yonetim_paneli"), callback_data="otomsg_list")],
         [
             InlineKeyboardButton(t("btn_back"), callback_data="sub_ilet_hub"),
             InlineKeyboardButton(t("btn_home"), callback_data="main_menu")
@@ -71,11 +72,11 @@ async def build_ilet_menu_keyboard(page=1):
     from plugins.broadcast import get_all_user_groups, is_group_active
     userbot = utils.bot_client
     if not userbot:
-        return InlineKeyboardMarkup([[InlineKeyboardButton("❌ Userbot aktif değil", callback_data="none")]]), "Userbot aktif değil"
+        return InlineKeyboardMarkup([[InlineKeyboardButton(t("broadcast_ui_userbot_aktif_degil"), callback_data="none")]]), "Userbot aktif değil"
 
     gruplar = await get_all_user_groups(userbot)
     if not gruplar:
-        return InlineKeyboardMarkup([[InlineKeyboardButton("❌ Grup bulunamadı", callback_data="none")]]), "Hiçbir grup bulunamadı."
+        return InlineKeyboardMarkup([[InlineKeyboardButton(t("broadcast_ui_grup_bulunamadi"), callback_data="none")]]), "Hiçbir grup bulunamadı."
 
     per_page = 10
     toplam_sayfa = max(1, (len(gruplar) + per_page - 1) // per_page)
@@ -149,7 +150,7 @@ async def handle_ilet_callbacks(client, callback_query, data):
                 await safe_edit(callback_query, client, text=metin, reply_markup=kb)
                 await callback_query.answer(f"{idx}. {hedef['title'][:20]} -> {durum_str}")
                 return True
-        await callback_query.answer("Hata oluştu.", show_alert=True)
+        await callback_query.answer(t("broadcast_ui_hata_olustu"), show_alert=True)
         return True
 
     if data.startswith("ilet_p_"):
@@ -184,9 +185,9 @@ async def build_otomesaj_list_keyboard():
     db = otomesaj_db_yukle()
     if not db:
         return InlineKeyboardMarkup([
-            [InlineKeyboardButton("➕ Yeni Görev Ekleme Rehberi", callback_data="otomsg_add_guide")],
-            [InlineKeyboardButton("◀️ İletim Menüsü", callback_data="sub_ilet_otomesaj")],
-            [InlineKeyboardButton("❌ Kapat", callback_data="otomsg_close")]
+            [InlineKeyboardButton(t("broadcast_ui_yeni_gorev_ekleme_rehberi"), callback_data="otomsg_add_guide")],
+            [InlineKeyboardButton(t("broadcast_ui_i_letim_menusu"), callback_data="sub_ilet_otomesaj")],
+            [InlineKeyboardButton(t("broadcast_ui_kapat"), callback_data="otomsg_close")]
         ]), "⏰ <b>Kayıtlı otomatik mesaj görevi bulunamadı.</b>\n\nEklemek için bir mesaja yanıt verip: <code>.otomesaj ekle [başlık]</code> yazın."
 
     keyboard = []
@@ -222,13 +223,13 @@ async def build_otomesaj_detail_keyboard(task_id):
 
     keyboard = [
         [InlineKeyboardButton(btn_aktif, callback_data=f"otomsg_tog_{task_id}"),
-         InlineKeyboardButton("⚡ Şimdi Gönder", callback_data=f"otomsg_run_{task_id}")],
-        [InlineKeyboardButton(f"⏱ Süre: {sure_str}", callback_data=f"otomsg_time_{task_id}"),
+         InlineKeyboardButton(t("broadcast_ui_simdi_gonder"), callback_data=f"otomsg_run_{task_id}")],
+        [InlineKeyboardButton(t("broadcast_ui_sure_sure_str", sure_str = sure_str), callback_data=f"otomsg_time_{task_id}"),
          InlineKeyboardButton(btn_delprev, callback_data=f"otomsg_togold_{task_id}")],
-        [InlineKeyboardButton("👥 Hedef Grupları Seç", callback_data=f"otomsg_grp_{task_id}_1")],
-        [InlineKeyboardButton("🗑 Bu Görevi Sil", callback_data=f"otomsg_del_{task_id}")],
-        [InlineKeyboardButton("◀️ Görev Listesi", callback_data="otomsg_list"),
-         InlineKeyboardButton("❌ Kapat", callback_data="otomsg_close")]
+        [InlineKeyboardButton(t("broadcast_ui_hedef_gruplari_sec"), callback_data=f"otomsg_grp_{task_id}_1")],
+        [InlineKeyboardButton(t("broadcast_ui_bu_gorevi_sil"), callback_data=f"otomsg_del_{task_id}")],
+        [InlineKeyboardButton(t("broadcast_ui_gorev_listesi"), callback_data="otomsg_list"),
+         InlineKeyboardButton(t("broadcast_ui_kapat"), callback_data="otomsg_close")]
     ]
     metin = (
         f"⏰ <b>GÖREV DETAYI: #{task_id} {tinfo.get('baslik', '')}</b>\n"
@@ -267,7 +268,8 @@ async def handle_otomsg_callbacks(client, callback_query, data):
             kb, metin = await build_otomesaj_detail_keyboard(tid)
             if kb:
                 await safe_edit(callback_query, client, text=metin, reply_markup=kb)
-            await callback_query.answer(f"Görev #{tid} {'Başlatıldı' if yeni else 'Durduruldu'}")
+            status = "Başlatıldı" if yeni else "Durduruldu"
+            await callback_query.answer(t("task_started_or_stopped", tid=tid, status=status))
             return True
 
     if data == "otomsg_close":

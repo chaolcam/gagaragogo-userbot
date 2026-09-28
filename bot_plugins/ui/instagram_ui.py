@@ -5,6 +5,7 @@
 # License: GNU GPL v3.0
 # Copyright (c) 2026 chaolcam
 # -----------------------------------------------------------------------------
+from core.locales import t
 import os
 import uuid
 import asyncio
@@ -13,6 +14,7 @@ import requests
 import json
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 import utils
+from core.locales import t
 
 logger = logging.getLogger(__name__)
 
@@ -22,9 +24,9 @@ async def handle_ig_callbacks(client, callback_query, data):
     if data.startswith("ig_menu_"):
         username = data.split("_")[2]
         keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("📸 Hikayeler", callback_data=f"ig_story_{username}_0")],
-            [InlineKeyboardButton("🖼 Gönderiler", callback_data=f"ig_post_{username}_0")],
-            [InlineKeyboardButton("⭐ Öne Çıkanlar", callback_data=f"ig_high_{username}_0")],
+            [InlineKeyboardButton(t("instagram_ui_hikayeler"), callback_data=f"ig_story_{username}_0")],
+            [InlineKeyboardButton(t("instagram_ui_gonderiler"), callback_data=f"ig_post_{username}_0")],
+            [InlineKeyboardButton(t("instagram_ui_one_cikanlar"), callback_data=f"ig_high_{username}_0")],
         ])
         metin = (
             f"<b>Instagram:</b> <code>@{username}</code>\n"
@@ -49,7 +51,7 @@ async def _handle_ig_media(client, callback_query, data):
 
     if not get_rapidapi_keys_list():
         await callback_query.answer(
-            "⚠️ RapidAPI anahtarınız yok! Lütfen sohbette .rapidapi [anahtar] yazarak anahtarınızı ekleyin.",
+            t("instagram_ui_rapidapi_anahtariniz_yok_lutfen_sohbette"),
             show_alert=True,
         )
         return
@@ -59,7 +61,7 @@ async def _handle_ig_media(client, callback_query, data):
     username = parts[2]
     index = int(parts[3])
 
-    await callback_query.answer("Veriler çekiliyor, lütfen bekleyin...", show_alert=False)
+    await callback_query.answer(t("instagram_ui_veriler_cekiliyor_lutfen_bekle"), show_alert=False)
 
     endpoint_map = {"story": "stories", "post": "posts", "high": "highlights"}
     if action == "dl":
@@ -101,11 +103,11 @@ async def _handle_ig_media(client, callback_query, data):
         )
         keyboard = InlineKeyboardMarkup([
             [
-                InlineKeyboardButton("◀️ Önceki", callback_data=f"ig_{action}_{username}_{index - 1}"),
-                InlineKeyboardButton("Sonraki ▶️", callback_data=f"ig_{action}_{username}_{index + 1}"),
+                InlineKeyboardButton(t("instagram_ui_onceki"), callback_data=f"ig_{action}_{username}_{index - 1}"),
+                InlineKeyboardButton(t("instagram_ui_sonraki"), callback_data=f"ig_{action}_{username}_{index + 1}"),
             ],
-            [InlineKeyboardButton("📥 Arşive İndir", callback_data=f"ig_dl_{username}_{index}_{action}")],
-            [InlineKeyboardButton("◀️ Menü", callback_data=f"ig_menu_{username}")],
+            [InlineKeyboardButton(t("instagram_ui_arsive_i_ndir"), callback_data=f"ig_dl_{username}_{index}_{action}")],
+            [InlineKeyboardButton(t("instagram_ui_menu"), callback_data=f"ig_menu_{username}")],
         ])
         await callback_query.edit_message_text(text=metin, reply_markup=keyboard)
     except Exception as e:
@@ -128,7 +130,7 @@ def _extract_ig_media_url(endpoint, item):
 
 
 async def _ig_download_to_archive(client, callback_query, username, media_url, index, action):
-    await callback_query.answer("İndiriliyor, lütfen bekleyin...", show_alert=False)
+    await callback_query.answer(t("instagram_ui_i_ndiriliyor_lutfen_bekleyin"), show_alert=False)
     dl_path = None
     try:
         from utils import get_yedek_grup_id, create_forum_topic_helper, bot_client as userbot
@@ -168,15 +170,15 @@ async def _ig_download_to_archive(client, callback_query, username, media_url, i
             else:
                 await userbot.send_photo(chat_id=hedef_chat, photo=dl_path, caption=f"@{username} medyası", reply_to_message_id=topic_id)
         except Exception as send_err:
-            await userbot.send_message(chat_id=hedef_chat, text=f"Medya yüklenirken hata oluştu: {send_err}", reply_to_message_id=topic_id)
+            await userbot.send_message(chat_id=hedef_chat, text=t("instagram_ui_medya_yuklenirken_hata_olustu_send_err", send_err = send_err), reply_to_message_id=topic_id)
 
         if dl_path and os.path.exists(dl_path):
             os.remove(dl_path)
-        await callback_query.answer("Medya arşive (IG Konusuna) başarıyla gönderildi!", show_alert=True)
+        await callback_query.answer(t("instagram_ui_medya_arsive_ig_konusuna_basar"), show_alert=True)
     except Exception as arch_err:
         if dl_path and os.path.exists(dl_path):
             try:
                 os.remove(dl_path)
             except Exception as _del_err:
                 logger.debug("dl_path silinemedi: %s", _del_err)
-        await callback_query.answer(f"Arşive yükleme hatası: {arch_err}", show_alert=True)
+        await callback_query.answer(t("instagram_ui_arsive_yukleme_hatasi_arch_err", arch_err = arch_err), show_alert=True)

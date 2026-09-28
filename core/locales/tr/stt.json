@@ -1,0 +1,9 @@
+{
+  "stt_b_ses_dosyasi_islenirken_hata_": "❌ <b>Ses dosyası işlenirken hata oluştu (FFmpeg kurulu mu?).</b>",
+  "stt_i_ses_isleniyor_ve_metne_donus": "⚙️ <i>Ses işleniyor ve metne dönüştürülüyor...</i>",
+  "stt_b_ses_dosyasi_indirilemedi_b": "❌ <b>Ses dosyası indirilemedi!</b>",
+  "stt_i_ses_kaydi_indiriliyor_ve_din": "🎙️ <i>Ses kaydı indiriliyor ve dinleniyor...</i>",
+  "stt_b_lutfen_bir_sesli_mesaja_sese_veya_vide": "💡 <b>Lütfen bir sesli mesaja, sese veya videoya yanıt vererek <code>.stt</code> yazın.</b>\n\n<i>Örnek:</i>\n• <code>.stt</code> (Varsayılan Türkçe)\n• <code>.stt en</code> (İngilizce sesler için)",
+  "stt_b_beklenmeyen_hata_b_code_e_code": "❌ <b>Beklenmeyen hata:</b> <code>{e}</code>",
+  "cmd_usage_stt_30": ".stt [dil_kodu] (Örn: .stt tr)"
+}

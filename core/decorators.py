@@ -1,3 +1,4 @@
+from core.locales import t
 # -----------------------------------------------------------------------------
 # Project: GagaraGogo Userbot
 # Component: Command Decorators & Dispatch Handlers
@@ -43,7 +44,7 @@ def ggr_cmd(
                 try:
                     await message.edit(f"❌ <b>Hata:</b> <code>{utils.guvenli_isim(err_text[:300])}</code>")
                 except Exception as _m_err:
-                    logging.debug("Hata mesajı iletilemedi: %s", _m_err)
+                    logging.debug(t("log_hata_mesaj_iletileme_27"), _m_err)
 
         # Pyrogram Client.on_message decorator'ı ile doğrudan kullanılabilsin diye filtreyi iliştir
         wrapper.custom_filter = cmd_filter

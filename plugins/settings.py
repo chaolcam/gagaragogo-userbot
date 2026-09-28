@@ -7,6 +7,7 @@
 # -----------------------------------------------------------------------------
 import os
 from utils import ggr
+from core.locales import t
 
 def format_grup_id(id_val):
     id_str = str(id_val).strip()
@@ -15,7 +16,7 @@ def format_grup_id(id_val):
     try: return int(id_str)
     except Exception: return id_str
 
-@ggr.cmd("setyedekgrup", info="Ana Admin / Arşiv Grup ID'sini manuel olarak ayarlar.", usage=".setyedekgrup [id]", category="Sistem")
+@ggr.cmd("setyedekgrup", info=t("cmd_info_ana_53"), usage=".setyedekgrup [id]", category="Sistem")
 async def set_yedek_grup(client, message):
     """Mevcut bir grubu ana admin grubu olarak bağlar; forum konularını açar, botu yönetici yapar ve karşılama mesajını sabitler."""
     if len(message.command) > 1:
@@ -27,7 +28,7 @@ async def set_yedek_grup(client, message):
         return
 
     try:
-        await message.edit_text(f"⏳ Grup (`{yeni_id}`) ana merkez olarak bağlanıyor, forum konuları açılıyor ve yapılandırılıyor...")
+        await message.edit_text(t("settings_grup_yeni_id_ana_merkez_olarak_baglaniyo", yeni_id = yeni_id))
         import utils
         await utils.grubu_yapilandir_ve_hazirla(client, yeni_id)
 
@@ -40,15 +41,10 @@ async def set_yedek_grup(client, message):
         )
 
         await message.edit_text(
-            f"✅ <b>Admin Grubu Başarıyla Yapılandırıldı!</b>\n\n"
-            f"🆔 <b>Grup ID:</b> <code>{yeni_id}</code>\n"
-            f"{konu_metni}\n"
-            f"📌 Karşılama ve güvenlik uyarısı mesajı gruba sabitlendi.\n"
-            f"🔒 Telegram Kayıtlı Mesajlar'daki TEK kalıcı bulut veritabanı güncellendi!\n\n"
-            f"<i>Bot her yeniden başladığında bu grubu hatırlayacak ve asla yeni grup açmayacaktır.</i>"
+            t("settings_admin_grubu_yapilandirildi", chat_id=yeni_id, title=konu_metni)
         )
     except Exception as e:
-        await message.edit_text(f"❌ Grup yapılandırma hatası:\n`{e}`")
+        await message.edit_text(t("settings_grup_yapilandirma_hatasi_n_e", e = e))
 
 
 @ggr.cmd(["dil", "lang", "botlang", "setlang", "botdil"], info="Bot dilini ayarlar / Changes bot language.", usage=".dil [tr/en] veya .lang [tr/en]", category="Sistem")

@@ -1,0 +1,6 @@
+{
+  "settings_grup_yeni_id_ana_merkez_olarak_baglaniyo": "Connecting group ('{new_id}') as headquarter, opening forum threads and configuring...",
+  "settings_grup_yapilandirma_hatasi_n_e": "❌ Group configuration error:\\n'{e}'",
+  "settings_admin_grubu_yapilandirildi": "✅ <b>Admin Group Configured Successfully!</b>\\n\\n🆔 <b>Group ID:</b> <code>{chat_id}\\n{title}</code> The📌 welcome and security alert message has been pinned to the group.\\n The ONLY persistent cloud database in🔒 Telegram Saved Messages has been updated!\\n\\n The<i> bot will remember this group every time it restarts and will never open a new group.</i>",
+  "cmd_info_ana_53": "Manually sets the Main Admin / Archive Group ID."
+}

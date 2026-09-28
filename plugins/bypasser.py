@@ -13,6 +13,7 @@ import requests as std_requests
 from curl_cffi import requests
 from bs4 import BeautifulSoup
 from utils import ggr
+from core.locales import t
 
 
 def RecaptchaV3():
@@ -84,7 +85,7 @@ def bypass_ouo(url):
                 if res.headers.get('Location'):
                     return res.headers.get('Location')
             except Exception as _byp_err:
-                logging.debug("Droplink bypass denemesi hatası: %s", _byp_err)
+                logging.debug(t("log_droplink_bypass_dene_35"), _byp_err)
                 continue
                 
     return None
@@ -135,9 +136,9 @@ async def zincirleme_bypass(url):
 
 @ggr.cmd(
     "bypass",
-    info="Ouo.io, Ouo.press, TinyURL, Bitly, CleanURI ve tüm kısa/reklamlı linkleri aşarak asıl hedef URL'yi çıkarır.",
-    usage=".bypass [link] ya da linke yanıt vererek .bypass",
-    category="Araçlar"
+    info=t("cmd_info_ouoio_107"),
+    usage=t("cmd_usage_bypass_48"),
+    category=t("cat_aralar")
 )
 async def bypass_cmd(client, message):
     target_text = ""
@@ -178,14 +179,14 @@ async def bypass_cmd(client, message):
         return
 
     # 2. ÇOKLU LİNK DURUMU (Birden fazla link)
-    await message.edit_text(f"⏳ <b>Toplu Bypass Başlatıldı:</b> Toplam <code>{toplam}</code> link tespit edildi...\n(0/{toplam} tamamlandı)")
+    await message.edit_text(t("bypasser_b_toplu_bypass_baslatildi_b_toplam_code_", toplam=toplam))
     
     sonuclar = []
     basarili_sayisi = 0
     
     for idx, url in enumerate(links, start=1):
         try:
-            await message.edit_text(f"⏳ <i>Linkler çözülüyor:</i> ({idx}/{toplam})\n<code>{url}</code>")
+            await message.edit_text(t("bypasser_i_linkler_cozuluyor_i_idx_toplam_n_code_", idx = idx, toplam = toplam, url = url))
             final_url = await zincirleme_bypass(url)
             if final_url:
                 sonuclar.append(f"<b>{idx}.</b> <code>{url}</code>\n➡️ <code>{final_url}</code>")

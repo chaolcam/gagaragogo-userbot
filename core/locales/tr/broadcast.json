@@ -1,0 +1,16 @@
+{
+  "broadcast_uye_oldugunuz_herhangi_bir_gru": "ℹ️ Üye olduğunuz herhangi bir grup bulunamadı.",
+  "broadcast_i_gruplar_hazirlaniyor_i": "🔄 <i>Gruplar hazırlanıyor...</i>",
+  "broadcast_gecersiz_numara_1_ile_var_1_arasinda_olm": "❌ Geçersiz numara! 1 ile {var_1} arasında olmalıdır.",
+  "broadcast_grup_durumu_guncellendi": "🔧 <b>{idx}. {title}</b>\\nYeni Durum: {durum}",
+  "cmd_info_yantlanan_85": "Yanıtlanan mesajı, doğrudan metni veya gönderilen medyayı tüm seçili gruplara iletir.",
+  "cmd_info_gruplar_72": "Grupları numaralandırarak listeler ve tek tıkla açıp kapatmanızı sağlar.",
+  "cmd_usage_ilet_71": ".ilet (veya mesaja yanıt: .ilet | veya medya altyazısına: .ilet [yazı])",
+  "cmd_usage_iletmenu_42": ".iletmenu (veya hızlı: .iletmenu [numara])",
+  "log_getallchats_uyars_s_23": "GetAllChats uyarısı: %s",
+  "log_get_dialogs_uyars_s_23": "get_dialogs uyarısı: %s",
+  "log_durum_mesaj_dzenlene_30": "Durum mesajı düzenlenemedi: %s",
+  "log_grup_iletim_hatas_s__27": "Grup iletim hatası (%s): %s",
+  "log_kullanc_s_ilet_komut_39": "Kullanıcı %s .ilet komutunu çalıştırdı.",
+  "log_ilet_inline_men_uyar_59": "İlet inline menü uyarısı (%s), metin listesine geçiliyor..."
+}

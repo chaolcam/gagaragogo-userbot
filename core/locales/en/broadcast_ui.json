@@ -1,0 +1,15 @@
+{
+  "broadcast_ui_kapat": " Close                                                                                                                                                                                                                                                    ",
+  "broadcast_ui_gorev_listesi": "Task List",
+  "broadcast_ui_bu_gorevi_sil": "Delete This Task",
+  "broadcast_ui_hedef_gruplari_sec": "Select Target Groups",
+  "broadcast_ui_simdi_gonder": "⚡ Send Now",
+  "broadcast_ui_i_letim_menusu": "◀️ Transmission Menu\",\n\"auto_new_task_addition_guide\": \"➕ New Task Addition Guide\",\n\"auto_error_occurred\": \"Error occurred.\",\n\"auto_group_not_found\": \"❌ Group not found",
+  "broadcast_ui_yeni_gorev_ekleme_rehberi": "Guide to Adding ➕ a New Task",
+  "broadcast_ui_hata_olustu": "Failure occurred. ",
+  "broadcast_ui_grup_bulunamadi": "Group not found",
+  "broadcast_ui_userbot_aktif_degil": "❌ Userbot is not active!",
+  "broadcast_ui_otomesaj_yonetim_paneli": "⚙️ Otomesaj Management Panel\",\n\"auto_groups_are_being_updated\": \"🔄 Groups are being updated...",
+  "task_started_or_stopped": "TODO: task_started_or_stopped",
+  "broadcast_ui_sure_sure_str": "⏱ Duration: {sure_str}"
+}

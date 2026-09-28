@@ -18,6 +18,7 @@ from pyrogram.errors import (
 import utils
 from core.cache import EntityCache
 from bot_plugins.ui.common import make_progress_bar, safe_edit
+from core.locales import t
 
 logger = logging.getLogger("ggr.rehber_ui")
 
@@ -127,9 +128,9 @@ def _build_rehber_action_keyboard(action: str, page: int, total_pages: int, page
 
     bot_row = []
     if action == "g2g_tgt":
-        bot_row.append(InlineKeyboardButton("◀️ Kaynak Seçimine Dön", callback_data="rm_act_g2g"))
+        bot_row.append(InlineKeyboardButton(t("contacts_ui_kaynak_secimine_don"), callback_data="rm_act_g2g"))
     else:
-        bot_row.append(InlineKeyboardButton("◀️ Rehber Menüsü", callback_data="rm_main"))
+        bot_row.append(InlineKeyboardButton(t("contacts_ui_rehber_menusu"), callback_data="rm_main"))
     bot_row.append(InlineKeyboardButton(t("btn_close"), callback_data="yardim_close"))
     keyboard.append(bot_row)
     return InlineKeyboardMarkup(keyboard)
@@ -138,7 +139,7 @@ def _build_rehber_action_keyboard(action: str, page: int, total_pages: int, page
 async def build_rehber_menu_groups(userbot, action: str, page: int = 1, src_idx: int = None, back_target: str = "rm_main"):
     """İşlem için grup seçim ekranını oluşturur."""
     if not userbot:
-        return InlineKeyboardMarkup([[InlineKeyboardButton("◀️ Geri", callback_data=back_target)]]), "❌ Userbot aktif değil."
+        return InlineKeyboardMarkup([[InlineKeyboardButton(t("contacts_ui_geri"), callback_data=back_target)]]), "❌ Userbot aktif değil."
 
     gruplar = []
     try:
@@ -153,8 +154,8 @@ async def build_rehber_menu_groups(userbot, action: str, page: int = 1, src_idx:
             "Hesabınızın üye olduğu grup tespit edilemedi veya taranamadı."
         )
         kb = InlineKeyboardMarkup([
-            [InlineKeyboardButton("🔄 Tekrar Tara", callback_data="rm_rf")],
-            [InlineKeyboardButton("◀️ Geri", callback_data=back_target)]
+            [InlineKeyboardButton(t("contacts_ui_tekrar_tara"), callback_data="rm_rf")],
+            [InlineKeyboardButton(t("contacts_ui_geri"), callback_data=back_target)]
         ])
         return kb, metin
 
@@ -232,7 +233,7 @@ async def build_rehber_menu_counts(userbot, action: str, src_idx: int, tgt_idx: 
             cb = f"rm_r_{action}_{src_idx}_{tgt_idx}_{c}"
         else:
             cb = f"rm_r_{action}_{src_idx}_{c}"
-        row.append(InlineKeyboardButton(f"{c} Kişi", callback_data=cb))
+        row.append(InlineKeyboardButton(t("contacts_ui_c_kisi", c = c), callback_data=cb))
         if len(row) == 3:
             keyboard.append(row)
             row = []
@@ -241,8 +242,8 @@ async def build_rehber_menu_counts(userbot, action: str, src_idx: int, tgt_idx: 
 
     back_cb = f"rm_gs_g2g_s_{src_idx}" if action == "g2g" else f"rm_act_{action}"
     keyboard.append([
-        InlineKeyboardButton("◀️ Grup Seçimine Dön", callback_data=back_cb),
-        InlineKeyboardButton("❌ İptal", callback_data="yardim_close")
+        InlineKeyboardButton(t("contacts_ui_grup_secimine_don"), callback_data=back_cb),
+        InlineKeyboardButton(t("contacts_ui_i_ptal"), callback_data="yardim_close")
     ])
     return InlineKeyboardMarkup(keyboard), metin
 
@@ -343,7 +344,7 @@ async def _rehber_worker_g2g(userbot, callback_query, task_id, src_group, tgt_gr
         f"🔒 <b>Gizlilik Engeli:</b> <code>{stats['gizlilik']}</code>\n"
         f"⏭️ <b>Zaten Grupta:</b> <code>{stats['zaten']}</code>\n"
         f"❌ <b>Başarısız/Hatalı:</b> <code>{stats['hatali']}</code>",
-        InlineKeyboardMarkup([[InlineKeyboardButton("📇 Rehber Menüsü", callback_data="rm_main")]])
+        InlineKeyboardMarkup([[InlineKeyboardButton(t("contacts_ui_rehber_menusu"), callback_data="rm_main")]])
     )
 
 
@@ -412,7 +413,7 @@ async def _rehber_worker_cek(userbot, callback_query, task_id, src_group, src_ti
         f"✅ <b>Başarıyla Kaydedilen:</b> <code>{basarili}</code>\n"
         f"⏭️ <b>Zaten Rehberde Olan:</b> <code>{zaten}</code>\n"
         f"❌ <b>Hatalar:</b> <code>{hatali}</code>",
-        InlineKeyboardMarkup([[InlineKeyboardButton("📇 Rehber Menüsü", callback_data="rm_main")]])
+        InlineKeyboardMarkup([[InlineKeyboardButton(t("contacts_ui_rehber_menusu"), callback_data="rm_main")]])
     )
 
 
@@ -468,13 +469,13 @@ async def _rehber_worker_ekle(userbot, callback_query, task_id, tgt_group, tgt_t
         f"🔒 <b>Gizlilik Engeli:</b> <code>{stats['gizlilik']}</code>\n"
         f"⏭️ <b>Zaten Grupta:</b> <code>{stats['zaten']}</code>\n"
         f"❌ <b>Hatalar:</b> <code>{stats['hatali']}</code>",
-        InlineKeyboardMarkup([[InlineKeyboardButton("📇 Rehber Menüsü", callback_data="rm_main")]])
+        InlineKeyboardMarkup([[InlineKeyboardButton(t("contacts_ui_rehber_menusu"), callback_data="rm_main")]])
     )
 
 
 async def run_rehber_action_worker(userbot, callback_query, task_id: str, action: str, src_idx: int, tgt_idx: int, limit: int):
     REHBER_ACTIVE_TASKS[task_id] = True
-    stop_kb = InlineKeyboardMarkup([[InlineKeyboardButton("🛑 İşlemi Durdur", callback_data=f"rm_stop_{task_id}")]])
+    stop_kb = InlineKeyboardMarkup([[InlineKeyboardButton(t("contacts_ui_i_slemi_durdur"), callback_data=f"rm_stop_{task_id}")]])
 
     async def safe_update(text, reply_markup=None):
         try:
@@ -557,19 +558,19 @@ async def _handle_rehber_execution(client, callback_query, data, userbot):
         task_id = str(uuid.uuid4())[:8]
         if action == "g2g":
             src_idx, tgt_idx, count = int(parts[3]), int(parts[4]), int(parts[5])
-            await callback_query.answer("🚀 Gruptan gruba aktarım başlatılıyor...", show_alert=False)
+            await callback_query.answer(t("contacts_ui_gruptan_gruba_aktarim_baslatil"), show_alert=False)
             asyncio.create_task(run_rehber_action_worker(userbot, callback_query, task_id, "g2g", src_idx, tgt_idx, count))
         elif action in ("cek", "ekle"):
             src_idx, count = int(parts[3]), int(parts[4])
             label = "Rehbere kayıt" if action == "cek" else "Gruba davet"
-            await callback_query.answer(f"🚀 {label} başlatılıyor...", show_alert=False)
+            await callback_query.answer(t("contacts_ui_label_baslatiliyor", label = label), show_alert=False)
             asyncio.create_task(run_rehber_action_worker(userbot, callback_query, task_id, action, src_idx, None, count))
         return True
 
     if data.startswith("rm_stop_"):
         tid = data.split("_")[2]
         REHBER_ACTIVE_TASKS[tid] = False
-        await callback_query.answer("🛑 İşlem durduruluyor...", show_alert=True)
+        await callback_query.answer(t("contacts_ui_i_slem_durduruluyor"), show_alert=True)
         return True
 
     return False
@@ -583,7 +584,7 @@ async def handle_rehber_callbacks(client, callback_query, data):
 
     userbot = utils.bot_client
     if not userbot:
-        await callback_query.answer("❌ Userbot aktif değil!", show_alert=True)
+        await callback_query.answer(t("contacts_ui_userbot_aktif_degil"), show_alert=True)
         return True
 
     if data == "rm_main":
@@ -593,7 +594,7 @@ async def handle_rehber_callbacks(client, callback_query, data):
         return True
 
     if data.startswith(("rm_rf", "rehber_rf_")):
-        await callback_query.answer("🔄 Gruplar yenileniyor...", show_alert=False)
+        await callback_query.answer(t("contacts_ui_gruplar_yenileniyor"), show_alert=False)
         kb, metin = await build_rehber_menu_main(userbot, force_refresh=True)
         await safe_edit(callback_query, client, text=metin, reply_markup=kb)
         return True

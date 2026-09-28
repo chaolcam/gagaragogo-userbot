@@ -1,0 +1,21 @@
+{
+  "tagger_b_bu_komut_yalnizca_gruplarda_": "❌ <b>Bu komut yalnızca gruplarda kullanılabilir!</b>",
+  "tagger_b_toplam_toplam_sayi_kisi_bulu": "🚀 <b>Toplam {toplam_sayi} kişi bulundu!</b> Etiketleme başlıyor...\n💡 <i>Durdurmak için:</i> <code>.tag dur</code>",
+  "tagger_b_etiketlenecek_uye_bulunamadi": "⚠️ <b>Etiketlenecek üye bulunamadı!</b>\n\n• Grubun gizlilik ayarlarında <i>'Üyeleri Gizle'</i> açık olabilir ve son mesajlarda üye bulunamamış olabilir.\n• Grupta aktif ya da etiketlenebilecek kullanıcı kalmamış olabilir.",
+  "tagger_b_baslik_tur_taraniyor_lutfen_": "⏳ <b>{baslik_tur} taranıyor, lütfen bekleyin...</b>\n💡 <i>Durdurmak için:</i> <code>.tag dur</code>",
+  "cmd_info_gruplardaki_45": "Gruplardaki üyeleri veya adminleri etiketler.",
+  "log_ye_filtresi_ekme_uya_35": "Üye filtresi çekme uyarısı (%s): %s",
+  "log_harf_arama_hatas_s_21": "Harf arama hatası: %s",
+  "log_sohbet_gemiinden_ye__42": "Sohbet geçmişinden üye toplama uyarısı: %s",
+  "log_standart_ye_ekme_uya_30": "Standart üye çekme uyarısı: %s",
+  "log_paket_gnderme_hatas__25": "Paket gönderme hatası: %s",
+  "log_son_paket_gnderme_ha_29": "Son paket gönderme hatası: %s",
+  "log_mesaj_gnderme_hatas__25": "Mesaj gönderme hatası: %s",
+  "log_etiketleme_hatas_s_s_26": "Etiketleme hatası (%s): %s",
+  "tagger_admins": "👑 Yöneticiler",
+  "tagger_members": "👥 Üyeler",
+  "tagger_admin_sing": "Yönetici",
+  "tagger_member_sing": "Üye",
+  "tagger_done_message": "Etiketleme Tamamlandı!",
+  "tagger_error_message": "Etiketleme Hatası"
+}

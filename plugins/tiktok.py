@@ -5,6 +5,7 @@
 # License: GNU GPL v3.0
 # Copyright (c) 2026 chaolcam
 # -----------------------------------------------------------------------------
+from core.locales import t
 import sys
 import os
 import json
@@ -17,6 +18,7 @@ import logging
 from pyrogram import Client, filters
 from utils import ggr, get_yedek_grup_id, ayar_getir
 from TikTokLive import TikTokLiveClient
+from core.locales import t
 
 def kill_process_tree(pid):
     try:
@@ -79,9 +81,9 @@ async def bulut_db_yukle_tiktok(client):
         if saved_cookie and not os.path.exists("tiktok_cookies.txt"):
             with open("tiktok_cookies.txt", "w", encoding="utf-8") as f:
                 f.write(saved_cookie)
-            logging.info("🍪 TikTok çerezleri bulut veritabanından diske başarıyla geri yüklendi.")
+            logging.info(t("log__tiktok_erezleri_bul_70"))
     except Exception as e:
-        logging.error("TikTok bulut veritabanı okuma hatası: %s", e)
+        logging.error(t("log_tiktok_bulut_veritab_40"), e)
 
 
 def _inject_tiktok_cookies(live_client):
@@ -295,7 +297,7 @@ async def record_tiktok_stream(client, username, target_chat, topic_id=None):
     try:
         await client.send_message(
             chat_id=target_chat,
-            text=f"\U0001f534 <b>Canli Yayin Basladi!</b>\n\U0001f464 <code>@{username}</code> su an yayinda, kayit arka planda baslatildi. \U0001f3a5",
+            text=t("tiktok_u0001f534_b_canli_yayin_basladi_b_n_u000", username = username),
             reply_to_message_id=topic_id
         )
     except Exception as e:
@@ -341,7 +343,7 @@ async def record_tiktok_stream(client, username, target_chat, topic_id=None):
         try:
             await client.send_message(
                 chat_id=target_chat,
-                text=f"\u26ab <b>Canli Yayin Bitti!</b>\n\U0001f464 <code>@{username}</code> yayini kapatti. Tum video parcalari yukarida paylasildi. \U0001f3ac",
+                text=t("tiktok_u26ab_b_canli_yayin_bitti_b_n_u0001f464_", username = username),
                 reply_to_message_id=topic_id
             )
         except Exception as _exc:
@@ -421,7 +423,7 @@ async def download_and_send_tiktok_post(client, username, video_id, title, targe
 
     url = f"https://www.tiktok.com/@{username}/video/{video_id}"
     api_url = f"https://tikwm.com/api/?url={url}&hd=1"
-    caption = f"🎵 <b>Yeni TikTok Gönderisi</b>\n👤 <code>@{username}</code>\n\n📝 {ggr.safe_html(title)}"
+    caption = t("tiktok_new_post_caption", username=username, title=ggr.safe_html(title))
 
     try:
         from curl_cffi import requests as c_requests
@@ -441,7 +443,7 @@ async def download_and_send_tiktok_post(client, username, video_id, title, targe
             await _send_single_tiktok_file(client, dosyalar[0], caption, target_chat, topic_id)
         return True
     except Exception as e:
-        logging.error("TikTok indirme hatası (@%s): %s", username, e)
+        logging.error(t("log_tiktok_indirme_hatas_31"), username, e)
         return False
     finally:
         try:
@@ -461,7 +463,7 @@ async def _check_live_for_user(client, username, target_chat, topic_id):
         if await live_client.is_live():
             asyncio.create_task(record_tiktok_stream(client, username, target_chat, topic_id))
     except Exception as live_err:
-        logging.error("TikTok canlı sorgu hatası @%s: %s - %s", username, type(live_err).__name__, live_err)
+        logging.error(t("log_tiktok_canl_sorgu_ha_38"), username, type(live_err).__name__, live_err)
 
 
 async def _check_post_for_user(client, db, username, user_data, target_chat, topic_id):
@@ -490,7 +492,7 @@ async def _check_post_for_user(client, db, username, user_data, target_chat, top
             if await download_and_send_tiktok_post(client, username, newest_id, title, target_chat, topic_id):
                 db["users"][username]["last_post_id"] = newest_id
                 db_kaydet(db)
-                logging.info("✅ @%s ilk tiktok gönderisi gönderildi ve id atandı.", username)
+                logging.info(t("log__s_ilk_tiktok_gnderi_51"), username)
             return
 
         yeni_videolar = []
@@ -510,7 +512,7 @@ async def _check_post_for_user(client, db, username, user_data, target_chat, top
             title = vid_data.get("title", "")[:500]
             if await download_and_send_tiktok_post(client, username, vid, title, target_chat, topic_id):
                 en_son_id = vid
-                logging.info("✅ @%s yeni tiktok gönderisi gönderildi: %s", username, vid)
+                logging.info(t("log__s_yeni_tiktok_gnder_42"), username, vid)
             else:
                 break
 
@@ -520,7 +522,7 @@ async def _check_post_for_user(client, db, username, user_data, target_chat, top
 
     except Exception as post_err:
         if "Expecting value: line 1 column 1 (char 0)" in str(post_err):
-            logging.debug("TikTok post check block @%s (Olası Rate Limit / Engel)", username)
+            logging.debug(t("log_tiktok_post_check_bl_54"), username)
         else:
             logging.error("TikTok post check error @%s: %s", username, post_err)
         ggr_last_post_check[username] = time.time()
@@ -528,7 +530,7 @@ async def _check_post_for_user(client, db, username, user_data, target_chat, top
 
 async def tiktok_monitor_loop(client):
     """TikTok canlı yayın ve gönderi takip döngüsü."""
-    logging.info("🕵️‍♂️ TikTok Canlı Yayın Takip Motoru Başlatıldı!")
+    logging.info(t("log__tiktok_canl_yayn_ta_49"))
     while True:
         try:
             db = db_yukle()
@@ -546,7 +548,7 @@ async def tiktok_monitor_loop(client):
                         db["users"][username]["topic_id"] = topic_id
                         db_kaydet(db)
                     except Exception as topic_err:
-                        logging.error("TikTok stalker loop topic oluşturulamadı: %s", topic_err)
+                        logging.error(t("log_tiktok_stalker_loop__44"), topic_err)
 
                 if filt in ("both", "live"):
                     await _check_live_for_user(client, username, target_chat, topic_id)
@@ -557,7 +559,7 @@ async def tiktok_monitor_loop(client):
                 await asyncio.sleep(2)
 
         except Exception as loop_err:
-            logging.error("TikTok monitor ana döngü hatası: %s - %s", type(loop_err).__name__, loop_err)
+            logging.error(t("log_tiktok_monitor_ana_d_40"), type(loop_err).__name__, loop_err)
 
         await asyncio.sleep(20)  # Her 20 saniyede bir kontrol et
 
@@ -575,7 +577,7 @@ async def auto_start_tiktok_monitor(client, message):
     message.continue_propagation()
 
 
-@ggr.cmd("ttcookie", info="TikTok çerezlerini kaydeder, siler veya durumunu gösterir.", usage=".ttcookie [dosya yanıtla | sessionid | sil]", category="Araçlar")
+@ggr.cmd("ttcookie", info=t("cmd_info_tiktok_58"), usage=t("cmd_usage_ttcookie_43"), category=t("cat_aralar"))
 async def ttcookie_kaydet(client, message):
     args = message.text.split()[1:] if message.text else []
     
@@ -588,7 +590,7 @@ async def ttcookie_kaydet(client, message):
             except Exception as _exc:
                 logging.debug("Suppressed: %s", _exc)
         await ggr.sync_cloud(client)
-        await message.edit_text("🗑️ <b>TikTok Çerezleri Başarıyla Silindi!</b>\nBulut veritabanından temizlendi.")
+        await message.edit_text(t("tiktok_b_tiktok_cerezleri_basariyla_silindi_b_b"))
         return
 
     cerez_icerik = None
@@ -599,7 +601,7 @@ async def ttcookie_kaydet(client, message):
             indirilen = await client.download_media(message.reply_to_message, in_memory=True)
             cerez_icerik = indirilen.getvalue().decode("utf-8")
         except Exception as e:
-            await message.edit_text(f"❌ Belge okunurken hata oluştu: {e}")
+            await message.edit_text(t("tiktok_belge_okunurken_hata_olustu_e", e = e))
             return
     elif len(message.command) > 1:
         # 3. Metin veya SessionID Olarak Girme
@@ -610,21 +612,11 @@ async def ttcookie_kaydet(client, message):
         mevcut_cerez = ggr.get("tiktok_cookie")
         if mevcut_cerez or os.path.exists("tiktok_cookies.txt"):
             await message.edit_text(
-                "✅ <b>TikTok Çereziniz Aktif!</b>\n\n"
-                "🔒 Çerezleriniz <b>Telegram Bulut Veritabanı</b>'na kayıtlıdır. Sunucu yeniden kurulsa bile otomatik olarak geri yüklenir.\n\n"
-                "• <i>Güncellemek için:</i> <code>.ttcookie [yeni_sessionid]</code> veya <code>cookies.txt</code> dosyasını yanıtlayın.\n"
-                "• <i>Silmek için:</i> <code>.ttcookie sil</code>"
+                t("tiktok_b_tiktok_cereziniz_aktif_b_cerezleriniz_")
             )
         else:
             await message.edit_text(
-                "💡 <b>TikTok Çerez (Cookie) Nasıl Eklenir?</b>\n\n"
-                "Yaş kısıtlamalı ve korumalı canlı yayınları sorunsuz izleyip kaydedebilmek için hesabınızın çerezini ekleyin:\n\n"
-                "1️⃣ <b>Pratik Yöntem (SessionID):</b>\n"
-                "Tarayıcınızdan TikTok hesabınıza girin. F12 (Geliştirici Araçları) ➔ <b>Application</b> ➔ <b>Cookies</b> sekmesindeki <code>sessionid</code> değerini kopyalayıp yazın:\n"
-                "👉 <code>.ttcookie [sessionid_değeri]</code>\n\n"
-                "2️⃣ <b>Dosya Yöntemi (cookies.txt):</b>\n"
-                "Cookie-Editor eklentisiyle <i>Export ➔ Netscape formatında</i> aldığınız <code>cookies.txt</code> dosyasını sohbete atıp yanıtlayarak <code>.ttcookie</code> yazın.\n\n"
-                "🔒 <i>Tüm çerezler Telegram Kayıtlı Mesajlar bulut veritabanınızda kalıcı ve güvenli saklanır.</i>"
+                t("tiktok_b_tiktok_cerez_cookie_nasil_eklenir_b_ya")
             )
         return
 
@@ -642,12 +634,10 @@ async def ttcookie_kaydet(client, message):
     await ggr.sync_cloud(client)
         
     await message.edit_text(
-        "✅ <b>TikTok Çerezleri (Cookies) Başarıyla Kaydedildi!</b>\n\n"
-        "🔒 <b>Bulut Veritabanına Yedeklendi:</b> Sunucunuz yeniden başlasa, kapansa veya Render yeniden build alsa bile çereziniz asla kaybolmaz!\n"
-        "🕵️‍♂️ Artık bot, kısıtlı veya gizli yayınları kendi hesabınız üzerinden engel yemeden kaydedecek."
+        t("tiktok_b_tiktok_cerezleri_cookies_basariyla_kay")
     )
 
-@ggr.cmd("tttakip", info="Bir TikTok kullanıcısını otomatik canlı yayın kayıt listesine ekler.", usage=".tttakip [kullanıcı_adı] [yayin/post]", category="Araçlar")
+@ggr.cmd("tttakip", info=t("cmd_info_bir_68"), usage=t("cmd_usage_tttakip_37"), category=t("cat_aralar"))
 async def tttakip_ekle(client, message):
     if len(message.command) < 2:
         await message.edit_text(ggr.t("err_tttakip_usage"))
@@ -657,8 +647,8 @@ async def tttakip_ekle(client, message):
     filtre = "both"
     if len(message.command) > 2:
         f_arg = message.command[2].lower()
-        if f_arg in ["yayin", "yayın", "live", "canlı"]: filtre = "live"
-        elif f_arg in ["post", "gönderi", "gonderi"]: filtre = "post"
+        if f_arg in ["yayin", t("tiktok_type_live"), "live", t("tiktok_type_live_2")]: filtre = "live"
+        elif f_arg in ["post", t("tiktok_type_post"), "gonderi"]: filtre = "post"
         
     db = db_yukle()
     target_chat = db.get("target_chat", ggr.backup_chat_id())
@@ -676,28 +666,28 @@ async def tttakip_ekle(client, message):
             topic_id = await create_forum_topic_helper(client, target_chat, f"TT: {username}")
             db["users"][username]["topic_id"] = topic_id
         except Exception as e:
-            logging.error("Topic oluşturulamadı: %s", e)
+            logging.error(t("log_topic_oluturulamad_s_24"), e)
             
     db_kaydet(db)
     
-    fm = "Tümü (Yayın + Post)"
-    if filtre == "live": fm = "Sadece Canlı Yayın"
+    fm = t("tiktok_all_types")
+    if filtre == "live": fm = t("tiktok_only_live")
     elif filtre == "post": fm = "Sadece Post"
     
     topic_msg = f" (Topic ID: {topic_id})" if topic_id else ""
-    await message.edit_text(f"✅ <code>@{username}</code> TikTok takip listesine başarıyla eklendi/güncellendi!{topic_msg}\n📌 <b>Filtre:</b> {fm}")
+    await message.edit_text(t("tiktok_code_username_code_tiktok_takip_listesin", username = username, topic_msg = topic_msg, fm = fm))
 
-@ggr.cmd("tttakiptencikar", info="Bir TikTok kullanıcısını kayıt listesinden çıkarır.", usage=".tttakiptencikar [kullanıcı_adı]", category="Araçlar")
+@ggr.cmd("tttakiptencikar", info=t("cmd_info_bir_51"), usage=t("cmd_usage_tttakiptencikar_32"), category=t("cat_aralar"))
 async def tttakip_cikar(client, message):
     if len(message.command) < 2:
-        await message.edit_text("Hatalı kullanım. Örnek: `.tttakiptencikar kullanici_adi`")
+        await message.edit_text(t("tiktok_hatali_kullanim_ornek_tttakipt"))
         return
         
     username = message.command[1].strip().lower().replace("@", "")
     db = db_yukle()
     
     if username not in db["users"]:
-        await message.edit_text(f"👤 `@{username}` TikTok takip listesinde bulunamadı.")
+        await message.edit_text(t("tiktok_username_tiktok_takip_listesinde_bulunam", username = username))
         return
         
     del db["users"][username]
@@ -714,6 +704,6 @@ async def tttakip_cikar(client, message):
             logging.debug("Suppressed: %s", _exc)
             
     try:
-        await message.edit_text(f"❌ `@{username}` TikTok takip listesinden çıkarıldı.")
+        await message.edit_text(t("tiktok_username_tiktok_takip_listesinden_cikari", username = username))
     except Exception:
-        await message.reply_text(f"❌ `@{username}` TikTok takip listesinden çıkarıldı.")
+        await message.reply_text(t("tiktok_username_tiktok_takip_listesinden_cikari", username = username))

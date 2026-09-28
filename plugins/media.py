@@ -15,6 +15,7 @@ import requests
 from io import BytesIO
 from PIL import Image
 from utils import ggr
+from core.locales import t
 
 ggr_medya_temp_dir = "downloads/medya_temp"
 os.makedirs(ggr_medya_temp_dir, exist_ok=True)
@@ -24,7 +25,7 @@ os.makedirs(ggr_medya_temp_dir, exist_ok=True)
 # 1. YUVARLAK VİDEO MESAJ (.yuvarlak / .note)
 # =============================================================================
 
-@ggr.cmd(["yuvarlak", "note", "telescope"], info="Yanıtlanan videoyu 1:1 yuvarlak video mesaja (Telescope) dönüştürür.", usage="Yanıtlayarak: .yuvarlak veya .note", category="Araçlar")
+@ggr.cmd(["yuvarlak", "note", "telescope"], info=t("cmd_info_yantlanan_68"), usage=t("cmd_usage_yantlayarak_34"), category=t("cat_aralar"))
 async def yuvarlak_video_komutu(client, message):
     kaynak = message.reply_to_message
     if not kaynak or (not kaynak.video and not kaynak.animation and not kaynak.video_note):
@@ -63,8 +64,8 @@ async def yuvarlak_video_komutu(client, message):
         await durum.delete()
 
     except Exception as e:
-        logging.error("Yuvarlak video hatası: %s", e)
-        await durum.edit_text(f"❌ Hata: <code>{e}</code>")
+        logging.error(t("log_yuvarlak_video_hatas_25"), e)
+        await durum.edit_text(t("media_hata_code_e_code", e = e))
     finally:
         for p in [input_path, output_path]:
             if os.path.exists(p):
@@ -78,7 +79,7 @@ async def yuvarlak_video_komutu(client, message):
 # 2. SESLİ MESAJ DÖNÜŞTÜRÜCÜ (.ses / .voice)
 # =============================================================================
 
-@ggr.cmd(["ses", "voice"], info="Yanıtlanan video veya ses dosyasını Telegram sesli mesajına (Voice Note) dönüştürür.", usage="Yanıtlayarak: .ses veya .voice", category="Araçlar")
+@ggr.cmd(["ses", "voice"], info=t("cmd_info_yantlanan_84"), usage=t("cmd_usage_yantlayarak_30"), category=t("cat_aralar"))
 async def sesli_mesaj_komutu(client, message):
     kaynak = message.reply_to_message
     if not kaynak or (not kaynak.audio and not kaynak.voice and not kaynak.video and not kaynak.video_note):
@@ -113,8 +114,8 @@ async def sesli_mesaj_komutu(client, message):
         await durum.delete()
 
     except Exception as e:
-        logging.error("Ses dönüştürme hatası: %s", e)
-        await durum.edit_text(f"❌ Hata: <code>{e}</code>")
+        logging.error(t("log_ses_dntrme_hatas_s_25"), e)
+        await durum.edit_text(t("media_hata_code_e_code", e = e))
     finally:
         for p in [input_path, output_path]:
             if os.path.exists(p):
@@ -128,7 +129,7 @@ async def sesli_mesaj_komutu(client, message):
 # 3. STANDART TELEGRAM ÇIKARTMASI (.sticker)
 # =============================================================================
 
-@ggr.cmd(["sticker", "stiker"], info="Yanıtlanan fotoğrafı Telegram standart çıkartmasına (WebP) dönüştürür.", usage="Yanıtlayarak: .sticker", category="Araçlar")
+@ggr.cmd(["sticker", "stiker"], info=t("cmd_info_yantlanan_70"), usage=t("cmd_usage_yantlayarak_22"), category=t("cat_aralar"))
 async def sticker_yap_komutu(client, message):
     kaynak = message.reply_to_message
     if not kaynak or (not kaynak.photo and not kaynak.document and not kaynak.sticker):
@@ -156,15 +157,15 @@ async def sticker_yap_komutu(client, message):
         await durum.delete()
 
     except Exception as e:
-        logging.error("Sticker dönüştürme hatası: %s", e)
-        await durum.edit_text(f"❌ Hata: <code>{e}</code>")
+        logging.error(t("log_sticker_dntrme_hatas_29"), e)
+        await durum.edit_text(t("media_hata_code_e_code", e = e))
 
 
 # =============================================================================
 # 4. METİN SESLENDİRME (.tts)
 # =============================================================================
 
-@ggr.cmd(["tts", "seslendir", "soyle"], info="Yazılan metni Türkçe seslendirip sesli mesaj olarak gönderir.", usage=".tts [metin] veya metne yanıtlayarak: .tts", category="Araçlar")
+@ggr.cmd(["tts", "seslendir", "soyle"], info=t("cmd_info_yazlan_61"), usage=t("cmd_usage_tts_42"), category=t("cat_aralar"))
 async def tts_komutu(client, message):
     metin = " ".join(message.command[1:]).strip() if len(message.command) > 1 else None
     
@@ -193,5 +194,5 @@ async def tts_komutu(client, message):
         await durum.delete()
 
     except Exception as e:
-        logging.error("TTS hatası: %s", e)
-        await durum.edit_text(f"❌ Seslendirme hatası: `{e}`")
+        logging.error(t("log_tts_hatas_s_14"), e)
+        await durum.edit_text(t("media_seslendirme_hatasi_e", e = e))

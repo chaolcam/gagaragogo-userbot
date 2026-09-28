@@ -14,14 +14,15 @@ import psutil
 import asyncio
 import logging
 from utils import ggr, KOMUT_BILGILERI, ggr_commands, tlog
+from core.locales import t
 
 # Komut kayıtları (Yardım menüsünde listelenmesi için)
-ggr.cmd("setalive", info="Alive menüsündeki afiş görselini ayarlar veya sıfırlar.", usage=".setalive [link] | .setalive reset", category="Sistem")
+ggr.cmd("setalive", info=t("cmd_info_alive_55"), usage=".setalive [link] | .setalive reset", category="Sistem")
 
-@ggr.cmd(["alive", "yardim", "yardım", "help"], info="Botun canlı durum kartını, sistem metriklerini ve kontrol panelini açar.", usage=".alive", category="Sistem")
+@ggr.cmd(["alive", "yardim", t("cat_help"), "help"], info=t("cmd_info_botun_72"), usage=".alive", category="Sistem")
 async def alive_menusu(client, message):
     """Yardımcı bot aracılığıyla şık .alive kartını ve interaktif kategori menüsünü açar."""
-    logging.info("Kullanıcı %s .alive komutunu çalıştırdı.", message.from_user.id if message.from_user else 'Bilinmeyen')
+    logging.info(t("log_kullanc_s_alive_komu_40"), message.from_user.id if message.from_user else 'Bilinmeyen')
     try:
         import utils
         if utils.YARDIMCI_BOT_USERNAME:
@@ -56,18 +57,18 @@ async def alive_menusu(client, message):
                         utils.LAST_YARDIM_MENU = (message.chat.id, None)
                     return
             except Exception as e:
-                logging.error("Inline bot hatası: %s", e)
+                logging.error(t("log_inline_bot_hatas_s_21"), e)
                 
         else:
             from core.locales import t
             await message.edit_text(t("err_bot_token_missing"))
     except Exception as e:
-        await message.edit_text(f"❌ Alive menüsü hatası: `{e}`")
+        await message.edit_text(t("system_alive_menusu_hatasi_e", e = e))
         import utils
         await utils.tlog(f"🚨 `.alive` Hatası:\n`{e}`")
 
 
-@ggr.cmd(["setalive", "aliveresim", "alivelogo"], info="Alive menüsündeki afiş görselini ayarlar veya sıfırlar.", usage=".setalive [link] | .setalive (fotoğrafa yanıt vererek) | .setalive reset", category="Sistem")
+@ggr.cmd(["setalive", "aliveresim", "alivelogo"], info=t("cmd_info_alive_55"), usage=t("cmd_usage_setalive_72"), category="Sistem")
 async def set_alive_logo(client, message):
     """Alive menüsünde gösterilecek logoyu/afişi günceller."""
     import utils
@@ -78,8 +79,7 @@ async def set_alive_logo(client, message):
     if param.lower() in ["reset", "varsayilan", "default", "sifirla"]:
         ggr.set("alive_logo", utils.DEFAULT_ALIVE_LOGO)
         await message.edit_text(
-            "✅ <b>Alive afişi varsayılana sıfırlandı!</b>\n\n"
-            "Kontrol etmek için: <code>.alive</code>"
+            t("system_b_alive_afisi_varsayilana_sifirlandi_b_k")
         )
         return
         
@@ -87,9 +87,7 @@ async def set_alive_logo(client, message):
     if param.startswith("http://") or param.startswith("https://"):
         ggr.set("alive_logo", param)
         await message.edit_text(
-            f"✅ <b>Alive afişi başarıyla güncellendi!</b>\n\n"
-            f"🔗 <b>Yeni Görsel:</b> <a href=\"{param}\">Görüntüle</a>\n"
-            "Kontrol etmek için: <code>.alive</code>"
+            t("system_alive_afisi_guncellendi", url=param)
         )
         return
         
@@ -102,7 +100,7 @@ async def set_alive_logo(client, message):
         (reply.document and reply.document.mime_type and reply.document.mime_type.startswith("image/"))
     )
     if is_media:
-        durum = await message.edit_text("⏳ <i>Görsel indiriliyor ve buluta yükleniyor...</i>")
+        durum = await message.edit_text(t("system_i_gorsel_indiriliyor_ve_buluta"))
         try:
             indirilen = await client.download_media(reply)
             if indirilen:
@@ -116,38 +114,29 @@ async def set_alive_logo(client, message):
                 if uploaded_url:
                     ggr.set("alive_logo", uploaded_url)
                     await durum.edit_text(
-                        f"✅ <b>Alive afişi başarıyla ayarlandı!</b>\n\n"
-                        f"🖼 <b>Görsel URL:</b> <a href=\"{uploaded_url}\">Görüntüle</a>\n"
-                        "Kontrol etmek için: <code>.alive</code>"
+                        t("system_alive_afisi_ayarlandi", url=uploaded_url)
                     )
                     return
                 else:
                     await durum.edit_text(
-                        "⚠️ <i>Görsel bulut sunucularına yüklenemedi. Lütfen görselin doğrudan internet linkini girin:</i>\n"
-                        "Örnek: <code>.setalive https://i.imgur.com/ornek.jpg</code>"
+                        t("system_i_gorsel_bulut_sunucularina_yuklenemedi_")
                     )
                     return
         except Exception as err:
-            await durum.edit_text(f"❌ <b>Görsel işleme hatası:</b> <code>{err}</code>")
+            await durum.edit_text(t("system_b_gorsel_isleme_hatasi_b_code_err_code", err = err))
             return
             
     # Parametre veya yanıt yoksa kullanım kılavuzunu göster
     mevcut_logo = utils.get_alive_logo()
     await message.edit_text(
-        "🖼 <b>ALIVE AFİŞİ AYARLAMA</b>\n"
-        "────────────────────────\n"
-        "Canlı durum (.alive) kartının en üstünde yer alan afişi değiştirmek için:\n\n"
-        "1. <b>Link ile:</b> <code>.setalive https://resim-linki.jpg</code>\n"
-        "2. <b>Fotoğraf ile:</b> Bir fotoğrafa yanıt vererek <code>.setalive</code> yazın.\n"
-        "3. <b>Sıfırlamak için:</b> <code>.setalive reset</code>\n\n"
-        f"🔗 <b>Mevcut Afiş:</b> <a href=\"{mevcut_logo}\">Görüntüle</a>"
+        t("system_alive_afisi_yardim", url=mevcut_logo)
     )
 
 
-@ggr.cmd("ayarlar", info="Özelliklerin açılıp kapatılabildiği interaktif kontrol panelini açar.", usage=".ayarlar", category="Sistem")
+@ggr.cmd("ayarlar", info=t("cmd_info_zelliklerin_69"), usage=".ayarlar", category="Sistem")
 async def ayarlar_menusu(client, message):
     """Yardımcı bot aracılığıyla özelliklerin açılıp kapatılabildiği interaktif kontrol panelini açar."""
-    logging.info("Kullanıcı %s .ayarlar komutunu çalıştırdı.", message.from_user.id if message.from_user else 'Bilinmeyen')
+    logging.info(t("log_kullanc_s_ayarlar_ko_42"), message.from_user.id if message.from_user else 'Bilinmeyen')
     import utils
     if utils.YARDIMCI_BOT_USERNAME:
         try:
@@ -169,7 +158,7 @@ async def ayarlar_menusu(client, message):
                     utils.LAST_YARDIM_MENU = (message.chat.id, sent_msg_id)
                 return
         except Exception as e:
-            logging.error("Inline ayarlar hatası: %s", e)
+            logging.error(t("log_inline_ayarlar_hatas_25"), e)
             
     from core.locales import t
     await message.edit_text(t("err_bot_token_missing"))
@@ -177,10 +166,10 @@ async def ayarlar_menusu(client, message):
 
 # ================= SUNUCU DURUMU, GÜNCELLEME VE PING =================
 
-@ggr.cmd("durum", info="Sunucu donanım kaynaklarını (CPU, RAM, Disk, Uptime ve İşletim Sistemi) detaylı olarak raporlar.", usage=".durum", category="Sistem")
+@ggr.cmd("durum", info=t("cmd_info_sunucu_96"), usage=".durum", category="Sistem")
 async def sunucu_durumu(client, message):
     """Sunucu donanım kaynaklarını (CPU, RAM, Disk, Uptime ve İşletim Sistemi) detaylı olarak raporlar."""
-    logging.info("Kullanıcı %s .durum komutunu çalıştırdı.", message.from_user.id if message.from_user else 'Bilinmeyen')
+    logging.info(t("log_kullanc_s_durum_komu_40"), message.from_user.id if message.from_user else 'Bilinmeyen')
     try:
         import platform
         import sys
@@ -212,7 +201,7 @@ async def sunucu_durumu(client, message):
         await message.edit_text(mesaj)
     except Exception as e:
         await ggr.log(f"🚨 <b>.durum komutu hatası:</b>\n<code>{e}</code>")
-        await message.edit_text(f"❌ Durum alınamadı: <code>{e}</code>")
+        await message.edit_text(t("system_durum_alinamadi_code_e_code", e = e))
 
 
 def _git_hazirla():
@@ -246,7 +235,7 @@ async def _apply_update_now(durum):
     eski_commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True).stdout.strip()
     fetch_res = subprocess.run(["git", "fetch", "origin", "main"], capture_output=True, text=True)
     if "fatal" in fetch_res.stderr.lower() or "error" in fetch_res.stderr.lower():
-        await durum.edit_text(f"❌ <b>Git Hatası:</b> <code>{fetch_res.stderr}</code>\n\nManuel Deploy yapabilirsiniz.")
+        await durum.edit_text(t("system_b_git_hatasi_b_code_var_1_code_n_nmanuel", var_1 = fetch_res.stderr))
         return
 
     remote_commit = subprocess.run(["git", "rev-parse", "--short", "origin/main"], capture_output=True, text=True).stdout.strip()
@@ -255,11 +244,11 @@ async def _apply_update_now(durum):
         await durum.edit_text(t("sys_up_to_date", old_commit=eski_commit))
         return
 
-    await durum.edit_text(f"🔄 <b>Yeni sürüm indiriliyor...</b> (<code>{eski_commit}</code> ➔ <code>{remote_commit}</code>)")
+    await durum.edit_text(t("system_b_yeni_surum_indiriliyor_b_code_eski_com", eski_commit = eski_commit, remote_commit = remote_commit))
     subprocess.run(["git", "reset", "--hard", "origin/main"], capture_output=True, text=True)
     yeni_commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True).stdout.strip()
     
-    await durum.edit_text(f"📥 <b>Yeni kodlar eşitlendi!</b> (<code>{eski_commit}</code> ➔ <code>{yeni_commit}</code>)\nKütüphaneler kontrol ediliyor...")
+    await durum.edit_text(t("system_b_yeni_kodlar_esitlendi_b_code_eski_comm", eski_commit = eski_commit, yeni_commit = yeni_commit))
     pip_cmd = [sys.executable, "-m", "pip", "install", "-r", "requirements.txt"]
     pip_res = subprocess.run(pip_cmd + ["--break-system-packages"], capture_output=True, text=True)
     if pip_res.returncode != 0:
@@ -269,7 +258,7 @@ async def _apply_update_now(durum):
         from core.locales import t
         await durum.edit_text(t("sys_update_done", new_commit=yeni_commit))
     else:
-        logging.warning("Pip uyarısı: %s", pip_res.stderr)
+        logging.warning(t("log_pip_uyars_s_15"), pip_res.stderr)
         
     utils.restart_bildirimi_kaydet(
         action="update",
@@ -288,7 +277,7 @@ async def _check_update_status(durum):
     fetch_res = subprocess.run(["git", "fetch", "origin", "main"], capture_output=True, text=True)
     
     if "fatal" in fetch_res.stderr.lower() or "error" in fetch_res.stderr.lower():
-        await durum.edit_text(f"❌ <b>Git Hatası:</b> <code>{fetch_res.stderr}</code>")
+        await durum.edit_text(t("system_b_git_hatasi_b_code_var_1_code", var_1 = fetch_res.stderr))
         return
         
     remote_commit = subprocess.run(["git", "rev-parse", "--short", "origin/main"], capture_output=True, text=True).stdout.strip()
@@ -312,38 +301,38 @@ async def _check_update_status(durum):
     await durum.edit_text(metin)
 
 
-@ggr.cmd("update", info="GitHub reposundaki yeni commitleri denetler (.update) veya indirip botu yeniden başlatır (.update now).", usage=".update | .update now", category="Sistem")
+@ggr.cmd("update", info=t("cmd_info_github_103"), usage=".update | .update now", category="Sistem")
 async def botu_guncelle(client, message):
     """GitHub reposundaki yeni commitleri denetler (.update) veya indirip botu yeniden başlatır (.update now)."""
-    logging.info("Kullanıcı %s .update komutunu çalıştırdı.", message.from_user.id if message.from_user else 'Bilinmeyen')
+    logging.info(t("log_kullanc_s_update_kom_41"), message.from_user.id if message.from_user else 'Bilinmeyen')
     args = message.text.split()
-    durum = await message.edit_text("🔄 <b>Güncellemeler denetleniyor...</b>")
+    durum = await message.edit_text(t("system_b_guncellemeler_denetleniyor_b"))
     try:
         if len(args) > 1 and args[1].lower() == "now":
             await _apply_update_now(durum)
         else:
             await _check_update_status(durum)
     except FileNotFoundError:
-        await durum.edit_text("❌ Sunucuda <code>git</code> bulunamadı.")
+        await durum.edit_text(t("system_sunucuda_code_git_code_bulunam"))
     except Exception as e:
         from core.locales import t
         await durum.edit_text(t("sys_update_err", e=str(e)))
 
 
-@ggr.cmd("ping", info="Bot ile Telegram sunucuları arasındaki gecikme süresini (ping ms) ölçer.", usage=".ping", category="Sistem")
+@ggr.cmd("ping", info=t("cmd_info_bot_72"), usage=".ping", category="Sistem")
 async def ping_komutu(client, message):
     """Bot ile Telegram sunucuları arasındaki gecikme süresini (ping ms) ölçer."""
     baslangic = time.time()
-    durum = await message.edit_text("🏓 Pong!")
+    durum = await message.edit_text(t("system_pong"))
     bitis = time.time()
     gecikme = (bitis - baslangic) * 1000
     await durum.edit_text(ggr.t("sys_ping_pong", ms=f"{gecikme:.2f}"))
 
 
-@ggr.cmd("restart", info="Python sürecini sunucuya veya terminale dokunmadan yeniden başlatır.", usage=".restart", category="Sistem")
+@ggr.cmd("restart", info=t("cmd_info_python_68"), usage=".restart", category="Sistem")
 async def botu_yeniden_baslat(client, message):
     """Python sürecini sunucuya veya terminale dokunmadan yeniden başlatır."""
-    logging.info("Kullanıcı %s .restart komutunu çalıştırdı.", message.from_user.id if message.from_user else 'Bilinmeyen')
+    logging.info(t("log_kullanc_s_restart_ko_42"), message.from_user.id if message.from_user else 'Bilinmeyen')
     await message.edit_text(ggr.t("sys_restarting"))
     import utils
     utils.restart_bildirimi_kaydet(

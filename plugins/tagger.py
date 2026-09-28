@@ -5,6 +5,7 @@
 # License: GNU GPL v3.0
 # Copyright (c) 2026 chaolcam
 # -----------------------------------------------------------------------------
+from core.locales import t
 import asyncio
 import logging
 from pyrogram.enums import ChatType, ChatMembersFilter
@@ -27,7 +28,7 @@ async def _topla_filter_members(client, chat_id, member_filter, seen_ids, uyeler
                     seen_ids.add(m.user.id)
                     uyeler.append(m.user)
     except Exception as e:
-        logging.warning("Üye filtresi çekme uyarısı (%s): %s", member_filter, e)
+        logging.warning(t("log_ye_filtresi_ekme_uya_35"), member_filter, e)
 
 
 async def _topla_harf_bazli(client, chat_id, seen_ids, uyeler):
@@ -45,7 +46,7 @@ async def _topla_harf_bazli(client, chat_id, seen_ids, uyeler):
                         seen_ids.add(m.user.id)
                         uyeler.append(m.user)
         except Exception as _h_err:
-            logging.debug("Harf arama hatası: %s", _h_err)
+            logging.debug(t("log_harf_arama_hatas_s_21"), _h_err)
             continue
 
 
@@ -61,7 +62,7 @@ async def _topla_gecmis_mesajlar(client, chat_id, seen_ids, uyeler):
                     seen_ids.add(u.id)
                     uyeler.append(u)
     except Exception as e:
-        logging.warning("Sohbet geçmişinden üye toplama uyarısı: %s", e)
+        logging.warning(t("log_sohbet_gemiinden_ye__42"), e)
 
 
 async def uyeleri_topla(client, chat_id, sadece_admin=False):
@@ -88,7 +89,7 @@ async def uyeleri_topla(client, chat_id, sadece_admin=False):
                         seen_ids.add(m.user.id)
                         uyeler.append(m.user)
         except Exception as e:
-            logging.warning("Standart üye çekme uyarısı: %s", e)
+            logging.warning(t("log_standart_ye_ekme_uya_30"), e)
 
     # 4. Aşama: Harf bazlı arama
     if len(uyeler) < 10 and ggr_aktif_etiketler.get(chat_id):
@@ -124,7 +125,7 @@ async def _send_tag_batches(uyeler, chat_id, ek_mesaj, sadece_admin, guvenli_mes
         if not ggr_aktif_etiketler.get(chat_id):
             break
 
-        ad = ggr.safe_html(user.first_name or ("Yönetici" if sadece_admin else "Üye"))
+        ad = ggr.safe_html(user.first_name or (t("tagger_admin_sing") if sadece_admin else t("tagger_member_sing")))
         mention = f"<a href=\"tg://user?id={user.id}\">{ad}</a>"
         paket.append(mention)
         sayac += 1
@@ -138,7 +139,7 @@ async def _send_tag_batches(uyeler, chat_id, ek_mesaj, sadece_admin, guvenli_mes
                 await asyncio.sleep(fw.value + 1)
                 await guvenli_mesaj_gonder(metin)
             except Exception as send_err:
-                logging.warning("Paket gönderme hatası: %s", send_err)
+                logging.warning(t("log_paket_gnderme_hatas__25"), send_err)
             paket = []
             await asyncio.sleep(1.5)
 
@@ -151,15 +152,15 @@ async def _send_tag_batches(uyeler, chat_id, ek_mesaj, sadece_admin, guvenli_mes
             await asyncio.sleep(fw.value + 1)
             await guvenli_mesaj_gonder(metin)
         except Exception as send_err:
-            logging.warning("Son paket gönderme hatası: %s", send_err)
+            logging.warning(t("log_son_paket_gnderme_ha_29"), send_err)
 
     return sayac
 
 
-@ggr.cmd(["tag", "tagall", "all", "alladmin", "etiket"], info="Gruplardaki üyeleri veya adminleri etiketler.", usage=".tag [mesaj] | .tag dur", category="Admin")
+@ggr.cmd(["tag", "tagall", "all", "alladmin", "etiket"], info=t("cmd_info_gruplardaki_45"), usage=".tag [mesaj] | .tag dur", category="Admin")
 async def tag_komutu(client, message):
     if message.chat.type not in [ChatType.GROUP, ChatType.SUPERGROUP]:
-        await message.edit_text("❌ <b>Bu komut yalnızca gruplarda kullanılabilir!</b>")
+        await message.edit_text(t("tagger_b_bu_komut_yalnizca_gruplarda_"))
         return
 
     chat_id = message.chat.id
@@ -193,43 +194,35 @@ async def tag_komutu(client, message):
                     return await client.send_message(chat_id, text, reply_to_message_id=thread_id)
                 return await client.send_message(chat_id, text)
             except Exception as e:
-                logging.error("Mesaj gönderme hatası: %s", e)
+                logging.error(t("log_mesaj_gnderme_hatas__25"), e)
                 return None
 
     ggr_aktif_etiketler[chat_id] = True
-    baslik_tur = "👑 Yöneticiler" if sadece_admin else "👥 Üyeler"
+    baslik_tur = t("tagger_admins") if sadece_admin else t("tagger_members")
     
     await message.edit_text(
-        f"⏳ <b>{baslik_tur} taranıyor, lütfen bekleyin...</b>\n"
-        "💡 <i>Durdurmak için:</i> <code>.tag dur</code>"
-    )
+        t("tagger_b_baslik_tur_taraniyor_lutfen_", baslik_tur=baslik_tur)    )
 
     try:
         uyeler = await uyeleri_topla(client, chat_id, sadece_admin=sadece_admin)
         if not uyeler:
             await message.edit_text(
-                "⚠️ <b>Etiketlenecek üye bulunamadı!</b>\n\n"
-                "• Grubun gizlilik ayarlarında <i>'Üyeleri Gizle'</i> açık olabilir ve son mesajlarda üye bulunamamış olabilir.\n"
-                "• Grupta aktif ya da etiketlenebilecek kullanıcı kalmamış olabilir."
-            )
+                t("tagger_b_etiketlenecek_uye_bulunamadi")            )
             return
 
         toplam_sayi = len(uyeler)
         await message.edit_text(
-            f"🚀 <b>Toplam {toplam_sayi} kişi bulundu!</b> Etiketleme başlıyor...\n"
-            "💡 <i>Durdurmak için:</i> <code>.tag dur</code>"
-        )
+            t("tagger_b_toplam_toplam_sayi_kisi_bulu", toplam_sayi=toplam_sayi)        )
 
         sayac = await _send_tag_batches(uyeler, chat_id, ek_mesaj, sadece_admin, guvenli_mesaj_gonder)
 
         if ggr_aktif_etiketler.get(chat_id):
             await guvenli_mesaj_gonder(
-                f"✅ <b>Etiketleme Tamamlandı!</b>\n"
-                f"Toplam <code>{sayac}</code> kişi başarıyla etiketlendi."
+                t("tagger_done_message", count=sayac)
             )
     except Exception as e:
-        logging.error("Etiketleme hatası (%s): %s", chat_id, e)
-        await guvenli_mesaj_gonder(f"❌ <b>Etiketleme Hatası:</b> <code>{e}</code>")
+        logging.error(t("log_etiketleme_hatas_s_s_26"), chat_id, e)
+        await guvenli_mesaj_gonder(t("tagger_error_message", error=e))
     finally:
         ggr_aktif_etiketler[chat_id] = False
 

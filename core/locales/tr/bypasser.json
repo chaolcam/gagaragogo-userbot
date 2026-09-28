@@ -1,0 +1,7 @@
+{
+  "bypasser_b_toplu_bypass_baslatildi_b_toplam_code_": "⏳ <b>Toplu Bypass Başlatıldı:</b> Toplam <code>{toplam}</code> link tespit edildi...\\n(0/{toplam} tamamlandı)",
+  "bypasser_i_linkler_cozuluyor_i_idx_toplam_n_code_": "⏳ <i>Linkler çözülüyor:</i> ({idx}/{toplam})\\n<code>{url}</code>",
+  "cmd_info_ouoio_107": "Ouo.io, Ouo.press, TinyURL, Bitly, CleanURI ve tüm kısa/reklamlı linkleri aşarak asıl hedef URL'yi çıkarır.",
+  "cmd_usage_bypass_48": ".bypass [link] ya da linke yanıt vererek .bypass",
+  "log_droplink_bypass_dene_35": "Droplink bypass denemesi hatası: %s"
+}

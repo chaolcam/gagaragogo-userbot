@@ -7,7 +7,7 @@ venv/
 
 # Bot Specific Data
 *.json
-!core/locales/*.json
+!core/locales/*/*.json
 *.log
 nohup.out
 unknown_errors.txt
@@ -20,7 +20,7 @@ tiktok_cookies.txt
 downloads/
 tiktok_downloads/
 *.exe
-
+*.bak
 # Custom Plugins (runtime storage)
 plugins/custom_*.py
 eklentiler/

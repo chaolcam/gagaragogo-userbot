@@ -1,0 +1,15 @@
+{
+  "protection_ozel_sohbet_anti_delete_b_durum_metni_b_": "Private Chat Anti-Delete: <b>{status_text}</b>\\n\\n📌 Registration Goal: <code>Main Admin Group</code>",
+  "protection_bilgi_metni_n_b_mesaj_b_n_n_var_1": "{info_text}\\n📝 <b>Message:</b>\\n\\n{var_1}",
+  "protection_sureli_medya_modu_b_durum_metni_b_n_n_ka": "Timed Media Mode: <b>{status_text}</b>\\n\\n📌 Recording Goal: <code>Main Admin Group</code>",
+  "cmd_info_zel_74": "Turns on or off the mode to capture deleted messages in private chats (DM).",
+  "cmd_info_tek_61": "Automatically captures and saves single-use media.",
+  "log_antidelete_forum_top_44": "Anti-delete forum topic creation error: %s",
+  "log_sreli_medya_forum_to_45": "Periodic media forum topic creation error: %s",
+  "log_kullanc_s_antidelete_45": "User %s ran the .antidelete command.",
+  "log_antidelete_direkt_ko_60": "Antidelete direct copy failed, downloading attempted: %s",
+  "log_antidelete_bypass_ha_29": "Anti-Delete Bypass Error: %s",
+  "log_kullanc_s_sureli_kom_41": "User %s .ran the timed command.\",\n\"log_timed_media_capture_32\": \"Timed media capture error: %s\",\n\"log_ghost_download_error_26\": \"Ghost download error: %s",
+  "log_sreli_medya_yakalama_32": "Timed media capture error: %s",
+  "log_hayalet_indirme_hata_26": "Ghost download error: %s"
+}

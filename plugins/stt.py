@@ -5,6 +5,7 @@
 # License: GNU GPL v3.0
 # Copyright (c) 2026 chaolcam
 # -----------------------------------------------------------------------------
+from core.locales import t
 import os
 import uuid
 import asyncio
@@ -15,6 +16,7 @@ from pyrogram.types import Message
 import speech_recognition as sr
 import utils
 from core.decorators import ggr_cmd
+from core.locales import t
 
 logger = logging.getLogger("ggr.stt")
 
@@ -81,20 +83,17 @@ async def _process_speech_recognition(wav_file: str, lang: str):
 
 
 @Client.on_message(filters.command(["stt", "yaziya", "yaziyadok"], prefixes=[".", "/"]) & filters.me)
-@ggr_cmd("stt", category="araçlar", desc="Sesli mesajları veya ses dosyalarını yazıya döker", usage=".stt [dil_kodu] (Örn: .stt tr)")
+@ggr_cmd("stt", category=t("cat_aralar"), desc="Sesli mesajları veya ses dosyalarını yazıya döker", usage=t("cmd_usage_stt_30"))
 async def stt_handler(client: Client, message: Message):
     reply = message.reply_to_message
     if not reply or not (reply.voice or reply.audio or reply.video or reply.video_note):
         await message.edit(
-            "💡 <b>Lütfen bir sesli mesaja, sese veya videoya yanıt vererek <code>.stt</code> yazın.</b>\n\n"
-            "<i>Örnek:</i>\n"
-            "• <code>.stt</code> (Varsayılan Türkçe)\n"
-            "• <code>.stt en</code> (İngilizce sesler için)"
+            t("stt_b_lutfen_bir_sesli_mesaja_sese_veya_vide")
         )
         return
 
     lang = _resolve_stt_language(message.command)
-    await message.edit("🎙️ <i>Ses kaydı indiriliyor ve dinleniyor...</i>")
+    await message.edit(t("stt_i_ses_kaydi_indiriliyor_ve_din"))
 
     os.makedirs("downloads", exist_ok=True)
     unique_id = uuid.uuid4().hex[:8]
@@ -104,14 +103,14 @@ async def stt_handler(client: Client, message: Message):
     try:
         downloaded = await reply.download(file_name=input_file)
         if not downloaded or not os.path.exists(downloaded):
-            await message.edit("❌ <b>Ses dosyası indirilemedi!</b>")
+            await message.edit(t("stt_b_ses_dosyasi_indirilemedi_b"))
             return
 
-        await message.edit("⚙️ <i>Ses işleniyor ve metne dönüştürülüyor...</i>")
+        await message.edit(t("stt_i_ses_isleniyor_ve_metne_donus"))
 
         converted = await asyncio.to_thread(_convert_to_wav, downloaded, wav_file)
         if not converted or not os.path.exists(wav_file):
-            await message.edit("❌ <b>Ses dosyası işlenirken hata oluştu (FFmpeg kurulu mu?).</b>")
+            await message.edit(t("stt_b_ses_dosyasi_islenirken_hata_"))
             return
 
         ok, res_text = await _process_speech_recognition(wav_file, lang)
@@ -128,7 +127,7 @@ async def stt_handler(client: Client, message: Message):
 
     except Exception as e:
         logger.error("STT genel hatası: %s", e)
-        await message.edit(f"❌ <b>Beklenmeyen hata:</b> <code>{e}</code>")
+        await message.edit(t("stt_b_beklenmeyen_hata_b_code_e_code", e = e))
 
     finally:
         _safe_cleanup_files(input_file, wav_file)

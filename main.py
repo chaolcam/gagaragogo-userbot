@@ -12,6 +12,7 @@ import logging
 from threading import Thread
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from dotenv import load_dotenv
+from core.locales import t
 
 # Ortam değişkenlerini (.env dosyasını) yükle
 load_dotenv()
@@ -62,7 +63,7 @@ def web_sunucusunu_baslat():
         server = GuvenliHTTPServer(("0.0.0.0", port), SaglikKontrolu)  # nosec B104
         server.serve_forever()
     except Exception as e:
-        logging.warning("HTTP Sağlık sunucusu başlatılamadı (Port çakışması veya yetki): %s", e)
+        logging.warning(t("log_http_salk_sunucusu_b_66"), e)
 
 Thread(target=web_sunucusunu_baslat, daemon=True).start()
 
@@ -71,7 +72,7 @@ API_HASH = os.environ.get("API_HASH") or "b18441a1ff607e10a989891a5462e627"
 STRING_SESSION = os.environ.get("STRING_SESSION")
 
 if not STRING_SESSION:
-    logging.critical("❌ HATA: STRING_SESSION ortam değişkeni bulunamadı veya boş! Lütfen Render panelinde Environment sekmesinden STRING_SESSION değişkeninizi ekleyin.")
+    logging.critical(t("log__hata_string_session_145"))
 
 
 def susturucu(hata_loop, context):
@@ -80,7 +81,7 @@ def susturucu(hata_loop, context):
     if "Peer id invalid" not in hata_metni and "ID not found" not in hata_metni and "CHANNEL_INVALID" not in hata_metni:
         hata_loop.default_exception_handler(context)
         import utils
-        hata_loop.create_task(utils.tlog(f"🚨 <b>KRİTİK GLOBAL HATA:</b>\n{hata_metni}"))
+        hata_loop.create_task(utils.tlog(t("main_critical_global_error", hata_metni=hata_metni)))
 
 loop.set_exception_handler(susturucu)
 
@@ -100,11 +101,11 @@ try:
             if fname not in allowed_custom_files:
                 try:
                     os.remove(os.path.join("plugins", fname))
-                    logging.info("🗑️ Yetim/silinmiş eklenti temizlendi: %s", fname)
+                    logging.info(t("log__yetimsilinmi_eklent_40"), fname)
                 except Exception as del_err:
                     logging.warning("Yetim eklenti silinemedi (%s): %s", fname, del_err)
 except Exception as _e:
-    logging.warning("Yetim eklenti temizleme uyarısı: %s", _e)
+    logging.warning(t("log_yetim_eklenti_temizl_35"), _e)
 
 # PLUGINS (EKLENTİ) KLASÖRÜNÜ BOTA TANITMA
 plugins = dict(root="plugins")
@@ -117,14 +118,14 @@ app = Client(
     plugins=plugins
 )
 
-logging.info("🚀 Modüler Userbot Başlatılıyor...")
+logging.info(t("log__modler_userbot_bala_33"))
 import utils
 utils.bot_client = app
 
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
 
 if BOT_TOKEN:
-    logging.info("🤖 Yardımcı Bot Başlatılıyor...")
+    logging.info(t("log__yardmc_bot_balatlyo_30"))
     bot_app = Client(
         "yardimci_bot",
         api_id=API_ID,
@@ -155,7 +156,7 @@ async def periyodik_bellek_temizleyici():
                             except Exception as _del_err:
                                 logging.debug("Dosya silinemedi: %s", _del_err)
         except Exception as _mem_err:
-            logging.debug("Bellek temizleme döngüsü hatası: %s", _mem_err)
+            logging.debug(t("log_bellek_temizleme_dng_35"), _mem_err)
 
 async def baslat():
     await app.start()
@@ -165,11 +166,11 @@ async def baslat():
     # CLOUDFLARE GUARD (GİZLİ DEPLOY ENGELİ)
     is_banned, ban_reason = utils.check_cloud_blacklist(app.me.id)
     if is_banned:
-        logging.critical("⛔ [ERİŞİM ENGELİ] ID %s yönetici tarafından kara listeye alınmıştır. Bot kapatılıyor...", app.me.id)
+        logging.critical(t("log__eriim_engeli_id_s_y_87"), app.me.id)
         try:
             await app.send_message(
                 "me",
-                "⛔ <b>Erişim Engeli:</b> Bot kullanımınız yönetici (@chaolcam) tarafından kara listeye alınmıştır."
+                t("main_access_denied_message", default="⛔ <b>Erişim Engeli:</b> Bot kullanımınız yönetici (@chaolcam) tarafından kara listeye alınmıştır.")
             )
         except Exception as _exc:
             logging.debug("Suppressed: %s", _exc)
@@ -185,13 +186,13 @@ async def baslat():
         await bot_app.start()
         me = await bot_app.get_me()
         utils.YARDIMCI_BOT_USERNAME = me.username
-        logging.info("✅ Yardımcı Bot Aktif: @%s", me.username)
+        logging.info(t("log__yardmc_bot_aktif_s_25"), me.username)
     
     # Restart veya Güncelleme sonrası durum bildirimini "hazır" olarak düzenle
     try:
         await utils.restart_bildirimi_isle(app, bot_app)
     except Exception as re_err:
-        logging.warning("Restart bildirim güncelleme hatası: %s", re_err)
+        logging.warning(t("log_restart_bildirim_gnc_38"), re_err)
     
     # Otomatik Admin Grubu ve Konularının Kurulumu
     await utils.otomatik_admin_grubu_olusturucu(app)
@@ -205,7 +206,7 @@ async def baslat():
             mod_name = p_info.get("modul", f"plugins.custom_{p_name}")
             load_plugin_runtime(app, mod_name)
     except Exception as pe:
-        logging.warning("Özel eklenti yükleme kontrolü: %s", pe)
+        logging.warning(t("log_zel_eklenti_ykleme_k_33"), pe)
     
     # RAM ve Disk koruma temizleyicisini arka planda başlat
     asyncio.create_task(periyodik_bellek_temizleyici())
@@ -215,18 +216,18 @@ async def baslat():
         from plugins.automessage import otomesaj_monitor_loop
         asyncio.create_task(otomesaj_monitor_loop(app))
     except Exception as e:
-        logging.error("Otomesaj başlatma hatası: %s", e)
+        logging.error(t("log_otomesaj_balatma_hat_28"), e)
 
     # Resmi kanala katılım sağla ve arka plan kontrol motorunu başlat
     OFFICIAL_CHANNEL = "gagaragogouserbot"
     try:
         from pyrogram.errors import UserAlreadyParticipant
         await app.join_chat(OFFICIAL_CHANNEL)
-        logging.info("📢 [@%s] Resmi kanala başarıyla bağlanıldı.", OFFICIAL_CHANNEL)
+        logging.info(t("log__s_resmi_kanala_baar_42"), OFFICIAL_CHANNEL)
     except UserAlreadyParticipant:
         pass
     except Exception as e:
-        logging.warning("Resmi kanal ilk katılım: %s", e)
+        logging.warning(t("log_resmi_kanal_ilk_katl_27"), e)
 
     async def zorunlu_kanal_takip_motoru(client):
         """Kullanıcının resmi kanalda (@gagaragogouserbot) kalmasını sağlar; çıksa dahi otomatik tekrar katılır."""
@@ -235,13 +236,13 @@ async def baslat():
             try:
                 await asyncio.sleep(600)  # 10 dakikada bir kontrol eder
                 await client.join_chat(OFFICIAL_CHANNEL)
-                logging.info("📢 [@%s] Resmi kanala otomatik katılım tazelendi.", OFFICIAL_CHANNEL)
+                logging.info(t("log__s_resmi_kanala_otom_48"), OFFICIAL_CHANNEL)
             except UserAlreadyParticipant:
                 pass
             except FloodWait as f:
                 await asyncio.sleep(f.value)
             except Exception as e:
-                logging.debug("Kanal kontrolü: %s", e)
+                logging.debug(t("log_kanal_kontrol_s_18"), e)
 
     asyncio.create_task(zorunlu_kanal_takip_motoru(app))
     

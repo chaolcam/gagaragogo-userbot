@@ -5,6 +5,7 @@
 # License: GNU GPL v3.0
 # Copyright (c) 2026 chaolcam
 # -----------------------------------------------------------------------------
+from core.locales import t
 import os
 import sys
 import time
@@ -91,4 +92,4 @@ async def safe_edit(callback_query, client, *args, **kwargs):
             return await callback_query.message.edit_text(*args, **kwargs)
     except Exception as e:
         if "MESSAGE_NOT_MODIFIED" not in str(e):
-            logging.warning("safe_edit uyarısı: %s", e)
+            logging.warning(t("log_safe_edit_uyars_s_21"), e)

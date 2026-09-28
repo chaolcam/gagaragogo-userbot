@@ -1,0 +1,15 @@
+{
+  "contacts_ui_gruplar_yenileniyor": "Refreshing groups...",
+  "contacts_ui_i_slem_durduruluyor": "🛑 The process is being stopped...",
+  "contacts_ui_gruptan_gruba_aktarim_baslatil": "🚀 Group-to-group transfer is starting...",
+  "contacts_ui_i_slemi_durdur": "🛑 Stop Process",
+  "contacts_ui_rehber_menusu": "◀️ Guide Menu",
+  "contacts_ui_i_ptal": "❌ Cancel",
+  "contacts_ui_grup_secimine_don": "◀️ Return to Group Selection\",\n\"auto_back\": \"◀️ Back\",\n\"auto_scan_again\": \"🔄 Scan Again",
+  "contacts_ui_geri": "◀️ Back",
+  "contacts_ui_tekrar_tara": "Scan again",
+  "contacts_ui_kaynak_secimine_don": "◀️ Return to Source Selection",
+  "contacts_ui_c_kisi": "{c} Person\",\n\"auto_label_starting\": \"🚀 {label} is starting...\",\n\"auto_rapidapi_anahtariniz_yok_lütfen_sohbette\": \"⚠️ You do not have a RapidAPI key! Please in the chat.Add your key by typing rapidapi [key].\",\n\"auto_media_upload_error_occurred_send_err\": \"Error occurred while uploading media: {send_err}\",\n\"auto_archive_upload_error_arch_err\": \"Archive upload error: {arch_err}\",\n\"auto_transfer_begins\": \"⏳ Members from the <b>{src}</b> group are being collected and transferred to the <b>{tgt}</b> group...Target: <b>{limit}</b> people.",
+  "contacts_ui_label_baslatiliyor": "Starting 🚀 {label}...",
+  "contacts_ui_userbot_aktif_degil": "❌ Userbot is not active!"
+}

@@ -5,6 +5,7 @@
 # License: GNU GPL v3.0
 # Copyright (c) 2026 chaolcam
 # -----------------------------------------------------------------------------
+from core.locales import t
 import re
 import asyncio
 import logging
@@ -12,6 +13,7 @@ from datetime import datetime, timedelta
 from pyrogram import filters
 from pyrogram.types import ChatPermissions
 from utils import ggr
+from core.locales import t
 
 def parse_time_arg(arg):
     """Zaman parametresini (örn: 30s, 15m, 2h, 7d) ayrıştırarak bitiş zamanını ve açıklamasını döndürür."""
@@ -76,7 +78,7 @@ async def extract_target_time_reason(client, message):
         
     return user, until_date, string_zaman, reason
 
-@ggr.cmd("ban", info="Gruptaki bir kullanıcıyı yasaklar.", usage="Yanıtlayarak: .ban [zaman] [sebep] | Örn: .ban 1d Spam", category="Admin", filter=filters.group)
+@ggr.cmd("ban", info=t("cmd_info_gruptaki_34"), usage=t("cmd_usage_yantlayarak_54"), category="Admin", filter=filters.group)
 async def ban_user(client, message):
     """Gruptaki bir kullanıcıyı kalıcı veya süreli olarak yasaklar."""
     user, until_date, string_zaman, reason = await extract_target_time_reason(client, message)
@@ -100,7 +102,7 @@ async def ban_user(client, message):
     except Exception as e:
         await message.edit_text(ggr.t("err_general", error=str(e)))
 
-@ggr.cmd("unban", info="Kullanıcının yasağını kaldırır.", usage="Yanıtlayarak: .unban | ID: .unban 1234", category="Admin", filter=filters.group)
+@ggr.cmd("unban", info=t("cmd_info_kullancnn_31"), usage=t("cmd_usage_yantlayarak_38"), category="Admin", filter=filters.group)
 async def unban_user(client, message):
     """Kullanıcının grup yasağını kaldırır."""
     user, _, _, _ = await extract_target_time_reason(client, message)
@@ -116,7 +118,7 @@ async def unban_user(client, message):
     except Exception as e:
         await message.edit_text(ggr.t("err_general", error=str(e)))
 
-@ggr.cmd("mute", info="Kullanıcıyı susturur.", usage="Yanıtlayarak: .mute [zaman] [sebep] | Örn: .mute 2h Küfür", category="Admin", filter=filters.group)
+@ggr.cmd("mute", info=t("cmd_info_kullancy_21"), usage=t("cmd_usage_yantlayarak_57"), category="Admin", filter=filters.group)
 async def mute_user(client, message):
     """Kullanıcının grupta mesaj yazmasını engeller (susturur)."""
     user, until_date, string_zaman, reason = await extract_target_time_reason(client, message)
@@ -140,7 +142,7 @@ async def mute_user(client, message):
     except Exception as e:
         await message.edit_text(ggr.t("err_general", error=str(e)))
 
-@ggr.cmd("unmute", info="Kullanıcının susturmasını kaldırır.", usage="Yanıtlayarak: .unmute | ID: .unmute 1234", category="Admin", filter=filters.group)
+@ggr.cmd("unmute", info=t("cmd_info_kullancnn_35"), usage=t("cmd_usage_yantlayarak_40"), category="Admin", filter=filters.group)
 async def unmute_user(client, message):
     """Kullanıcının susturmasını kaldırarak tüm mesaj gönderme yetkilerini geri verir."""
     user, _, _, _ = await extract_target_time_reason(client, message)
@@ -166,7 +168,7 @@ async def unmute_user(client, message):
     except Exception as e:
         await message.edit_text(ggr.t("err_general", error=str(e)))
 
-@ggr.cmd("purge", info="Yanıtlanan mesajdan itibaren (kendisi dahil) tüm mesajları siler.", usage="Yanıtlayarak: .purge", category="Admin")
+@ggr.cmd("purge", info=t("cmd_info_yantlanan_65"), usage=t("cmd_usage_yantlayarak_20"), category="Admin")
 async def purge_messages(client, message):
     """Yanıtlanan mesajdan mevcut komut mesajına kadar olan tüm mesajları topluca siler."""
     if not message.reply_to_message:
@@ -177,10 +179,10 @@ async def purge_messages(client, message):
     end_id = message.id
 
     if end_id - start_id > 10000:
-        await message.edit_text("❌ Çok fazla mesaj var (10000+). Lütfen daha dar bir aralık seçin.")
+        await message.edit_text(t("admin_cok_fazla_mesaj_var_10000_lutf"))
         return
 
-    await message.edit_text("🧹 <i>Temizleniyor...</i>")
+    await message.edit_text(t("admin_i_temizleniyor_i"))
 
     message_ids = list(range(start_id, end_id + 1))
     
@@ -206,7 +208,7 @@ async def purge_messages(client, message):
     except Exception as _exc:
         logging.debug("Suppressed: %s", _exc)
 
-@ggr.cmd("delme", info="Bu sohbette attığınız son N adet mesajınızı siler.", usage=".delme [sayı]", category="Admin")
+@ggr.cmd("delme", info=t("cmd_info_bu_50"), usage=t("cmd_usage_delme_13"), category="Admin")
 async def delme_messages(client, message):
     """Kullanıcının sohbette gönderdiği kendi son mesajlarını siler."""
     args = message.command[1:] if len(message.command) > 1 else []
@@ -217,7 +219,7 @@ async def delme_messages(client, message):
     if limit > 200:
         limit = 200
         
-    await message.edit_text(f"🧹 <i>Son {limit} adet mesajınız taranıyor...</i>")
+    await message.edit_text(t("admin_i_son_limit_adet_mesajiniz_taraniyor_i", limit = limit))
     
     my_id = (await client.get_me()).id
     to_delete = []
@@ -257,7 +259,7 @@ LOCK_FIELDS = {
     "sabitle": ("can_pin_messages", "Mesaj Sabitleme")
 }
 
-@ggr.cmd("lock", info="Grupta belirli bir medya veya işlem türünü kilitler.", usage=".lock [msg/media/sticker/link/poll/invite/all]", category="Admin")
+@ggr.cmd("lock", info=t("cmd_info_grupta_52"), usage=".lock [msg/media/sticker/link/poll/invite/all]", category="Admin")
 async def lock_chat(client, message):
     if not message.chat or message.chat.type.name not in ["GROUP", "SUPERGROUP"]:
         await message.edit_text(ggr.t("err_groups_only"))
@@ -299,7 +301,7 @@ async def lock_chat(client, message):
             for k in perm_kwargs:
                 perm_kwargs[k] = False
             await client.set_chat_permissions(message.chat.id, ChatPermissions(**perm_kwargs))
-            await message.edit_text("🔒 <b>Gruptaki tüm üye yetkileri kilitlendi!</b>")
+            await message.edit_text(t("admin_b_gruptaki_tum_uye_yetkileri_k"))
             return
             
         if tur in LOCK_FIELDS:
@@ -312,13 +314,13 @@ async def lock_chat(client, message):
                 perm_kwargs["can_send_polls"] = False
                 
             await client.set_chat_permissions(message.chat.id, ChatPermissions(**perm_kwargs))
-            await message.edit_text(f"🔒 <b>{desc} yetkisi bu grupta kilitlendi!</b>")
+            await message.edit_text(t("admin_b_desc_yetkisi_bu_grupta_kilitlendi_b", desc = desc))
         else:
-            await message.edit_text(f"❌ Bilinmeyen yetki türü: <code>{tur}</code>\nGeçerli türler: msg, media, sticker, link, poll, invite, all")
+            await message.edit_text(t("admin_bilinmeyen_yetki_turu_code_tur_code_ngec", tur = tur))
     except Exception as e:
-        await message.edit_text(f"❌ Yetki kilitlenirken hata: <code>{e}</code>")
+        await message.edit_text(t("admin_yetki_kilitlenirken_hata_code_e_code", e = e))
 
-@ggr.cmd("unlock", info="Grupta kilitlenen bir yetkiyi tekrar açar.", usage=".unlock [msg/media/sticker/link/poll/invite/all]", category="Admin")
+@ggr.cmd("unlock", info=t("cmd_info_grupta_42"), usage=".unlock [msg/media/sticker/link/poll/invite/all]", category="Admin")
 async def unlock_chat(client, message):
     if not message.chat or message.chat.type.name not in ["GROUP", "SUPERGROUP"]:
         await message.edit_text(ggr.t("err_groups_only"))
@@ -360,7 +362,7 @@ async def unlock_chat(client, message):
             for k in perm_kwargs:
                 perm_kwargs[k] = True
             await client.set_chat_permissions(message.chat.id, ChatPermissions(**perm_kwargs))
-            await message.edit_text("🔓 <b>Gruptaki tüm üye yetkileri açıldı!</b>")
+            await message.edit_text(t("admin_b_gruptaki_tum_uye_yetkileri_a"))
             return
             
         if tur in LOCK_FIELDS:
@@ -373,8 +375,8 @@ async def unlock_chat(client, message):
                 perm_kwargs["can_send_polls"] = True
                 
             await client.set_chat_permissions(message.chat.id, ChatPermissions(**perm_kwargs))
-            await message.edit_text(f"🔓 <b>{desc} yetkisi bu grupta açıldı!</b>")
+            await message.edit_text(t("admin_b_desc_yetkisi_bu_grupta_acildi_b", desc = desc))
         else:
-            await message.edit_text(f"❌ Bilinmeyen yetki türü: <code>{tur}</code>\nGeçerli türler: msg, media, sticker, link, poll, invite, all")
+            await message.edit_text(t("admin_bilinmeyen_yetki_turu_code_tur_code_ngec", tur = tur))
     except Exception as e:
-        await message.edit_text(f"❌ Yetki açılırken hata: <code>{e}</code>")
+        await message.edit_text(t("admin_yetki_acilirken_hata_code_e_code", e = e))

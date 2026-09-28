@@ -1,0 +1,9 @@
+{
+  "stt_b_ses_dosyasi_islenirken_hata_": "❌ <b>Error processing audio file (is FFmpeg installed⚠️).</b>",
+  "stt_i_ses_isleniyor_ve_metne_donus": "⚙️ <i>The audio is being processed and converted to text...</i>",
+  "stt_b_ses_dosyasi_indirilemedi_b": "❌ <b>Audio file could not be downloaded!</b>\",\n\"auto_i_voice_recording_downloading_and_listening\": \"🎙️ <i>Voice recording downloading and listening...</i>",
+  "stt_i_ses_kaydi_indiriliyor_ve_din": "🎙️ <i>Downloading and listening to audio...</i>",
+  "stt_b_lutfen_bir_sesli_mesaja_sese_veya_vide": "💡 <b>Please reply to a voicemail, audio, or video with <code>.stt</code>.</b>\n\n<i>Example:</i>\n• <code>.stt</code> (Default Turkish)\n• <code>.stt en</code> (for English sounds)",
+  "stt_b_beklenmeyen_hata_b_code_e_code": "❌ <b>Unexpected error:</b> <code>{e}</code>",
+  "cmd_usage_stt_30": ".stt [language_code] (e.g.: .stt tr)"
+}

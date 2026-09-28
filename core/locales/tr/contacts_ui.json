@@ -1,0 +1,15 @@
+{
+  "contacts_ui_gruplar_yenileniyor": "🔄 Gruplar yenileniyor...",
+  "contacts_ui_i_slem_durduruluyor": "🛑 İşlem durduruluyor...",
+  "contacts_ui_gruptan_gruba_aktarim_baslatil": "🚀 Gruptan gruba aktarım başlatılıyor...",
+  "contacts_ui_i_slemi_durdur": "🛑 İşlemi Durdur",
+  "contacts_ui_rehber_menusu": "◀️ Rehber Menüsü",
+  "contacts_ui_i_ptal": "❌ İptal",
+  "contacts_ui_grup_secimine_don": "◀️ Grup Seçimine Dön",
+  "contacts_ui_geri": "◀️ Geri",
+  "contacts_ui_tekrar_tara": "🔄 Tekrar Tara",
+  "contacts_ui_kaynak_secimine_don": "◀️ Kaynak Seçimine Dön",
+  "contacts_ui_c_kisi": "{c} Kişi",
+  "contacts_ui_label_baslatiliyor": "🚀 {label} başlatılıyor...",
+  "contacts_ui_userbot_aktif_degil": "❌ Userbot aktif değil!"
+}

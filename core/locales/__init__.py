@@ -6,6 +6,7 @@
 # Copyright (c) 2026 chaolcam
 # -----------------------------------------------------------------------------
 
+from core.locales import t
 import os
 import json
 import logging
@@ -19,31 +20,47 @@ _STRINGS_CACHE: Dict[str, Dict[str, str]] = {}
 
 
 def _load_locale(lang_code: str) -> Dict[str, str]:
-    """Loads a language dictionary from its corresponding JSON file."""
+    """Loads a language dictionary from its corresponding JSON file or directory."""
     if lang_code in _STRINGS_CACHE:
         return _STRINGS_CACHE[lang_code]
 
+    data = {}
+    
+    # 1. Modüler JSON Klasörü (Örn: locales/tr/ui.json, locales/tr/plugins.json)
+    dir_path = os.path.join(_LOCALES_DIR, lang_code)
+    if os.path.isdir(dir_path):
+        for fname in os.listdir(dir_path):
+            if fname.endswith(".json"):
+                fpath = os.path.join(dir_path, fname)
+                try:
+                    with open(fpath, "r", encoding="utf-8") as f:
+                        data.update(json.load(f))
+                except Exception as e:
+                    logger.error("Error loading modular locale file %s: %s", fpath, e)
+
+    # 2. Geriye dönük uyumluluk (Örn: locales/tr.json)
     file_path = os.path.join(_LOCALES_DIR, f"{lang_code}.json")
-    if os.path.exists(file_path):
+    if os.path.isfile(file_path):
         try:
             with open(file_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                _STRINGS_CACHE[lang_code] = data
-                return data
+                data.update(json.load(f))
         except Exception as e:
             logger.error("Error loading locale file %s: %s", file_path, e)
 
-    return {}
+    _STRINGS_CACHE[lang_code] = data
+    return data
 
 
 def get_available_languages() -> list:
-    """Discovers all available language codes based on existing .json files."""
-    langs = []
+    """Discovers all available language codes based on existing .json files and directories."""
+    langs = set()
     if os.path.exists(_LOCALES_DIR):
         for fname in os.listdir(_LOCALES_DIR):
             if fname.endswith(".json"):
-                langs.append(fname[:-5].lower())
-    return langs or ["tr", "en"]
+                langs.add(fname[:-5].lower())
+            elif os.path.isdir(os.path.join(_LOCALES_DIR, fname)) and not fname.startswith("__"):
+                langs.add(fname.lower())
+    return list(langs) or ["tr", "en"]
 
 
 def get_current_lang() -> str:

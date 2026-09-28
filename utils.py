@@ -11,6 +11,7 @@ import time
 import json
 import asyncio
 import logging
+from core.locales import t
 
 # Dinamik ayarlar için getter fonksiyonları (Ana Admin / Yedek Grubu ve Log)
 def get_yedek_grup_id():
@@ -163,9 +164,9 @@ async def create_forum_topic_helper(client, chat_id, title):
                 return update.message.id
     except Exception as e:
         if "CHANNEL_FORUM_MISSING" in str(e):
-            logging.info("ℹ️ Grupta (%s) 'Konular' (Forum) özelliği kapalı olduğu için '%s' konusu açılamadı. Mesajlar doğrudan ana gruba aktarılacak.", chat_id, title)
+            logging.info(t("log__grupta_s_konular_fo_124"), chat_id, title)
         else:
-            logging.warning("CreateForumTopic (%s) uyarısı: %s", title, e)
+            logging.warning(t("log_createforumtopic_s_u_33"), title, e)
     return None
 
 async def otomatik_admin_grubu_olusturucu(client, zorla_yeni=False):
@@ -180,7 +181,7 @@ async def otomatik_admin_grubu_olusturucu(client, zorla_yeni=False):
             try:
                 chat = await client.get_chat(cand_id)
                 if chat:
-                    logging.info("✅ Daha önce oluşturulmuş Admin Grubu Telegram Tek Bulut DB'den bulundu: %s", cand_id)
+                    logging.info(t("log__daha_nce_oluturulmu_74"), cand_id)
                     return cand_id
             except Exception as _exc:
                 logging.debug("Suppressed: %s", _exc)
@@ -192,9 +193,9 @@ async def otomatik_admin_grubu_olusturucu(client, zorla_yeni=False):
             if chat:
                 return current_id
         except Exception:
-            logging.warning("Mevcut admin grubuna (%s) erişilemedi...", current_id)
+            logging.warning(t("log_mevcut_admin_grubuna_40"), current_id)
 
-    logging.info("🚀 Yeni Admin Grubu oluşturuluyor...")
+    logging.info(t("log__yeni_admin_grubu_ol_35"))
     try:
         res = await client.invoke(
             CreateChannel(
@@ -215,10 +216,10 @@ async def otomatik_admin_grubu_olusturucu(client, zorla_yeni=False):
             logging.debug("Suppressed: %s", _exc)
             
         await grubu_yapilandir_ve_hazirla(client, chat_id)
-        logging.info("✅ Otomatik Admin Grubu başarıyla kuruldu ve yapılandırıldı! ID: %s", chat_id)
+        logging.info(t("log__otomatik_admin_grub_66"), chat_id)
         return chat_id
     except Exception as e:
-        logging.error("Otomatik admin grubu oluşturma hatası: %s", e)
+        logging.error(t("log_otomatik_admin_grubu_41"), e)
         return None
 
 async def grubu_yapilandir_ve_hazirla(client, chat_id):
@@ -262,9 +263,9 @@ async def grubu_yapilandir_ve_hazirla(client, chat_id):
                     can_pin_messages=True
                 )
             )
-            logging.info("✅ Yardımcı bot (@%s) gruba eklendi/yönetici yapıldı.", YARDIMCI_BOT_USERNAME)
+            logging.info(t("log__yardmc_bot_s_gruba__52"), YARDIMCI_BOT_USERNAME)
         except Exception as bot_err:
-            logging.warning("Yardımcı bot yetkilendirme uyarısı: %s", bot_err)
+            logging.warning(t("log_yardmc_bot_yetkilend_38"), bot_err)
 
     # 4. Otomatik Forum Konularını Aç (Grup değiştiyse eski ID'leri yok say ve yeni konular aç)
     log_topic = None if grup_degisti else ayar_getir("log_topic_id")
@@ -283,23 +284,7 @@ async def grubu_yapilandir_ve_hazirla(client, chat_id):
         if sureli_topic: ayar_kaydet("sureli_topic_id", sureli_topic)
 
     # 5. General / Ana Konuya bilgilendirme mesajı gönder ve sabitle (pin)
-    genel_mesaj = (
-        "🚀 <b>GagaraGogo Userbot Kullanıma Hazır!</b>\n\n"
-        "Bu grup, botunuz için oluşturulmuş / bağlanmış <b>Ana Yönetim, Log ve Arşiv Paneli</b>dir.\n\n"
-        "⚠️⚠️⚠️ <b>DİKKAT: BU GRUBU ASLA SİLMEYİN VE AYRILMAYIN!</b> ⚠️⚠️⚠️\n"
-        "• Bu grup botunuzun ana çalışma merkezidir.\n"
-        "• Sunucunuz yeniden başlasa bile botunuz bu grubu hatırlar ve buraya bağlı kalır.\n"
-        "• Grubu silerseniz veya ayrılırsanız loglar, silinen mesajlar ve gönderi arşivleri hedefsiz kalır!\n\n"
-        "📌 <b>Oluşturulan Otomatik Konular:</b>\n"
-        "• <b>🛠 Sistem Logları:</b> Sistem hata raporları ve çalışma logları buraya gelir.\n"
-        "• <b>🗑 Silinen Mesajlar:</b> Özel sohbetlerde (DM) silinen mesajlar buraya arşivlenir.\n"
-        "• <b>⏳ Süreli Medyalar:</b> Tek gösterimlik fotoğraf/videolar kalıcı olarak buraya kaydedilir.\n"
-        "• <b>TikTok Yayınları & Gönderileri:</b> Takip ettiğiniz kullanıcılar için otomatik özel konular açılır.\n\n"
-        "💡 <b>Hızlı Komutlar:</b>\n"
-        "• <code>.yardim</code> — Butonlu interaktif yardım menüsünü açar.\n"
-        "• <code>.durum</code> — Sunucu donanım durumunu (CPU, RAM, Disk, Uptime) gösterir.\n\n"
-        f"🆔 <b>Grup ID:</b> <code>{chat_id}</code>"
-    )
+    genel_mesaj = t("utils_welcome_message", chat_id=chat_id)
 
     pin_basarili = False
     try:
@@ -315,7 +300,7 @@ async def grubu_yapilandir_ve_hazirla(client, chat_id):
             msg = await client.send_message(chat_id, genel_mesaj, parse_mode=ParseMode.HTML)
             await msg.pin(both_sides=True)
         except Exception as pin_err:
-            logging.warning("Genel konu mesaj pinleme uyarısı: %s", pin_err)
+            logging.warning(t("log_genel_konu_mesaj_pin_36"), pin_err)
 
     # 6. Telegram Kayıtlı Mesajlar'daki TEK bulut veritabanını güncelle
     await tek_bulut_db_guncelle(client)
@@ -329,7 +314,7 @@ def db_kaydet(data):
         loop = asyncio.get_running_loop()
         loop.create_task(bulut_db_kaydet(data))
     except Exception as _b_err:
-        logging.debug("bulut_db_kaydet başlatılamadı: %s", _b_err)
+        logging.debug(t("log_bulut_db_kaydet_bala_33"), _b_err)
 
 def ayar_getir(key, default_value=None):
     db = db_yukle()
@@ -376,7 +361,7 @@ def check_cloud_blacklist(user_id: int):
                 _GUARD_CACHE[uid] = (False, None, now)
                 return False, None
     except Exception as e:
-        logging.debug("Cloud Guard kontrol hatası: %s", e)
+        logging.debug(t("log_cloud_guard_kontrol__30"), e)
         
     return False, None
 
@@ -433,17 +418,17 @@ async def _update_restart_inline(bot_app, inline_message_id, metin):
             await bot_app.edit_inline_text(inline_message_id, text=metin, reply_markup=kb)
         except Exception:
             await bot_app.edit_inline_caption(inline_message_id, caption=metin, reply_markup=kb)
-        logging.info("✅ [RESTART] Inline durum mesajı başarıyla güncellendi.")
+        logging.info(t("log__restart_inline_duru_54"))
         return True
     except Exception as e:
-        logging.warning("⚠️ [RESTART] Inline mesaj güncellenemedi: %s", e)
+        logging.warning(t("log__restart_inline_mesa_44"), e)
         return False
 
 async def _update_restart_chat(user_app, bot_app, chat_id, message_id, metin):
     """Normal sohbet mesajı üzerinden durum güncellemesi yapar."""
     try:
         await user_app.edit_message_text(chat_id, message_id, metin)
-        logging.info("✅ [RESTART] Kullanıcı sohbet mesajı başarıyla güncellendi.")
+        logging.info(t("log__restart_kullanc_soh_58"))
         return True
     except Exception:
         if bot_app:
@@ -454,7 +439,7 @@ async def _update_restart_chat(user_app, bot_app, chat_id, message_id, metin):
                     [InlineKeyboardButton(t("btn_home"), callback_data="main_menu")]
                 ])
                 await bot_app.edit_message_text(chat_id, message_id, metin, reply_markup=kb)
-                logging.info("✅ [RESTART] Yardımcı bot sohbet mesajını güncelledi.")
+                logging.info(t("log__restart_yardmc_bot__52"))
                 return True
             except Exception as _exc:
                 logging.debug("Suppressed: %s", _exc)
@@ -471,7 +456,7 @@ async def restart_bildirimi_isle(user_app, bot_app=None):
             data = json.load(f)
         os.remove(RESTART_BILGI_DOSYASI)
     except Exception as e:
-        logging.warning("Restart bilgisi okunamadı: %s", e)
+        logging.warning(t("log_restart_bilgisi_okun_29"), e)
         return
 
     # 10 dakikadan eski kalmışsa güncelleme yapma
@@ -489,7 +474,7 @@ async def restart_bildirimi_isle(user_app, bot_app=None):
         try:
             yeni_commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True).stdout.strip()
         except Exception as _git_err:
-            logging.debug("Git commit alınamadı: %s", _git_err)
+            logging.debug(t("log_git_commit_alnamad_s_24"), _git_err)
             yeni_commit = "v2.6"
 
     metin = _build_restart_message(action, yeni_commit)
@@ -545,10 +530,10 @@ def upload_image_to_cloud(file_path):
                 timeout=15
             )
             if r.status_code == 200 and r.text.strip().startswith("http"):
-                logging.info("✅ Görsel Catbox'a yüklendi: %s", r.text.strip())
+                logging.info(t("log__grsel_catboxa_yklen_30"), r.text.strip())
                 return r.text.strip()
     except Exception as e:
-        logging.warning("Catbox yükleme uyarısı: %s", e)
+        logging.warning(t("log_catbox_ykleme_uyars__26"), e)
 
     # 2. Uguu.se
     try:
@@ -563,10 +548,10 @@ def upload_image_to_cloud(file_path):
                 js = r.json()
                 if js.get("success") and js.get("files"):
                     url = js["files"][0]["url"]
-                    logging.info("✅ Görsel Uguu'ya yüklendi: %s", url)
+                    logging.info(t("log__grsel_uguuya_yklend_29"), url)
                     return url
     except Exception as e:
-        logging.warning("Uguu yükleme uyarısı: %s", e)
+        logging.warning(t("log_uguu_ykleme_uyars_s_24"), e)
 
     # 3. Tmpfiles.org
     try:
@@ -582,10 +567,10 @@ def upload_image_to_cloud(file_path):
                 raw_url = js.get("data", {}).get("url", "")
                 if raw_url:
                     direct_url = raw_url.replace("tmpfiles.org/", "tmpfiles.org/dl/")
-                    logging.info("✅ Görsel Tmpfiles'a yüklendi: %s", direct_url)
+                    logging.info(t("log__grsel_tmpfilesa_ykl_32"), direct_url)
                     return direct_url
     except Exception as e:
-        logging.warning("Tmpfiles yükleme uyarısı: %s", e)
+        logging.warning(t("log_tmpfiles_ykleme_uyar_28"), e)
 
     # 4. Litterbox (Catbox geçici depolama)
     try:
@@ -598,10 +583,10 @@ def upload_image_to_cloud(file_path):
                 timeout=15
             )
             if r.status_code == 200 and r.text.strip().startswith("http"):
-                logging.info("✅ Görsel Litterbox'a yüklendi: %s", r.text.strip())
+                logging.info(t("log__grsel_litterboxa_yk_33"), r.text.strip())
                 return r.text.strip()
     except Exception as e:
-        logging.warning("Litterbox yükleme uyarısı: %s", e)
+        logging.warning(t("log_litterbox_ykleme_uya_29"), e)
 
     return None
 
@@ -744,7 +729,7 @@ async def send_inline_result_in_context(client, message, query_id: int, result_i
     try:
         peer = await client.resolve_peer(message.chat.id)
     except Exception as e:
-        logging.error("send_inline_result_in_context peer hatası: %s", e)
+        logging.error(t("log_send_inline_result_i_45"), e)
         return None
 
     # 1. Öncelik: Eğer forum konusu tespit edildiyse doğrudan konuya gönder
@@ -779,7 +764,7 @@ async def send_inline_result_in_context(client, message, query_id: int, result_i
                 )
             )
         except Exception as e2:
-            logging.debug("SendInlineBotResult konu kökü denemesi: %s", e2)
+            logging.debug(t("log_sendinlinebotresult__42"), e2)
 
     # 2. Standart grup / özel sohbet veya genel gönderim
     try:
@@ -795,7 +780,7 @@ async def send_inline_result_in_context(client, message, query_id: int, result_i
             )
         )
     except Exception as e3:
-        logging.warning("SendInlineBotResult MTProto hatası (%s), standart API'ye dönülüyor...", e3)
+        logging.warning(t("log_sendinlinebotresult__69"), e3)
         fallback_reply = topic_id or reply_target_id
         return await client.send_inline_bot_result(
             message.chat.id,

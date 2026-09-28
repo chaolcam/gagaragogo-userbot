@@ -5,6 +5,7 @@
 # License: GNU GPL v3.0
 # Copyright (c) 2026 chaolcam
 # -----------------------------------------------------------------------------
+from core.locales import t
 import asyncio
 import time
 import logging
@@ -12,19 +13,20 @@ from pyrogram import Client, filters, errors
 from pyrogram.enums import ChatType
 import utils
 from utils import ggr
+from core.locales import t
 
 # Komut kayıtları (Yardım menüsü için)
 ggr.cmd(
     "ilet", 
-    info="Yanıtlanan mesajı, doğrudan metni veya gönderilen medyayı tüm seçili gruplara iletir.", 
-    usage=".ilet (veya mesaja yanıt: .ilet | veya medya altyazısına: .ilet [yazı])",
-    category="Grup & İletim"
+    info=t("cmd_info_yantlanan_85"), 
+    usage=t("cmd_usage_ilet_71"),
+    category=t("cat_grupiletim")
 )
 ggr.cmd(
     "iletmenu", 
-    info="Grupları numaralandırarak listeler ve tek tıkla açıp kapatmanızı sağlar.", 
-    usage=".iletmenu (veya hızlı: .iletmenu [numara])",
-    category="Grup & İletim"
+    info=t("cmd_info_gruplar_72"), 
+    usage=t("cmd_usage_iletmenu_42"),
+    category=t("cat_grupiletim")
 )
 
 # Sabit güvenli aralık (kullanıcı isteği: ~0.8 sn)
@@ -86,7 +88,7 @@ async def _fetch_raw_chats(client, groups_map):
                     cid = int(f"-100{c.id}")
                     groups_map[cid] = c.title or "Süper Grup"
     except Exception as e:
-        logging.warning("GetAllChats uyarısı: %s", e)
+        logging.warning(t("log_getallchats_uyars_s_23"), e)
 
 
 async def _fetch_dialog_groups(client, groups_map):
@@ -100,7 +102,7 @@ async def _fetch_dialog_groups(client, groups_map):
             if "group" in chat_type_str or getattr(chat, "type", None) in (ChatType.GROUP, ChatType.SUPERGROUP):
                 groups_map[chat.id] = chat.title or "Grup"
     except Exception as e:
-        logging.warning("get_dialogs uyarısı: %s", e)
+        logging.warning(t("log_get_dialogs_uyars_s_23"), e)
 
 
 async def get_all_user_groups(client, force_refresh=False):
@@ -164,7 +166,7 @@ async def _safe_edit_status(message, is_caption: bool, text: str):
         else:
             await message.edit_text(text)
     except Exception as _e:
-        logging.debug("Durum mesajı düzenlenemedi: %s", _e)
+        logging.debug(t("log_durum_mesaj_dzenlene_30"), _e)
 
 
 def _detect_ilet_content(message, is_caption: bool, ek_metin: str):
@@ -191,7 +193,7 @@ async def _send_single_group_with_retry(client, chat_id, chat_title, kaynak_mesa
         except Exception:
             return False
     except Exception as err:
-        logging.warning("Grup iletim hatası (%s): %s", chat_title, err)
+        logging.warning(t("log_grup_iletim_hatas_s__27"), chat_title, err)
         return False
 
 
@@ -222,7 +224,7 @@ async def _broadcast_to_groups(client, message, hedef_gruplar, kaynak_mesaj, gon
 @ggr.on(ilet_filtresi)
 async def toplu_ilet_komutu(client, message):
     """Mesajı, yanıtlanan içeriği veya altyazılı medyayı seçili gruplara iletir."""
-    logging.info("Kullanıcı %s .ilet komutunu çalıştırdı.", message.from_user.id if message.from_user else 'Bilinmeyen')
+    logging.info(t("log_kullanc_s_ilet_komut_39"), message.from_user.id if message.from_user else 'Bilinmeyen')
 
     is_caption = bool(message.caption)
     raw_text = (message.caption if is_caption else message.text or "").strip()
@@ -270,11 +272,10 @@ async def _handle_manual_group_toggle(client, message, idx: int):
         yeni_durum = toggle_group(secilen["id"])
         durum_str = "✅ <b>AÇIK (Gönderilecek)</b>" if yeni_durum else "⛔ <b>KAPALI (Atlanacak)</b>"
         await message.edit_text(
-            f"🔧 <b>{idx}. {ggr.safe_html(secilen['title'])}</b>\n"
-            f"Yeni Durum: {durum_str}"
+            t("broadcast_grup_durumu_guncellendi", idx=idx, title=ggr.safe_html(secilen['title']), durum=durum_str)
         )
     else:
-        await message.edit_text(f"❌ Geçersiz numara! 1 ile {len(ggr_son_listelenen_gruplar)} arasında olmalıdır.")
+        await message.edit_text(t("broadcast_gecersiz_numara_1_ile_var_1_arasinda_olm", var_1 = len(ggr_son_listelenen_gruplar)))
 
 
 async def _show_inline_ilet_menu(client, message, durum) -> bool:
@@ -295,11 +296,11 @@ async def _show_inline_ilet_menu(client, message, durum) -> bool:
             await durum.delete()
             return True
     except Exception as e:
-        logging.warning("İlet inline menü uyarısı (%s), metin listesine geçiliyor...", e)
+        logging.warning(t("log_ilet_inline_men_uyar_59"), e)
     return False
 
 
-@ggr.cmd("iletmenu", info="Grupları numaralandırarak listeler ve tek tıkla açıp kapatmanızı sağlar.", usage=".iletmenu | .iletmenu [numara]", category="Grup & İletim")
+@ggr.cmd("iletmenu", info=t("cmd_info_gruplar_72"), usage=".iletmenu | .iletmenu [numara]", category=t("cat_grupiletim"))
 async def ilet_menu_komutu(client, message):
     """Grupları listeler ve altındaki numara butonlarıyla açıp kapatmayı sağlar."""
     global ggr_son_listelenen_gruplar
@@ -309,13 +310,13 @@ async def ilet_menu_komutu(client, message):
         await _handle_manual_group_toggle(client, message, int(args[0]))
         return
 
-    durum = await message.edit_text("🔄 <i>Gruplar hazırlanıyor...</i>")
+    durum = await message.edit_text(t("broadcast_i_gruplar_hazirlaniyor_i"))
     force = bool(args and args[0].lower() in ["yenile", "refresh"])
     gruplar = await get_all_user_groups(client, force_refresh=force)
     ggr_son_listelenen_gruplar = gruplar
 
     if not gruplar:
-        await durum.edit_text("ℹ️ Üye olduğunuz herhangi bir grup bulunamadı.")
+        await durum.edit_text(t("broadcast_uye_oldugunuz_herhangi_bir_gru"))
         return
 
     opened_inline = await _show_inline_ilet_menu(client, message, durum)

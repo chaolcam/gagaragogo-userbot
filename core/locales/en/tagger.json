@@ -1,0 +1,21 @@
+{
+  "tagger_b_bu_komut_yalnizca_gruplarda_": "❌ <b>This command can only be used in groups!</b>\",\n\"auto_error_usage_example_tttakipt\": \"Error in usage. Example: `.tttakiptencikar kullanici_adi`",
+  "tagger_b_toplam_toplam_sayi_kisi_bulu": "🚀 <b>A total of {total_number} people were found!</b> Starting tagging...\n💡 <i>To stop:</i> <code>.tag stop</code>",
+  "tagger_b_etiketlenecek_uye_bulunamadi": "⚠️ <b>No members found to tag!</b>\n\n• '<i>Hide Members'</i> may be turned on in the group's privacy settings and members may not be found in recent messages.\n• There may be no active or tagged users left in the group.",
+  "tagger_b_baslik_tur_taraniyor_lutfen_": "⏳ <b>{baslik_tur} is being scanned, please wait...</b>\\n💡 <i>To stop:</i> <code>.tag stop</code>\",\n\"auto_error_var_1\": \"Error: {var_1}",
+  "cmd_info_gruplardaki_45": "Tags members or admins in groups.",
+  "log_ye_filtresi_ekme_uya_35": "Member filter pull warning (%s): %s\",\n\"log_letter_search_error_s_21\": \"Letter search error: %s",
+  "log_harf_arama_hatas_s_21": "Letter search error: %s",
+  "log_sohbet_gemiinden_ye__42": "Member collection warning from chat history: %s\",\n\"log_standard_member_withdrawal_warning_30\": \"Standard member withdrawal warning: %s\",\n\"log_package_send_error__25\": \"Package sending error: %s",
+  "log_standart_ye_ekme_uya_30": "Standard withdrawal warning: %s",
+  "log_paket_gnderme_hatas__25": "Error sending package: %s",
+  "log_son_paket_gnderme_ha_29": "Last packet sending error: %s\",\n\"log_message_send_error__25\": \"Message sending error: %s\",\n\"log_labeling_error_s_s_26\": \"Labeling error (%s): %s\",\n\"log__tiktok_cookies_found_70\": \"🍪 TikTok cookies were successfully restored from the cloud database to disk.\",\n\"log_tiktok_cloud_database_40\": \"TikTok cloud database read error: %s\",\n\"log_tiktok_download_error_31\": \"TikTok download error (@%s): %s",
+  "log_mesaj_gnderme_hatas__25": "Form Error Message",
+  "log_etiketleme_hatas_s_s_26": "Labeling error (%s): %s",
+  "tagger_admins": "👑 Administrators",
+  "tagger_members": "👥 Members",
+  "tagger_admin_sing": "Administrator",
+  "tagger_member_sing": "Member",
+  "tagger_done_message": "Tagging Completed!",
+  "tagger_error_message": "Tagging Error"
+}

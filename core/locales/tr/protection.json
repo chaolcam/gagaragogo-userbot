@@ -1,0 +1,15 @@
+{
+  "protection_ozel_sohbet_anti_delete_b_durum_metni_b_": "Özel Sohbet Anti-Delete: <b>{durum_metni}</b>\\n\\n📌 Kayıt Hedefi: <code>Ana Admin Grubu</code>",
+  "protection_bilgi_metni_n_b_mesaj_b_n_n_var_1": "{bilgi_metni}\\n📝 <b>Mesaj:</b>\\n\\n{var_1}",
+  "protection_sureli_medya_modu_b_durum_metni_b_n_n_ka": "Süreli Medya Modu: <b>{durum_metni}</b>\\n\\n📌 Kayıt Hedefi: <code>Ana Admin Grubu</code>",
+  "cmd_info_zel_74": "Özel sohbetlerde (DM) silinen mesajları yakalama modunu açar veya kapatır.",
+  "cmd_info_tek_61": "Tek gösterimlik süreli medyaları otomatik yakalayıp kaydeder.",
+  "log_antidelete_forum_top_44": "Anti-delete forum topic oluşturma hatası: %s",
+  "log_sreli_medya_forum_to_45": "Süreli medya forum topic oluşturma hatası: %s",
+  "log_kullanc_s_antidelete_45": "Kullanıcı %s .antidelete komutunu çalıştırdı.",
+  "log_antidelete_direkt_ko_60": "Antidelete direkt kopyalama başarısız, indirme deneniyor: %s",
+  "log_antidelete_bypass_ha_29": "Anti-Delete Bypass Hatası: %s",
+  "log_kullanc_s_sureli_kom_41": "Kullanıcı %s .sureli komutunu çalıştırdı.",
+  "log_sreli_medya_yakalama_32": "Süreli medya yakalama hatası: %s",
+  "log_hayalet_indirme_hata_26": "Hayalet indirme hatası: %s"
+}

@@ -5,6 +5,7 @@
 # License: GNU GPL v3.0
 # Copyright (c) 2026 chaolcam
 # -----------------------------------------------------------------------------
+from core.locales import t
 import time
 import asyncio
 import logging
@@ -38,10 +39,10 @@ def format_afk_duration(seconds):
 kayitli_afk = ggr.get("afk_durumu")
 if isinstance(kayitli_afk, dict) and kayitli_afk.get("is_afk"):
     AFK_STATE.update(kayitli_afk)
-    logging.info("💤 AFK durumu bulut veritabanından yüklendi (Sebep: %s)", AFK_STATE['reason'])
+    logging.info(t("log__afk_durumu_bulut_ve_54"), AFK_STATE['reason'])
 
 
-@ggr.cmd("afk", info="AFK (Uzakta/Meşgul) modunu açar.", usage=".afk [sebep]", category="Araçlar")
+@ggr.cmd("afk", info=t("cmd_info_afk_32"), usage=".afk [sebep]", category=t("cat_aralar"))
 async def afk_modunu_ac(client, message):
     reason = "Şu an meşgulüm / AFK'yım."
     if len(message.command) > 1:

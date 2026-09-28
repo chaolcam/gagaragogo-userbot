@@ -1,0 +1,7 @@
+{
+  "cmd_install_info": "Telegram",
+  "cmd_plugins_info": "Tüm dahili sistem eklentilerini ve sonradan yüklenen özel eklentileri listeler.",
+  "cmd_plugins_usage": ".plugins",
+  "cmd_install_usage": ".py dosyasına yanıtlayarak: .install",
+  "plugin_store_header": "<b>GAGARAGOGO</b> ⬝ <b>Eklenti & Mağaza</b>\n────────────────────────\nResmi mağazadaki (<code>@{channel}</code>) eklentileri tek tıkla kurabilir veya özel eklentilerinizi yönetebilirsiniz.\n\n• <b>Özel Eklenti:</b> <code>.py</code> dosyasına <code>.install</code> ile yanıt verin.\n• <b>Mağazadan:</b> <code>.install [No]</code> veya mağazayı inceleyin."
+}

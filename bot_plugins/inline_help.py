@@ -5,6 +5,7 @@
 # License: GNU GPL v3.0
 # Copyright (c) 2026 chaolcam
 # -----------------------------------------------------------------------------
+from core.locales import t
 import logging
 from pyrogram import Client, filters
 from pyrogram.types import (
@@ -94,9 +95,9 @@ async def inline_ig(client, inline_query):
 
     username = inline_query.matches[0].group(1).strip().lstrip("@")
     keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("📸 Hikayeler", callback_data=f"ig_story_{username}_0")],
-        [InlineKeyboardButton("🖼 Gönderiler", callback_data=f"ig_post_{username}_0")],
-        [InlineKeyboardButton("⭐ Öne Çıkanlar", callback_data=f"ig_high_{username}_0")],
+        [InlineKeyboardButton(t("inline_help_hikayeler"), callback_data=f"ig_story_{username}_0")],
+        [InlineKeyboardButton(t("inline_help_gonderiler"), callback_data=f"ig_post_{username}_0")],
+        [InlineKeyboardButton(t("inline_help_one_cikanlar"), callback_data=f"ig_high_{username}_0")],
     ])
     metin = (
         f"<b>Instagram:</b> <code>@{username}</code>\n"
@@ -221,7 +222,7 @@ async def _route_yardim_callback(client, callback_query, data):
 async def yardim_callback(client, callback_query):
     owner_id = utils.get_owner_id()
     if owner_id and callback_query.from_user and callback_query.from_user.id != owner_id:
-        await callback_query.answer("⛔ Bu butonlar sadece bot sahibine aittir!", show_alert=True)
+        await callback_query.answer(t("inline_help_bu_butonlar_sadece_bot_sahibin"), show_alert=True)
         return
 
     data = callback_query.data
@@ -234,6 +235,6 @@ async def yardim_callback(client, callback_query):
     except Exception as err:
         logger.error("[INLINE_UI] Hata (Veri: %s): %s", data, err)
         try:
-            await callback_query.answer(f"Hata: {type(err).__name__}", show_alert=True)
+            await callback_query.answer(t("inline_help_hata_var_1", var_1=type(err).__name__), show_alert=True)
         except Exception as _cb_err:
             logger.debug("Callback answer hatası: %s", _cb_err)
