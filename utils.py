@@ -53,8 +53,8 @@ def get_owner_id():
     global OWNER_ID
     if OWNER_ID:
         return OWNER_ID
-    if ggr and hasattr(ggr, "me") and ggr.me:
-        OWNER_ID = ggr.me.id
+    if bot_client and hasattr(bot_client, "me") and bot_client.me:
+        OWNER_ID = bot_client.me.id
         return OWNER_ID
     return None
 
