@@ -44,23 +44,32 @@ logger = logging.getLogger("ggr.inline_ui")
 @Client.on_inline_query(filters.regex("^(alive|yardim|ayarlar)"))
 async def inline_yardim(client, inline_query):
     """Kullanıcı @YardimciBot yardim yazdığında açılan ana kontrol paneli."""
+    logger.info("🔥 INLINE QUERY ALINDI! Query: %s, User: %s", inline_query.query, inline_query.from_user.id)
     owner_id = utils.get_owner_id()
     if owner_id and inline_query.from_user.id != owner_id:
+        logger.warning("⛔ Yetkisiz kullanım denemesi: %s", inline_query.from_user.id)
         await inline_query.answer([], cache_time=1, is_personal=True)
         return
 
     query = inline_query.query.strip().lower()
     alive_logo = utils.get_alive_logo()
+    logger.info("Logo URL: %s", alive_logo)
 
-    if query == "ayarlar":
-        keyboard, metin = get_settings_keyboard()
-        title = "GagaraGogo Kontrol Paneli & Ayarlar"
-        description = "Sistem ayarlarını, logları ve özellikleri yönetin."
-    else:
-        metin = get_main_menu_text()
-        keyboard = get_main_menu_keyboard()
-        title = "GagaraGogo İnteraktif Yardım Menüsü"
-        description = "Tüm komutları ve durum raporunu görsel butonlarla keşfedin."
+    try:
+        if query == "ayarlar":
+            keyboard, metin = get_settings_keyboard()
+            title = "GagaraGogo Kontrol Paneli & Ayarlar"
+            description = "Sistem ayarlarını, logları ve özellikleri yönetin."
+        else:
+            metin = get_main_menu_text()
+            logger.info("Metin oluşturuldu.")
+            keyboard = get_main_menu_keyboard()
+            logger.info("Klavye oluşturuldu.")
+            title = "GagaraGogo İnteraktif Yardım Menüsü"
+            description = "Tüm komutları ve durum raporunu görsel butonlarla keşfedin."
+    except Exception as e:
+        logger.error("❌ INLINE MENU OLUŞTURULURKEN HATA: %s", e, exc_info=True)
+        return
 
     if alive_logo:
         results = [
