@@ -19,7 +19,10 @@ from core.locales import t
 # Komut kayıtları (Yardım menüsünde listelenmesi için)
 ggr.cmd("setalive", info=t("cmd_info_alive_55"), usage=".setalive [link] | .setalive reset", category="Sistem")
 
-@ggr.cmd(["alive", "yardim", t("cat_help"), "help"], info=t("cmd_info_botun_72"), usage=".alive", category="Sistem")
+@ggr.cmd("alive", info=t("cmd_info_botun_72"), usage=".alive", category="Sistem")
+@ggr.cmd("yardim", category="")
+@ggr.cmd("yardım", category="")
+@ggr.cmd("help", category="")
 async def alive_menusu(client, message):
     """Yardımcı bot aracılığıyla şık .alive kartını ve interaktif kategori menüsünü açar."""
     logging.info(t("log_kullanc_s_alive_komu_40"), message.from_user.id if message.from_user else 'Bilinmeyen')
