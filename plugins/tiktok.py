@@ -101,6 +101,8 @@ def _inject_tiktok_cookies(live_client):
     try:
         if not os.path.exists("tiktok_cookies.txt"):
             return
+        session_id = None
+        tt_target_idc = "alisg"
         with open("tiktok_cookies.txt", "r", encoding="utf-8", errors="ignore") as f:
             for line in f:
                 if line.startswith("#") or not line.strip():
@@ -109,6 +111,10 @@ def _inject_tiktok_cookies(live_client):
                 if len(parts) >= 7:
                     c_name = parts[5]
                     c_val = parts[6]
+                    if c_name == "sessionid":
+                        session_id = c_val
+                    elif c_name == "tt-target-idc":
+                        tt_target_idc = c_val
                     try:
                         live_client.web.cookies.set(c_name, c_val)
                     except Exception:
@@ -118,6 +124,8 @@ def _inject_tiktok_cookies(live_client):
                             live_client.web.httpx_client.cookies.set(c_name, c_val)
                         except Exception:
                             pass
+        if session_id and hasattr(live_client.web, "set_session"):
+            live_client.web.set_session(session_id=session_id, tt_target_idc=tt_target_idc)
     except Exception as e:
         logging.error("Cookie injection error: %s", e)
 
@@ -125,6 +133,25 @@ def _inject_tiktok_cookies(live_client):
 async def _extract_stream_url(live_client, username):
     """TikTok API'sinden veya cerezli web sayfasindan direkt stream URL'sini cekmeye calisir."""
     target_url = f"https://www.tiktok.com/@{username}/live"
+
+    # 1. Oncelik: TikTokLive client ile API uzerinden oda ve akis bilgisini cek (AgeRestricted 18+ destekli)
+    try:
+        room_id = await live_client.web.fetch_room_id_from_api(username)
+        if room_id:
+            info = await live_client.web.fetch_room_info(room_id)
+            stream_url_obj = info.get("stream_url", {})
+            flv_pull = stream_url_obj.get("flv_pull_url", {})
+            for q in ["FULL_HD1", "HD1", "SD1", "SD2"]:
+                if q in flv_pull:
+                    logging.info("✅ @%s direkt FLV stream URL alindi (kalite: %s)", username, q)
+                    return flv_pull[q], True
+            if flv_pull:
+                return list(flv_pull.values())[0], True
+            if stream_url_obj.get("rtmp_pull_url"):
+                return stream_url_obj.get("rtmp_pull_url"), True
+    except Exception as api_ex:
+        logging.debug("TikTokLive API stream extraction error: %s", api_ex)
+
     try:
         from TikTokLive.client.web.routes.fetch_room_id_api import FetchRoomIdAPIRoute
         import json
