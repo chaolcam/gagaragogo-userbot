@@ -198,10 +198,10 @@ def _build_record_cmd(output_file_base, target_url, is_direct_stream):
     if os.path.exists("tiktok_cookies.txt"):
         cmd.extend(["--cookies", "tiktok_cookies.txt"])
     if is_direct_stream:
-        cmd.extend(["-o", f"{output_file_base}.%(ext)s", target_url])
+        cmd.extend(["--remux-video", "mp4", "-o", f"{output_file_base}.%(ext)s", target_url])
     else:
         cmd.extend(["--downloader-args", "ffmpeg:-live_start_index -1"])
-        cmd.extend(["-o", f"{output_file_base}.%(ext)s", "--remux-video", "mp4", target_url])
+        cmd.extend(["--remux-video", "mp4", "-o", f"{output_file_base}.%(ext)s", target_url])
     return cmd
 
 
@@ -317,12 +317,21 @@ async def _upload_video_part(client, output_file, username, part_no, target_chat
             sz = os.path.getsize(output_file)
             if sz < 100:
                 raise Exception(f"Video dosyasi cok kucuk veya bos ({sz} byte).")
-            await client.send_document(
-                chat_id=target_chat,
-                document=output_file,
-                caption=f"\U0001f3a5 <b>TikTok Canli Yayin Parcasi</b>\n\U0001f464 <code>@{username}</code>\n\U0001f4e6 Dosya: <code>part_{part_no:03d}.mp4</code>",
-                reply_to_message_id=topic_id
-            )
+            try:
+                await client.send_video(
+                    chat_id=target_chat,
+                    video=output_file,
+                    caption=f"\U0001f3a5 <b>TikTok Canli Yayin Parcasi</b>\n\U0001f464 <code>@{username}</code>\n\U0001f4e6 Parca: <code>part_{part_no:03d}.mp4</code>",
+                    supports_streaming=True,
+                    reply_to_message_id=topic_id
+                )
+            except Exception:
+                await client.send_document(
+                    chat_id=target_chat,
+                    document=output_file,
+                    caption=f"\U0001f3a5 <b>TikTok Canli Yayin Parcasi</b>\n\U0001f464 <code>@{username}</code>\n\U0001f4e6 Dosya: <code>part_{part_no:03d}.mp4</code>",
+                    reply_to_message_id=topic_id
+                )
             os.remove(output_file)
         except Exception as e:
             await client.send_message(target_chat, f"\U0001f6e0 <b>Yukleme Hatasi:</b> <code>{e}</code>", reply_to_message_id=topic_id)
