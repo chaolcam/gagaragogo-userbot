@@ -147,10 +147,10 @@ async def _extract_stream_url(live_client, username):
     except Exception as ex:
         logging.warning("Stream URL API extraction error: %s, cerezli web fallback deneniyor...", ex)
 
-    # Fallback: curl_cffi ile gercek Chrome TLS taklidi yaparak direkt FLV/HLS cek
+    # Fallback: curl_cffi ile gercek Chrome TLS taklidi yaparak SIGI_STATE ve direkt FLV/HLS cek
     try:
         from curl_cffi import requests as c_requests
-        import re
+        import re, json
         cookie_dict = {}
         if os.path.exists("tiktok_cookies.txt"):
             with open("tiktok_cookies.txt", "r", encoding="utf-8", errors="ignore") as f:
@@ -170,13 +170,38 @@ async def _extract_stream_url(live_client, username):
             timeout=15
         )
         html = resp.text
-        flvs = [u for u in re.findall(r'https?://[^\s"\'<>\\]+', html) if ("pull" in u or "stream" in u) and ".flv" in u and "only_audio=1" not in u]
+
+        # 1. SIGI_STATE JSON içinden direkt FLV/HLS akışını al
+        sigi_match = re.search(r'<script id="SIGI_STATE"[^>]*>(.*?)</script>', html)
+        if sigi_match:
+            try:
+                sigi_data = json.loads(sigi_match.group(1))
+                live_room = sigi_data.get("LiveRoom", {}).get("liveRoomUserInfo", {}).get("liveRoom", {})
+                if live_room.get("status") == 2:  # 2: Kesin Canlı Yayında
+                    pull_raw = live_room.get("streamData", {}).get("pull_data", {}).get("stream_data")
+                    if pull_raw:
+                        sd = json.loads(pull_raw).get("data", {})
+                        for q in ["hd", "origin", "sd", "ld"]:
+                            if q in sd and "main" in sd[q]:
+                                flv_url = sd[q]["main"].get("flv")
+                                if flv_url:
+                                    logging.info("✅ @%s SIGI_STATE üzerinden direkt FLV URL alındı (kalite: %s)", username, q)
+                                    return flv_url, True
+                                hls_url = sd[q]["main"].get("hls")
+                                if hls_url:
+                                    logging.info("✅ @%s SIGI_STATE üzerinden direkt HLS URL alındı (kalite: %s)", username, q)
+                                    return hls_url, True
+            except Exception as _parse_err:
+                logging.debug("SIGI parse error: %s", _parse_err)
+
+        # 2. Regex ile HTML içindeki CDN FLV/HLS URL'lerini tara
+        flvs = [u for u in re.findall(r'https?://[^\s"\'<>\\]+?\.flv[^\s"\'<>\\]*', html) if ("tiktokcdn" in u or "pull" in u) and "only_audio=1" not in u]
         if flvs:
-            logging.info("\u2705 @%s Web sayfasindan direkt FLV URL cekildi", username)
+            logging.info("✅ @%s Web sayfasından direkt FLV URL çekildi: %s", username, flvs[0][:100])
             return flvs[0], True
-        hlss = [u for u in re.findall(r'https?://[^\s"\'<>\\]+', html) if ("pull" in u or "stream" in u) and ".m3u8" in u]
+        hlss = [u for u in re.findall(r'https?://[^\s"\'<>\\]+?\.m3u8[^\s"\'<>\\]*', html) if ("tiktokcdn" in u or "pull" in u)]
         if hlss:
-            logging.info("\u2705 @%s Web sayfasindan direkt HLS URL cekildi", username)
+            logging.info("✅ @%s Web sayfasından direkt HLS URL çekildi: %s", username, hlss[0][:100])
             return hlss[0], True
     except Exception as web_ex:
         logging.error("Web fallback stream extraction hatasi: %s", web_ex)
@@ -559,9 +584,23 @@ async def _check_live_for_user(client, username, target_chat, topic_id):
                 timeout=15
             )
             html = resp.text
-            if "pull" in html and (".flv" in html or ".m3u8" in html) and "SlardarWAF" not in html:
-                is_live_detected = True
-                logging.info("🎯 @%s WAF fallback ile canli yayinda oldugu teyit edildi!", username)
+            # 1. SIGI_STATE status kontrolü (2: Canlı, 4: Bitti/Çevrimdışı)
+            sigi_match = re.search(r'<script id="SIGI_STATE"[^>]*>(.*?)</script>', html)
+            if sigi_match:
+                try:
+                    sigi_data = json.loads(sigi_match.group(1))
+                    lr_status = sigi_data.get("LiveRoom", {}).get("liveRoomUserInfo", {}).get("liveRoom", {}).get("status")
+                    if lr_status == 2:
+                        is_live_detected = True
+                        logging.info("🎯 @%s SIGI_STATE ile kesin canli yayinda oldugu teyit edildi (status: 2)!", username)
+                except Exception as _pe:
+                    logging.debug("SIGI check error: %s", _pe)
+
+            # 2. Fallback: Eğer SIGI_STATE yoksa FLV ve SlardarWAF kontrolü
+            if not is_live_detected and not sigi_match:
+                if ("pull" in html or "tiktokcdn" in html) and (".flv" in html or ".m3u8" in html) and "SlardarWAF" not in html:
+                    is_live_detected = True
+                    logging.info("🎯 @%s WAF fallback ile canli yayinda oldugu teyit edildi!", username)
         except Exception as fb_err:
             logging.debug("Fallback live check error: %s", fb_err)
 
