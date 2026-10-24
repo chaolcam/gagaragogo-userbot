@@ -750,7 +750,9 @@ async def tttakip_ekle(client, message):
             db["users"][username]["topic_id"] = topic_id
         except Exception as e:
             logging.error(t("log_topic_oluturulamad_s_24"), e)
-            
+
+    # Cooldown sıfırla (hemen kontrol edebilsin)
+    ggr_record_cooldown.pop(username, None)
     db_kaydet(db)
     
     fm = t("tiktok_all_types")
