@@ -147,28 +147,37 @@ async def _extract_stream_url(live_client, username):
     except Exception as ex:
         logging.warning("Stream URL API extraction error: %s, cerezli web fallback deneniyor...", ex)
 
-    # Fallback: Cerezli web sayfasindan direkt FLV veya HLS URL'si cek
+    # Fallback: curl_cffi ile gercek Chrome TLS taklidi yaparak direkt FLV/HLS cek
     try:
-        import http.cookiejar, urllib.request, re
+        from curl_cffi import requests as c_requests
+        import re
+        cookie_dict = {}
         if os.path.exists("tiktok_cookies.txt"):
-            cj = http.cookiejar.MozillaCookieJar("tiktok_cookies.txt")
-            cj.load(ignore_discard=True, ignore_expires=True)
-            handlers = [urllib.request.HTTPCookieProcessor(cj)]
-            proxy = get_tiktok_proxy()
-            if proxy:
-                handlers.append(urllib.request.ProxyHandler({'http': proxy, 'https': proxy}))
-            opener = urllib.request.build_opener(*handlers)
-            opener.addheaders = [("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")]
-            resp = await asyncio.to_thread(opener.open, target_url)
-            html = (await asyncio.to_thread(resp.read)).decode("utf-8", errors="ignore")
-            flvs = [u for u in re.findall(r'https?://[^\s"\'<>\\]+', html) if ("pull" in u or "stream" in u) and ".flv" in u and "only_audio=1" not in u]
-            if flvs:
-                logging.info("\u2705 @%s Web sayfasindan direkt FLV URL cekildi", username)
-                return flvs[0], True
-            hlss = [u for u in re.findall(r'https?://[^\s"\'<>\\]+', html) if ("pull" in u or "stream" in u) and ".m3u8" in u]
-            if hlss:
-                logging.info("\u2705 @%s Web sayfasindan direkt HLS URL cekildi", username)
-                return hlss[0], True
+            with open("tiktok_cookies.txt", "r", encoding="utf-8", errors="ignore") as f:
+                for line in f:
+                    if not line.startswith("#") and "\t" in line:
+                        p = line.strip().split("\t")
+                        if len(p) >= 7:
+                            cookie_dict[p[5]] = p[6]
+        proxy = get_tiktok_proxy()
+        proxies = {"http": proxy, "https": proxy} if proxy else None
+        resp = await asyncio.to_thread(
+            c_requests.get,
+            target_url,
+            proxies=proxies,
+            cookies=cookie_dict if cookie_dict else None,
+            impersonate="chrome120",
+            timeout=15
+        )
+        html = resp.text
+        flvs = [u for u in re.findall(r'https?://[^\s"\'<>\\]+', html) if ("pull" in u or "stream" in u) and ".flv" in u and "only_audio=1" not in u]
+        if flvs:
+            logging.info("\u2705 @%s Web sayfasindan direkt FLV URL cekildi", username)
+            return flvs[0], True
+        hlss = [u for u in re.findall(r'https?://[^\s"\'<>\\]+', html) if ("pull" in u or "stream" in u) and ".m3u8" in u]
+        if hlss:
+            logging.info("\u2705 @%s Web sayfasindan direkt HLS URL cekildi", username)
+            return hlss[0], True
     except Exception as web_ex:
         logging.error("Web fallback stream extraction hatasi: %s", web_ex)
 
@@ -518,28 +527,38 @@ async def _check_live_for_user(client, username, target_chat, topic_id):
         _inject_tiktok_cookies(live_client)
         is_live_detected = await live_client.is_live()
     except Exception as live_err:
-        # TikTokLive API'si WAF engeline takılırsa, çerezli web sayfasından doğrula
+        # TikTokLive API'si WAF engeline takılırsa, curl_cffi Chrome TLS ile doğrula
         try:
-            import http.cookiejar, urllib.request, re
+            from curl_cffi import requests as c_requests
+            import re
+            cookie_dict = {}
             if os.path.exists("tiktok_cookies.txt"):
-                cj = http.cookiejar.MozillaCookieJar("tiktok_cookies.txt")
-                cj.load(ignore_discard=True, ignore_expires=True)
-                handlers = [urllib.request.HTTPCookieProcessor(cj)]
-                proxy = get_tiktok_proxy()
-                if proxy:
-                    handlers.append(urllib.request.ProxyHandler({'http': proxy, 'https': proxy}))
-                opener = urllib.request.build_opener(*handlers)
-                opener.addheaders = [("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")]
-                resp = await asyncio.to_thread(opener.open, f"https://www.tiktok.com/@{username}/live")
-                html = (await asyncio.to_thread(resp.read)).decode("utf-8", errors="ignore")
-                if "pull" in html and (".flv" in html or ".m3u8" in html) and "SlardarWAF" not in html:
-                    is_live_detected = True
-                    logging.info("🎯 @%s WAF fallback ile canli yayinda oldugu teyit edildi!", username)
+                with open("tiktok_cookies.txt", "r", encoding="utf-8", errors="ignore") as f:
+                    for line in f:
+                        if not line.startswith("#") and "\t" in line:
+                            p = line.strip().split("\t")
+                            if len(p) >= 7:
+                                cookie_dict[p[5]] = p[6]
+            proxy = get_tiktok_proxy()
+            proxies = {"http": proxy, "https": proxy} if proxy else None
+            resp = await asyncio.to_thread(
+                c_requests.get,
+                f"https://www.tiktok.com/@{username}/live",
+                proxies=proxies,
+                cookies=cookie_dict if cookie_dict else None,
+                impersonate="chrome120",
+                timeout=15
+            )
+            html = resp.text
+            if "pull" in html and (".flv" in html or ".m3u8" in html) and "SlardarWAF" not in html:
+                is_live_detected = True
+                logging.info("🎯 @%s WAF fallback ile canli yayinda oldugu teyit edildi!", username)
         except Exception as fb_err:
             logging.debug("Fallback live check error: %s", fb_err)
 
         if not is_live_detected:
-            logging.error(t("log_tiktok_canl_sorgu_ha_38"), username, type(live_err).__name__, live_err)
+            # Kullanıcı canlı yayında değil (veya oda kapalı), sessiz debug logu bas
+            logging.debug("TikTok canlı sorgu @%s: çevrimdışı (%s)", username, type(live_err).__name__)
 
     if is_live_detected:
         asyncio.create_task(record_tiktok_stream(client, username, target_chat, topic_id))
