@@ -536,7 +536,9 @@ async def tiktok_monitor_loop(client):
         try:
             db = db_yukle()
             users = db.get("users", {})
-            target_chat = db.get("target_chat", get_yedek_grup_id())
+            target_chat = db.get("target_chat") or get_yedek_grup_id()
+            if target_chat == 0 or target_chat == "0":
+                target_chat = get_yedek_grup_id()
 
             for username, user_data in list(users.items()):
                 topic_id = user_data.get("topic_id")
@@ -652,7 +654,9 @@ async def tttakip_ekle(client, message):
         elif f_arg in ["post", t("tiktok_type_post"), "gonderi"]: filtre = "post"
         
     db = db_yukle()
-    target_chat = db.get("target_chat", ggr.backup_chat_id())
+    target_chat = db.get("target_chat") or ggr.backup_chat_id()
+    if target_chat == 0 or target_chat == "0":
+        target_chat = ggr.backup_chat_id()
     topic_id = None
     
     if username in db["users"]:
