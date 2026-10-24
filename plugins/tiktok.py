@@ -336,11 +336,21 @@ async def record_tiktok_stream(client, username, target_chat, topic_id=None):
         while username in ggr_recording_users:
             live_client = TikTokLiveClient(unique_id=username)
             _inject_tiktok_cookies(live_client)
-            is_live = await live_client.is_live()
-            if not is_live:
-                break
+            is_live = False
+            try:
+                is_live = await live_client.is_live()
+            except Exception:
+                is_live = False
+
             output_file_base = os.path.join(download_dir, f"part_{part_no:03d}")
             target_url, is_direct_stream = await _extract_stream_url(live_client, username)
+
+            # Eger is_live hata verdiyse ama web scraper'dan direkt stream linki geldiyse yayin aktiftir
+            if not is_live and is_direct_stream:
+                is_live = True
+
+            if not is_live:
+                break
             if not is_direct_stream:
                 logging.warning("\u26a0\ufe0f @%s direkt stream URL alinamadi, webpage URL kullanilacak", username)
             if await _check_disk_space(client, username, download_dir, target_chat, topic_id):
