@@ -87,20 +87,27 @@ async def bulut_db_yukle_tiktok(client):
 
 
 def _inject_tiktok_cookies(live_client):
-    """Mevcut tiktok_cookies.txt dosyasindan session ID'yi live_client'a enjekte eder."""
+    """Mevcut tiktok_cookies.txt dosyasindaki cerezleri live_client'a enjekte eder."""
     try:
         if not os.path.exists("tiktok_cookies.txt"):
             return
-        with open("tiktok_cookies.txt", "r") as f:
+        with open("tiktok_cookies.txt", "r", encoding="utf-8", errors="ignore") as f:
             for line in f:
-                if "sessionid" in line and not line.startswith("#"):
-                    parts = line.strip().split("\t")
-                    if len(parts) >= 7 and parts[5] == "sessionid":
-                        session_id = parts[6]
-                        live_client.web.cookies.set("sessionid", session_id)
-                        if hasattr(live_client.web, 'httpx_client'):
-                            live_client.web.httpx_client.cookies.set("sessionid", session_id)
-                        break
+                if line.startswith("#") or not line.strip():
+                    continue
+                parts = line.strip().split("\t")
+                if len(parts) >= 7:
+                    c_name = parts[5]
+                    c_val = parts[6]
+                    try:
+                        live_client.web.cookies.set(c_name, c_val)
+                    except Exception:
+                        pass
+                    if hasattr(live_client.web, 'httpx_client'):
+                        try:
+                            live_client.web.httpx_client.cookies.set(c_name, c_val)
+                        except Exception:
+                            pass
     except Exception as e:
         logging.error("Cookie injection error: %s", e)
 
