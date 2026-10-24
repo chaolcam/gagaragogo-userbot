@@ -38,8 +38,17 @@ ggr_post_check_interval = 300 # 5 dakika (300 saniye)
 RECORDING_USERS = ggr_recording_users
 RECORDING_PROCS = ggr_recording_procs
 RECORD_COOLDOWN = ggr_record_cooldown
-LAST_POST_CHECK = ggr_last_post_check
 POST_CHECK_INTERVAL = ggr_post_check_interval
+
+def get_tiktok_proxy():
+    """TikTok istekleri için proxy döner (Environment veya Ayarlar'dan)."""
+    proxy = os.environ.get("TIKTOK_PROXY") or ggr.get("tiktok_proxy")
+    if proxy and str(proxy).strip():
+        p_val = str(proxy).strip()
+        if not p_val.startswith("http"):
+            p_val = f"http://{p_val}"
+        return p_val
+    return "http://kjczaimi:f46byb5ujhu3@45.38.107.97:6014"
 
 def db_yukle():
     if not os.path.exists(ggr_tiktok_db_file):
@@ -144,7 +153,11 @@ async def _extract_stream_url(live_client, username):
         if os.path.exists("tiktok_cookies.txt"):
             cj = http.cookiejar.MozillaCookieJar("tiktok_cookies.txt")
             cj.load(ignore_discard=True, ignore_expires=True)
-            opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
+            handlers = [urllib.request.HTTPCookieProcessor(cj)]
+            proxy = get_tiktok_proxy()
+            if proxy:
+                handlers.append(urllib.request.ProxyHandler({'http': proxy, 'https': proxy}))
+            opener = urllib.request.build_opener(*handlers)
             opener.addheaders = [("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")]
             resp = await asyncio.to_thread(opener.open, target_url)
             html = (await asyncio.to_thread(resp.read)).decode("utf-8", errors="ignore")
@@ -170,6 +183,9 @@ def _build_record_cmd(output_file_base, target_url, is_direct_stream):
         "--retries", "2",
         "--fragment-retries", "2",
     ]
+    proxy = get_tiktok_proxy()
+    if proxy:
+        cmd.extend(["--proxy", proxy])
     if os.path.exists("tiktok_cookies.txt"):
         cmd.extend(["--cookies", "tiktok_cookies.txt"])
     if is_direct_stream:
@@ -508,7 +524,11 @@ async def _check_live_for_user(client, username, target_chat, topic_id):
             if os.path.exists("tiktok_cookies.txt"):
                 cj = http.cookiejar.MozillaCookieJar("tiktok_cookies.txt")
                 cj.load(ignore_discard=True, ignore_expires=True)
-                opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
+                handlers = [urllib.request.HTTPCookieProcessor(cj)]
+                proxy = get_tiktok_proxy()
+                if proxy:
+                    handlers.append(urllib.request.ProxyHandler({'http': proxy, 'https': proxy}))
+                opener = urllib.request.build_opener(*handlers)
                 opener.addheaders = [("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")]
                 resp = await asyncio.to_thread(opener.open, f"https://www.tiktok.com/@{username}/live")
                 html = (await asyncio.to_thread(resp.read)).decode("utf-8", errors="ignore")
