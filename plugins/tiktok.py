@@ -113,32 +113,52 @@ def _inject_tiktok_cookies(live_client):
 
 
 async def _extract_stream_url(live_client, username):
-    """TikTok API'sinden direkt stream URL'sini cekmeye calisir."""
+    """TikTok API'sinden veya cerezli web sayfasindan direkt stream URL'sini cekmeye calisir."""
     target_url = f"https://www.tiktok.com/@{username}/live"
     try:
         from TikTokLive.client.web.routes.fetch_room_id_api import FetchRoomIdAPIRoute
         import json
         room_data = await FetchRoomIdAPIRoute.fetch_user_room_data(live_client.web, username)
-        if "data" not in room_data or "liveRoom" not in room_data["data"]:
-            return target_url, False
-        lr = room_data["data"]["liveRoom"]
-        if "streamData" not in lr or "pull_data" not in lr["streamData"]:
-            return target_url, False
-        stream_data = json.loads(lr["streamData"]["pull_data"]["stream_data"])
-        data_obj = stream_data.get("data", {})
-        priority = ["origin", "hd", "sd", "ld"] + [q for q in data_obj if q not in ("origin", "hd", "sd", "ld")]
-        for quality in priority:
-            if quality not in data_obj or "main" not in data_obj[quality]:
-                continue
-            main_urls = data_obj[quality]["main"]
-            if main_urls.get("flv"):
-                logging.info("\u2705 @%s direkt FLV stream URL alindi (kalite: %s)", username, quality)
-                return main_urls["flv"], True
-            if main_urls.get("hls"):
-                logging.info("\u2705 @%s direkt HLS stream URL alindi (kalite: %s)", username, quality)
-                return main_urls["hls"], True
+        if "data" in room_data and "liveRoom" in room_data["data"]:
+            lr = room_data["data"]["liveRoom"]
+            if "streamData" in lr and "pull_data" in lr["streamData"]:
+                stream_data = json.loads(lr["streamData"]["pull_data"]["stream_data"])
+                data_obj = stream_data.get("data", {})
+                priority = ["origin", "hd", "sd", "ld"] + [q for q in data_obj if q not in ("origin", "hd", "sd", "ld")]
+                for quality in priority:
+                    if quality not in data_obj or "main" not in data_obj[quality]:
+                        continue
+                    main_urls = data_obj[quality]["main"]
+                    if main_urls.get("flv"):
+                        logging.info("\u2705 @%s direkt FLV stream URL alindi (kalite: %s)", username, quality)
+                        return main_urls["flv"], True
+                    if main_urls.get("hls"):
+                        logging.info("\u2705 @%s direkt HLS stream URL alindi (kalite: %s)", username, quality)
+                        return main_urls["hls"], True
     except Exception as ex:
-        logging.error("Stream URL extraction error: %s", ex)
+        logging.warning("Stream URL API extraction error: %s, cerezli web fallback deneniyor...", ex)
+
+    # Fallback: Cerezli web sayfasindan direkt FLV veya HLS URL'si cek
+    try:
+        import http.cookiejar, urllib.request, re
+        if os.path.exists("tiktok_cookies.txt"):
+            cj = http.cookiejar.MozillaCookieJar("tiktok_cookies.txt")
+            cj.load(ignore_discard=True, ignore_expires=True)
+            opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
+            opener.addheaders = [("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")]
+            resp = await asyncio.to_thread(opener.open, target_url)
+            html = (await asyncio.to_thread(resp.read)).decode("utf-8", errors="ignore")
+            flvs = [u for u in re.findall(r'https?://[^\s"\'<>\\]+', html) if ("pull" in u or "stream" in u) and ".flv" in u and "only_audio=1" not in u]
+            if flvs:
+                logging.info("\u2705 @%s Web sayfasindan direkt FLV URL cekildi", username)
+                return flvs[0], True
+            hlss = [u for u in re.findall(r'https?://[^\s"\'<>\\]+', html) if ("pull" in u or "stream" in u) and ".m3u8" in u]
+            if hlss:
+                logging.info("\u2705 @%s Web sayfasindan direkt HLS URL cekildi", username)
+                return hlss[0], True
+    except Exception as web_ex:
+        logging.error("Web fallback stream extraction hatasi: %s", web_ex)
+
     return target_url, False
 
 
@@ -465,13 +485,34 @@ async def _check_live_for_user(client, username, target_chat, topic_id):
         return
     if time.time() < ggr_record_cooldown.get(username, 0):
         return  # Cooldown devrede
+
+    is_live_detected = False
     try:
         live_client = TikTokLiveClient(unique_id=username)
         _inject_tiktok_cookies(live_client)
-        if await live_client.is_live():
-            asyncio.create_task(record_tiktok_stream(client, username, target_chat, topic_id))
+        is_live_detected = await live_client.is_live()
     except Exception as live_err:
-        logging.error(t("log_tiktok_canl_sorgu_ha_38"), username, type(live_err).__name__, live_err)
+        # TikTokLive API'si WAF engeline takılırsa, çerezli web sayfasından doğrula
+        try:
+            import http.cookiejar, urllib.request, re
+            if os.path.exists("tiktok_cookies.txt"):
+                cj = http.cookiejar.MozillaCookieJar("tiktok_cookies.txt")
+                cj.load(ignore_discard=True, ignore_expires=True)
+                opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
+                opener.addheaders = [("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")]
+                resp = await asyncio.to_thread(opener.open, f"https://www.tiktok.com/@{username}/live")
+                html = (await asyncio.to_thread(resp.read)).decode("utf-8", errors="ignore")
+                if "pull" in html and (".flv" in html or ".m3u8" in html) and "SlardarWAF" not in html:
+                    is_live_detected = True
+                    logging.info("🎯 @%s WAF fallback ile canli yayinda oldugu teyit edildi!", username)
+        except Exception as fb_err:
+            logging.debug("Fallback live check error: %s", fb_err)
+
+        if not is_live_detected:
+            logging.error(t("log_tiktok_canl_sorgu_ha_38"), username, type(live_err).__name__, live_err)
+
+    if is_live_detected:
+        asyncio.create_task(record_tiktok_stream(client, username, target_chat, topic_id))
 
 
 async def _check_post_for_user(client, db, username, user_data, target_chat, topic_id):
