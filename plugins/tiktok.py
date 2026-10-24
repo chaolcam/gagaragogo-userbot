@@ -34,6 +34,7 @@ ggr_recording_users = {} # {username: True}
 ggr_recording_procs = {} # {username: subprocess_ptr}
 ggr_record_cooldown = {} # {username: timestamp_until_next_try}
 ggr_last_post_check = {} # {username: timestamp}
+ggr_last_offline_log = {} # {username: timestamp}
 ggr_post_check_interval = 300 # 5 dakika (300 saniye)
 RECORDING_USERS = ggr_recording_users
 RECORDING_PROCS = ggr_recording_procs
@@ -581,8 +582,11 @@ async def _check_live_for_user(client, username, target_chat, topic_id):
         live_client = TikTokLiveClient(unique_id=username)
         _inject_tiktok_cookies(live_client)
         is_live_detected = await live_client.is_live()
-    except Exception as live_err:
-        # TikTokLive API'si WAF engeline takılırsa, curl_cffi Chrome TLS ile doğrula
+    except Exception:
+        is_live_detected = False
+
+    if not is_live_detected:
+        # TikTokLive API'si False döndüyse veya engellendiyse, curl_cffi Chrome TLS ile doğrula
         try:
             from curl_cffi import requests as c_requests
             import re, json
@@ -617,6 +621,7 @@ async def _check_live_for_user(client, username, target_chat, topic_id):
                         break
                 except Exception as _c_err:
                     logging.debug("Live check curl error: %s", _c_err)
+
             # 1. SIGI_STATE status kontrolü (2: Canlı, 4: Bitti/Çevrimdışı)
             sigi_match = re.search(r'<script id="SIGI_STATE"[^>]*>(.*?)</script>', html)
             if sigi_match:
@@ -637,9 +642,12 @@ async def _check_live_for_user(client, username, target_chat, topic_id):
         except Exception as fb_err:
             logging.debug("Fallback live check error: %s", fb_err)
 
-        if not is_live_detected:
-            # Kullanıcı canlı yayında değil (veya oda kapalı), sessiz debug logu bas
-            logging.debug("TikTok canlı sorgu @%s: çevrimdışı (%s)", username, type(live_err).__name__)
+    if not is_live_detected:
+        # Render loglarında botun aktif tarama yaptığını göstermek için dakikada 1 info log bas
+        now = time.time()
+        if now - ggr_last_offline_log.get(username, 0) > 60:
+            ggr_last_offline_log[username] = now
+            logging.info("🔎 [TikTok Takip] @%s kontrol edildi: Çevrimdışı (Yayın kapalı)", username)
 
     if is_live_detected:
         asyncio.create_task(record_tiktok_stream(client, username, target_chat, topic_id))
