@@ -151,58 +151,71 @@ async def _extract_stream_url(live_client, username):
     try:
         from curl_cffi import requests as c_requests
         import re, json
-        cookie_dict = {}
+        proxy = get_tiktok_proxy()
+        proxies = {"http": proxy, "https": proxy} if proxy else None
+
+        # Once cookiesiz temiz istek yap (bozuk/eski cerezler TikTok tarafindan 403 ile engellenir)
+        cookie_attempts = [None]
         if os.path.exists("tiktok_cookies.txt"):
+            cookie_dict = {}
             with open("tiktok_cookies.txt", "r", encoding="utf-8", errors="ignore") as f:
                 for line in f:
                     if not line.startswith("#") and "\t" in line:
                         p = line.strip().split("\t")
                         if len(p) >= 7:
                             cookie_dict[p[5]] = p[6]
-        proxy = get_tiktok_proxy()
-        proxies = {"http": proxy, "https": proxy} if proxy else None
-        resp = await asyncio.to_thread(
-            c_requests.get,
-            target_url,
-            proxies=proxies,
-            cookies=cookie_dict if cookie_dict else None,
-            impersonate="chrome120",
-            timeout=15
-        )
-        html = resp.text
+            if cookie_dict:
+                cookie_attempts.append(cookie_dict)
 
-        # 1. SIGI_STATE JSON içinden direkt FLV/HLS akışını al
-        sigi_match = re.search(r'<script id="SIGI_STATE"[^>]*>(.*?)</script>', html)
-        if sigi_match:
+        for attempt_cookies in cookie_attempts:
             try:
-                sigi_data = json.loads(sigi_match.group(1))
-                live_room = sigi_data.get("LiveRoom", {}).get("liveRoomUserInfo", {}).get("liveRoom", {})
-                if live_room.get("status") == 2:  # 2: Kesin Canlı Yayında
-                    pull_raw = live_room.get("streamData", {}).get("pull_data", {}).get("stream_data")
-                    if pull_raw:
-                        sd = json.loads(pull_raw).get("data", {})
-                        for q in ["hd", "origin", "sd", "ld"]:
-                            if q in sd and "main" in sd[q]:
-                                flv_url = sd[q]["main"].get("flv")
-                                if flv_url:
-                                    logging.info("✅ @%s SIGI_STATE üzerinden direkt FLV URL alındı (kalite: %s)", username, q)
-                                    return flv_url, True
-                                hls_url = sd[q]["main"].get("hls")
-                                if hls_url:
-                                    logging.info("✅ @%s SIGI_STATE üzerinden direkt HLS URL alındı (kalite: %s)", username, q)
-                                    return hls_url, True
-            except Exception as _parse_err:
-                logging.debug("SIGI parse error: %s", _parse_err)
+                resp = await asyncio.to_thread(
+                    c_requests.get,
+                    target_url,
+                    proxies=proxies,
+                    cookies=attempt_cookies,
+                    impersonate="chrome120",
+                    timeout=15
+                )
+                if resp.status_code != 200 or len(resp.text) < 500:
+                    continue
 
-        # 2. Regex ile HTML içindeki CDN FLV/HLS URL'lerini tara
-        flvs = [u for u in re.findall(r'https?://[^\s"\'<>\\]+?\.flv[^\s"\'<>\\]*', html) if ("tiktokcdn" in u or "pull" in u) and "only_audio=1" not in u]
-        if flvs:
-            logging.info("✅ @%s Web sayfasından direkt FLV URL çekildi: %s", username, flvs[0][:100])
-            return flvs[0], True
-        hlss = [u for u in re.findall(r'https?://[^\s"\'<>\\]+?\.m3u8[^\s"\'<>\\]*', html) if ("tiktokcdn" in u or "pull" in u)]
-        if hlss:
-            logging.info("✅ @%s Web sayfasından direkt HLS URL çekildi: %s", username, hlss[0][:100])
-            return hlss[0], True
+                html = resp.text
+
+                # 1. SIGI_STATE JSON içinden direkt FLV/HLS akışını al
+                sigi_match = re.search(r'<script id="SIGI_STATE"[^>]*>(.*?)</script>', html)
+                if sigi_match:
+                    try:
+                        sigi_data = json.loads(sigi_match.group(1))
+                        live_room = sigi_data.get("LiveRoom", {}).get("liveRoomUserInfo", {}).get("liveRoom", {})
+                        if live_room.get("status") == 2:  # 2: Kesin Canlı Yayında
+                            pull_raw = live_room.get("streamData", {}).get("pull_data", {}).get("stream_data")
+                            if pull_raw:
+                                sd = json.loads(pull_raw).get("data", {})
+                                for q in ["hd", "origin", "sd", "ld"]:
+                                    if q in sd and "main" in sd[q]:
+                                        flv_url = sd[q]["main"].get("flv")
+                                        if flv_url:
+                                            logging.info("✅ @%s SIGI_STATE üzerinden direkt FLV URL alındı (kalite: %s)", username, q)
+                                            return flv_url, True
+                                        hls_url = sd[q]["main"].get("hls")
+                                        if hls_url:
+                                            logging.info("✅ @%s SIGI_STATE üzerinden direkt HLS URL alındı (kalite: %s)", username, q)
+                                            return hls_url, True
+                    except Exception as _parse_err:
+                        logging.debug("SIGI parse error: %s", _parse_err)
+
+                # 2. Regex ile HTML içindeki CDN FLV/HLS URL'lerini tara
+                flvs = [u for u in re.findall(r'https?://[^\s"\'<>\\]+?\.flv[^\s"\'<>\\]*', html) if ("tiktokcdn" in u or "pull" in u) and "only_audio=1" not in u]
+                if flvs:
+                    logging.info("✅ @%s Web sayfasından direkt FLV URL çekildi: %s", username, flvs[0][:100])
+                    return flvs[0], True
+                hlss = [u for u in re.findall(r'https?://[^\s"\'<>\\]+?\.m3u8[^\s"\'<>\\]*', html) if ("tiktokcdn" in u or "pull" in u)]
+                if hlss:
+                    logging.info("✅ @%s Web sayfasından direkt HLS URL çekildi: %s", username, hlss[0][:100])
+                    return hlss[0], True
+            except Exception as _attempt_err:
+                logging.debug("Stream extraction attempt hatasi: %s", _attempt_err)
     except Exception as web_ex:
         logging.error("Web fallback stream extraction hatasi: %s", web_ex)
 
@@ -214,13 +227,13 @@ def _build_record_cmd(output_file_base, target_url, is_direct_stream):
     cmd = [
         sys.executable, "-m", "yt_dlp",
         "--impersonate", "chrome",
-        "--retries", "2",
-        "--fragment-retries", "2",
+        "--retries", "5",
+        "--fragment-retries", "5",
     ]
     proxy = get_tiktok_proxy()
     if proxy:
         cmd.extend(["--proxy", proxy])
-    if os.path.exists("tiktok_cookies.txt"):
+    if not is_direct_stream and os.path.exists("tiktok_cookies.txt"):
         cmd.extend(["--cookies", "tiktok_cookies.txt"])
     if is_direct_stream:
         cmd.extend(["--remux-video", "mp4", "-o", f"{output_file_base}.%(ext)s", target_url])
@@ -368,10 +381,10 @@ async def _upload_video_part(client, output_file, username, part_no, target_chat
     if proc.returncode != 0:
         await client.send_message(
             target_chat,
-            f"\u2139\ufe0f <b>Bilgi:</b> Yayin su an cevrimdisi veya bitti (<code>@{username}</code>). 5 dakika boyunca tekrar denenmeyecek.",
+            f"\u2139\ufe0f <b>Bilgi:</b> Yayin su an cevrimdisi veya bitti (<code>@{username}</code>). 1 dakika sonra tekrar kontrol edilecek.",
             reply_to_message_id=topic_id
         )
-        ggr_record_cooldown[username] = time.time() + 300
+        ggr_record_cooldown[username] = time.time() + 60
     return False
 
 
@@ -402,13 +415,21 @@ async def record_tiktok_stream(client, username, target_chat, topic_id=None):
                 is_live = False
 
             output_file_base = os.path.join(download_dir, f"part_{part_no:03d}")
-            target_url, is_direct_stream = await _extract_stream_url(live_client, username)
+            
+            # Direkt FLV stream URL'sini cek (gerekirse 3 kez yeniden dene)
+            target_url, is_direct_stream = None, False
+            for retry_i in range(3):
+                target_url, is_direct_stream = await _extract_stream_url(live_client, username)
+                if is_direct_stream:
+                    break
+                await asyncio.sleep(2)
 
-            # Eger is_live hata verdiyse ama web scraper'dan direkt stream linki geldiyse yayin aktiftir
-            if not is_live and is_direct_stream:
+            # Eger web scraper'dan direkt stream linki geldiyse yayin kesin aktiftir
+            if is_direct_stream:
                 is_live = True
 
-            if not is_live:
+            if not is_live and not is_direct_stream:
+                logging.info("🔴 @%s canli yayin akisi alinamadi veya yayin bitti.", username)
                 break
             if not is_direct_stream:
                 logging.warning("\u26a0\ufe0f @%s direkt stream URL alinamadi, webpage URL kullanilacak", username)
@@ -564,26 +585,38 @@ async def _check_live_for_user(client, username, target_chat, topic_id):
         # TikTokLive API'si WAF engeline takılırsa, curl_cffi Chrome TLS ile doğrula
         try:
             from curl_cffi import requests as c_requests
-            import re
-            cookie_dict = {}
+            import re, json
+            proxy = get_tiktok_proxy()
+            proxies = {"http": proxy, "https": proxy} if proxy else None
+
+            cookie_attempts = [None]
             if os.path.exists("tiktok_cookies.txt"):
+                cookie_dict = {}
                 with open("tiktok_cookies.txt", "r", encoding="utf-8", errors="ignore") as f:
                     for line in f:
                         if not line.startswith("#") and "\t" in line:
                             p = line.strip().split("\t")
                             if len(p) >= 7:
                                 cookie_dict[p[5]] = p[6]
-            proxy = get_tiktok_proxy()
-            proxies = {"http": proxy, "https": proxy} if proxy else None
-            resp = await asyncio.to_thread(
-                c_requests.get,
-                f"https://www.tiktok.com/@{username}/live",
-                proxies=proxies,
-                cookies=cookie_dict if cookie_dict else None,
-                impersonate="chrome120",
-                timeout=15
-            )
-            html = resp.text
+                if cookie_dict:
+                    cookie_attempts.append(cookie_dict)
+
+            html = ""
+            for attempt_cookies in cookie_attempts:
+                try:
+                    resp = await asyncio.to_thread(
+                        c_requests.get,
+                        f"https://www.tiktok.com/@{username}/live",
+                        proxies=proxies,
+                        cookies=attempt_cookies,
+                        impersonate="chrome120",
+                        timeout=15
+                    )
+                    if resp.status_code == 200 and len(resp.text) >= 500:
+                        html = resp.text
+                        break
+                except Exception as _c_err:
+                    logging.debug("Live check curl error: %s", _c_err)
             # 1. SIGI_STATE status kontrolü (2: Canlı, 4: Bitti/Çevrimdışı)
             sigi_match = re.search(r'<script id="SIGI_STATE"[^>]*>(.*?)</script>', html)
             if sigi_match:
