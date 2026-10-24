@@ -219,19 +219,9 @@ async def tek_bulut_db_guncelle(client=None) -> None:
 
         if mevcut_dosya_mesaji:
             try:
-                await client.edit_message_media(
-                    chat_id="me",
-                    message_id=mevcut_dosya_mesaji.id,
-                    media=InputMediaDocument(dosya_akisi, caption=BULUT_DB_CAPTION, parse_mode=ParseMode.HTML)
-                )
-                logger.debug("Bulut DB dosyası başarıyla edit_message_media ile güncellendi.")
-                return
-            except Exception as edit_err:
-                logger.warning("edit_message_media yapılamadı (%s), yeni dosya gönderilip eskisi temizleniyor...", edit_err)
-                try:
-                    await mevcut_dosya_mesaji.delete()
-                except Exception as _del_err:
-                    logger.debug("Mevcut dosya silinemedi: %s", _del_err)
+                await mevcut_dosya_mesaji.delete()
+            except Exception as _del_err:
+                logger.debug("Mevcut dosya silinemedi: %s", _del_err)
 
         await client.send_document(
             chat_id="me",

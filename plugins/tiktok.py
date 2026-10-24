@@ -460,6 +460,7 @@ async def _check_live_for_user(client, username, target_chat, topic_id):
         return  # Cooldown devrede
     try:
         live_client = TikTokLiveClient(unique_id=username)
+        _inject_tiktok_cookies(live_client)
         if await live_client.is_live():
             asyncio.create_task(record_tiktok_stream(client, username, target_chat, topic_id))
     except Exception as live_err:
